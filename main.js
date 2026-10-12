@@ -1,34 +1,8 @@
-import {
-  createIcons,
-  ShoppingCart,
-  History,
-  Wallet,
-  Volume2,
-  VolumeX,
-  Download,
-  Plus,
-  Minus,
-  Search,
-  X,
-  PlusCircle,
-  Receipt,
-  FileText,
-  Copy,
-  RotateCcw,
-  Upload,
-  Check,
-  CheckCircle2,
-  Tag,
-  Percent,
-  TrendingUp,
-  TrendingDown,
-  Sparkles,
-  ShieldAlert,
-  ShieldCheck,
-  ShoppingBasket,
-  ReceiptText
-} from 'lucide';
-import confetti from 'canvas-confetti';
+// ==========================================================================
+// SMART GROCERY & BUDGET SAFETY TRACKER (PWA)
+// Mobile-First Architecture for Anak Rantau
+// ==========================================================================
+
 
 // ==========================================================================
 // CONSTANTS & SEED DATA (Realistis untuk Siswa/Mahasiswa Rantau)
@@ -232,12 +206,12 @@ const sound = new SoundManager();
 // UTILITY FUNCTIONS: CURRENCY & MATH
 // ==========================================================================
 
-export function formatRupiah(num) {
+function formatRupiah(num) {
   if (isNaN(num) || num === null || num === undefined) return '0';
   return Math.round(num).toLocaleString('id-ID');
 }
 
-export function parseRupiahInput(str) {
+function parseRupiahInput(str) {
   if (!str) return 0;
   const cleaned = String(str).replace(/[^0-9]/g, '');
   return parseInt(cleaned, 10) || 0;
@@ -250,7 +224,7 @@ export function parseRupiahInput(str) {
  * - single: unitPrice * (1 - d1/100)
  * - tiered: unitPrice * (1 - d1/100) * (1 - d2/100)
  */
-export function calculateItemPricing(item) {
+function calculateItemPricing(item) {
   const qty = parseFloat(item.qty) || 0;
   const unitPrice = parseFloat(item.unitPrice) || 0;
   const normalRowTotal = unitPrice * qty;
@@ -287,7 +261,7 @@ export function calculateItemPricing(item) {
  * - equal: Stabil = (Rp 0)
  * - new: Item Baru
  */
-export function comparePriceWithPrevMonth(itemName, currentUnitPrice) {
+function comparePriceWithPrevMonth(itemName, currentUnitPrice) {
   if (!itemName) return { status: 'new', diffVal: 0, diffPct: 0, prevPrice: 0 };
   
   // Cari di database bulan lalu (case-insensitive)
@@ -365,37 +339,9 @@ function saveState() {
 // ==========================================================================
 
 function updateIcons() {
-  createIcons({
-    icons: {
-      ShoppingCart,
-      History,
-      Wallet,
-      Volume2,
-      VolumeX,
-      Download,
-      Plus,
-      Minus,
-      Search,
-      X,
-      PlusCircle,
-      Receipt,
-      FileText,
-      Copy,
-      RotateCcw,
-      Upload,
-      Check,
-      CheckCircle2,
-      Tag,
-      Percent,
-      TrendingUp,
-      TrendingDown,
-      Sparkles,
-      ShieldAlert,
-      ShieldCheck,
-      ShoppingBasket,
-      ReceiptText
-    }
-  });
+  if (window.lucide && typeof window.lucide.createIcons === 'function') {
+    window.lucide.createIcons();
+  }
 }
 
 /**
@@ -1033,11 +979,13 @@ function openCheckoutModal() {
     verdictCard.classList.add('safe');
     verdictTitle.textContent = '🎉 Misi Hemat Berhasil!';
     verdictDesc.textContent = `Kamu berhasil berhemat dan masih menyisakan Rp ${formatRupiah(balance)} di dompet!`;
-    confetti({
-      particleCount: 80,
-      spread: 70,
-      origin: { y: 0.6 }
-    });
+    if (typeof window.confetti === 'function') {
+      window.confetti({
+        particleCount: 80,
+        spread: 70,
+        origin: { y: 0.6 }
+      });
+    }
     sound.playSuccess();
   } else {
     balanceLabel.textContent = 'DEFISIT / OVERBUDGET:';
@@ -1368,7 +1316,7 @@ let deferredPrompt = null;
 function setupPWA() {
   if ('serviceWorker' in navigator) {
     window.addEventListener('load', () => {
-      navigator.serviceWorker.register('/sw.js').catch((err) => {
+      navigator.serviceWorker.register('./sw.js').catch((err) => {
         console.warn('SW registration failed:', err);
       });
     });

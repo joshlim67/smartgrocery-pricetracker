@@ -1,10 +1,14 @@
 // Service Worker for Smart Grocery PWA
-const CACHE_NAME = 'smart-grocery-v1';
+const CACHE_NAME = 'smart-grocery-v2';
 const ASSETS_TO_CACHE = [
-  '/',
-  '/index.html',
-  '/manifest.webmanifest',
-  '/icon.svg'
+  './',
+  './index.html',
+  './style.css',
+  './main.js',
+  './manifest.webmanifest',
+  './icon.svg',
+  './vendor/lucide.min.js',
+  './vendor/confetti.browser.js'
 ];
 
 self.addEventListener('install', (event) => {
@@ -30,7 +34,6 @@ self.addEventListener('activate', (event) => {
 });
 
 self.addEventListener('fetch', (event) => {
-  // Stale-while-revalidate strategy for same-origin requests
   if (event.request.method === 'GET') {
     event.respondWith(
       caches.match(event.request).then((cachedResponse) => {
@@ -43,7 +46,6 @@ self.addEventListener('fetch', (event) => {
           }
           return networkResponse;
         }).catch(() => {
-          // If offline and not in cache, fallback
           return cachedResponse;
         });
 

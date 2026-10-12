@@ -12,16 +12,16 @@
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="apple-mobile-web-app-title" content="SmartGrocery">
   <meta name="format-detection" content="telephone=no">
-  <link rel="manifest" href="/manifest.webmanifest">
-  <link rel="icon" type="image/svg+xml" href="/icon.svg">
-  <link rel="apple-touch-icon" href="/icon.svg">
+  <link rel="manifest" href="./manifest.webmanifest">
+  <link rel="icon" type="image/svg+xml" href="./icon.svg">
+  <link rel="apple-touch-icon" href="./icon.svg">
 
   <!-- Google Fonts: Plus Jakarta Sans for crisp modern typography -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
   
-  <link rel="stylesheet" href="/style.css">
+  <link rel="stylesheet" href="./style.css">
 </head>
 <body>
   <!-- Desktop Frame Simulator Wrapper (Centered, Max 430px) -->
@@ -612,7 +612,10 @@
   <!-- Audio elements / Canvas Confetti container -->
   <div id="confetti-container"></div>
 
-  <!-- Main JavaScript Entrypoint -->
-  <script type="module" src="/main.js"></script>
+  <!-- Vendor Scripts (Offline & GitHub Pages compatible) -->
+  <script src="./vendor/lucide.min.js"></script>
+  <script src="./vendor/confetti.browser.js"></script>
+  <!-- Main Application Logic -->
+  <script src="./main.js" defer></script>
 </body>
 </html>
