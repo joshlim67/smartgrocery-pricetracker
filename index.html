@@ -41,6 +41,10 @@
         </div>
 
         <div class="header-actions">
+          <button id="btn-cloud-sync" class="icon-btn-glass cloud-sync-btn" title="Status Sinkronisasi Firebase" aria-label="Status Cloud">
+            <i data-lucide="cloud" id="cloud-icon"></i>
+            <span class="cloud-status-dot disconnected" id="cloud-status-dot"></span>
+          </button>
           <button id="btn-sound-toggle" class="icon-btn-glass" title="Toggle Suara Audio Haptic" aria-label="Toggle Suara">
             <i data-lucide="volume-2" id="sound-icon"></i>
           </button>
@@ -609,6 +613,107 @@
     </div>
   </div>
 
+  <!-- ================= MODAL: PENGATURAN CLOUD SYNC FIREBASE ================= -->
+  <div id="cloud-sync-modal" class="bottom-sheet-backdrop hidden" role="dialog" aria-modal="true" aria-labelledby="modal-cloud-title">
+    <div class="bottom-sheet-card glass-sheet">
+      <div class="sheet-drag-handle"></div>
+
+      <div class="sheet-header">
+        <div class="sheet-header-title">
+          <i data-lucide="cloud" class="text-primary"></i>
+          <h2 id="modal-cloud-title">Sinkronisasi Cloud Firebase</h2>
+        </div>
+        <button id="btn-close-cloud-modal" class="btn-sheet-close" aria-label="Tutup">
+          <i data-lucide="x"></i>
+        </button>
+      </div>
+
+      <div class="sheet-body-scroll">
+        <!-- Status Card -->
+        <div class="cloud-status-banner glass-card-nested">
+          <div class="status-indicator-row">
+            <span class="status-pulse-dot" id="cloud-modal-dot"></span>
+            <div>
+              <div class="status-title-row">
+                <strong id="cloud-modal-status-text" class="status-text disconnected">Memeriksa koneksi...</strong>
+              </div>
+              <p class="status-subtitle">Mode 1 Database Bersama (Semua device PC & HP otomatis sinkron realtime)</p>
+            </div>
+          </div>
+          <div class="last-sync-row">
+            <span>Sinkronisasi Terakhir:</span>
+            <strong id="cloud-modal-last-sync">-</strong>
+          </div>
+        </div>
+
+        <!-- Info Card: Single User / Multi-Device Shared State -->
+        <div class="cloud-info-box glass-card-nested">
+          <div class="info-title">
+            <i data-lucide="info" class="text-amber"></i>
+            <span>Sinkron Otomatis PC & HP</span>
+          </div>
+          <p class="info-desc">
+            Aplikasi ini menggunakan <strong>1 Database Bersama (Shared Realtime Document)</strong>. Begitu Anda input barang di PC, layar HP Anda yang sedang membuka web ini akan <strong>otomatis langsung ter-update realtime</strong> tanpa perlu reload.
+          </p>
+        </div>
+
+        <!-- Firebase Config Input Section -->
+        <div class="cloud-config-section">
+          <label class="form-label" for="firebase-config-textarea">
+            <span>Konfigurasi Firebase Web (firebaseConfig)</span>
+            <span class="text-hint">Salin dari Firebase Console</span>
+          </label>
+          <p class="config-instructions">
+            Jika belum diisi di file <code>firebase-config.js</code>, Anda dapat menempelkan objek konfigurasi atau JSON di bawah ini:
+          </p>
+
+          <textarea id="firebase-config-textarea" class="glass-textarea" rows="7" placeholder='{
+  "apiKey": "AIzaSy...",
+  "authDomain": "project-id.firebaseapp.com",
+  "projectId": "project-id",
+  "storageBucket": "project-id.firebasestorage.app",
+  "messagingSenderId": "...",
+  "appId": "..."
+}'></textarea>
+
+          <div class="config-actions-row">
+            <button type="button" id="btn-save-firebase-config" class="btn-glow-primary">
+              <i data-lucide="save"></i> Simpan & Hubungkan
+            </button>
+            <button type="button" id="btn-clear-firebase-config" class="btn-ghost-danger">
+              <i data-lucide="trash-2"></i> Reset
+            </button>
+          </div>
+        </div>
+
+        <!-- Quick Firestore Rules Guide -->
+        <div class="rules-guide-box glass-card-nested">
+          <div class="rules-header">
+            <i data-lucide="shield-alert" class="text-emerald"></i>
+            <span>Pastikan Security Rules Firestore Aktif:</span>
+          </div>
+          <p class="rules-desc">Di Firebase Console &rarr; Firestore Database &rarr; Tab <strong>Rules</strong>, gunakan aturan ini agar PC & HP bisa membaca & menulis:</p>
+          <pre class="rules-code"><code>rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    match /{document=**} {
+      allow read, write: if true;
+    }
+  }
+}</code></pre>
+        </div>
+
+      </div>
+
+      <div class="sheet-footer">
+        <button type="button" id="btn-manual-sync-now" class="btn-giant-thumb">
+          <i data-lucide="refresh-cw"></i>
+          <span>Paksa Sinkronkan Sekarang</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
   <!-- Audio elements / Canvas Confetti container -->
   <div id="confetti-container"></div>
 
@@ -617,5 +722,7 @@
   <script src="./vendor/confetti.browser.js"></script>
   <!-- Main Application Logic -->
   <script src="./main.js" defer></script>
+  <!-- Firebase Realtime Sync Module (Multi-Device) -->
+  <script type="module" src="./firebase-sync.js"></script>
 </body>
 </html>

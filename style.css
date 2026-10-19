@@ -2038,5 +2038,212 @@ body::after {
   color: rgba(255, 255, 255, 0.8);
 }
 
+/* CLOUD SYNC FIREBASE STYLES */
+.cloud-sync-btn {
+  position: relative;
+}
+
+.cloud-status-dot {
+  position: absolute;
+  top: 6px;
+  right: 6px;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  border: 1.5px solid var(--bg-dark);
+  transition: all 0.3s ease;
+}
+
+.cloud-status-dot.connected {
+  background: var(--emerald);
+  box-shadow: 0 0 8px var(--emerald-glow);
+}
+
+.cloud-status-dot.syncing {
+  background: var(--primary);
+  box-shadow: 0 0 8px var(--primary-glow);
+  animation: pulse-sync 1s infinite alternate;
+}
+
+.cloud-status-dot.disconnected {
+  background: var(--amber);
+  box-shadow: 0 0 6px var(--amber-glow);
+}
+
+.cloud-status-dot.error {
+  background: var(--crimson);
+  box-shadow: 0 0 8px var(--crimson-glow);
+}
+
+@keyframes pulse-sync {
+  from { opacity: 0.4; transform: scale(0.85); }
+  to { opacity: 1; transform: scale(1.15); }
+}
+
+.cloud-status-banner {
+  padding: 14px;
+  border-radius: 14px;
+  background: var(--bg-card-nested);
+  border: 1px solid var(--glass-border);
+  margin-bottom: 14px;
+}
+
+.status-indicator-row {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+}
+
+.status-pulse-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  margin-top: 5px;
+  flex-shrink: 0;
+}
+
+.status-text.connected { color: var(--emerald-light); font-weight: 700; }
+.status-text.disconnected { color: var(--amber); font-weight: 700; }
+.status-text.syncing { color: var(--primary); font-weight: 700; }
+.status-text.error { color: #fda4af; font-weight: 700; }
+
+.status-subtitle {
+  font-size: 0.72rem;
+  color: var(--text-muted);
+  margin-top: 3px;
+  line-height: 1.4;
+}
+
+.last-sync-row {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  margin-top: 10px;
+  padding-top: 8px;
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.last-sync-row strong {
+  color: #fff;
+}
+
+.cloud-info-box {
+  margin-bottom: 14px;
+  padding: 12px;
+  border-radius: 12px;
+  background: rgba(56, 189, 248, 0.07);
+  border: 1px solid rgba(56, 189, 248, 0.22);
+}
+
+.info-title {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.82rem;
+  font-weight: 700;
+  color: #fff;
+  margin-bottom: 6px;
+}
+
+.info-desc {
+  font-size: 0.72rem;
+  color: #cbd5e1;
+  line-height: 1.45;
+}
+
+.cloud-config-section {
+  margin-bottom: 14px;
+}
+
+.config-instructions {
+  font-size: 0.72rem;
+  color: var(--text-muted);
+  margin-bottom: 8px;
+}
+
+.glass-textarea {
+  width: 100%;
+  background: rgba(8, 12, 22, 0.85);
+  border: 1px solid var(--glass-border);
+  border-radius: 10px;
+  padding: 10px 12px;
+  color: #e2e8f0;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  font-size: 0.74rem;
+  resize: vertical;
+  line-height: 1.4;
+  outline: none;
+  box-sizing: border-box;
+}
+
+.glass-textarea:focus {
+  border-color: var(--primary);
+  box-shadow: 0 0 10px var(--primary-glow);
+}
+
+.config-actions-row {
+  display: flex;
+  gap: 10px;
+  margin-top: 10px;
+}
+
+.btn-ghost-danger {
+  background: rgba(244, 63, 94, 0.12);
+  border: 1px solid rgba(244, 63, 94, 0.3);
+  color: #fda4af;
+  padding: 10px 16px;
+  border-radius: 10px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  transition: all 0.2s ease;
+}
+
+.btn-ghost-danger:hover {
+  background: rgba(244, 63, 94, 0.25);
+  border-color: rgba(244, 63, 94, 0.6);
+}
+
+.rules-guide-box {
+  padding: 12px;
+  border-radius: 12px;
+  background: rgba(16, 185, 129, 0.07);
+  border: 1px solid rgba(16, 185, 129, 0.25);
+  margin-bottom: 14px;
+}
+
+.rules-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: #fff;
+  margin-bottom: 6px;
+}
+
+.rules-desc {
+  font-size: 0.7rem;
+  color: var(--text-muted);
+  margin-bottom: 6px;
+}
+
+.rules-code {
+  background: #050811;
+  padding: 10px;
+  border-radius: 8px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  font-size: 0.7rem;
+  color: #38bdf8;
+  overflow-x: auto;
+  margin: 0;
+  font-family: ui-monospace, monospace;
+}
+
 /* UTILITY CLASSES */
 .hidden { display: none !important; }
+

@@ -322,7 +322,7 @@ function loadStateFromStorage() {
   }
 }
 
-function saveState() {
+function saveStateToLocalStorage() {
   try {
     localStorage.setItem(STORAGE_KEYS.SAFETY_CAP, state.safetyCap);
     localStorage.setItem(STORAGE_KEYS.CART, JSON.stringify(state.cart));
@@ -333,6 +333,29 @@ function saveState() {
     console.error('Error saving state to localStorage:', err);
   }
 }
+
+function saveState() {
+  saveStateToLocalStorage();
+
+  // Push realtime update ke Firebase Cloud Firestore (jika terhubung)
+  if (window.FirebaseSync && typeof window.FirebaseSync.pushLocalState === 'function') {
+    window.FirebaseSync.pushLocalState();
+  }
+}
+
+// Global Bridge untuk integrasi modul Firebase Sync
+window.SmartGrocery = {
+  state,
+  sound,
+  saveStateToLocalStorage,
+  renderAll: () => {
+    renderCartItems();
+    renderHistorySessions();
+    renderBudgetBreakdown();
+    updateSafetyCapBanner();
+    updateIcons();
+  }
+};
 
 // ==========================================================================
 // RENDER & DOM BINDINGS
@@ -1499,6 +1522,99 @@ function setupEventListeners() {
   document.getElementById('btn-confirm-save-receipt').onclick = confirmCheckoutAndSave;
   document.getElementById('btn-close-history-modal').onclick = () => {
     document.getElementById('history-detail-modal').classList.add('hidden');
+  };
+
+  // Cloud Sync Firebase Modal Handlers
+  const cloudModal = document.getElementById('cloud-sync-modal');
+  const cloudTextarea = document.getElementById('firebase-config-textarea');
+  
+  document.getElementById('btn-cloud-sync').onclick = () => {
+    if (window.FirebaseSync && typeof window.FirebaseSync.getConfig === 'function') {
+      const cfg = window.FirebaseSync.getConfig();
+      if (cfg && !cloudTextarea.value.trim()) {
+        const cleanCfg = { ...cfg };
+        delete cleanCfg.source;
+        cloudTextarea.value = JSON.stringify(cleanCfg, null, 2);
+      }
+    }
+    cloudModal.classList.remove('hidden');
+    sound.playClick();
+  };
+
+  document.getElementById('btn-close-cloud-modal').onclick = () => {
+    cloudModal.classList.add('hidden');
+  };
+
+  // Helper parser fleksibel: mendukung JSON maupun JS Object literal dari Firebase Console
+  function parseFirebaseConfigInput(text) {
+    if (!text || !text.trim()) return null;
+    const raw = text.trim();
+    try {
+      return JSON.parse(raw);
+    } catch (_) {}
+
+    const extract = (key) => {
+      const match = raw.match(new RegExp(`['"]?${key}['"]?\\s*:\\s*['"\`]([^'"\`]+)['"\`]`));
+      return match ? match[1] : '';
+    };
+
+    const apiKey = extract('apiKey');
+    const projectId = extract('projectId');
+    if (apiKey && projectId) {
+      return {
+        apiKey,
+        projectId,
+        authDomain: extract('authDomain'),
+        storageBucket: extract('storageBucket'),
+        messagingSenderId: extract('messagingSenderId'),
+        appId: extract('appId')
+      };
+    }
+    return null;
+  }
+
+  document.getElementById('btn-save-firebase-config').onclick = async () => {
+    const parsed = parseFirebaseConfigInput(cloudTextarea.value);
+    if (!parsed || !parsed.apiKey || !parsed.projectId) {
+      alert('Format konfigurasi tidak valid! Pastikan mengandung apiKey dan projectId dari Firebase Console.');
+      sound.playWarning();
+      return;
+    }
+
+    try {
+      if (window.FirebaseSync && typeof window.FirebaseSync.saveCustomConfig === 'function') {
+        const ok = await window.FirebaseSync.saveCustomConfig(parsed);
+        if (ok) {
+          alert('Berhasil terhubung ke Firebase! Database sekarang tersinkron realtime dengan HP & PC.');
+          sound.playSuccess();
+        } else {
+          alert('Gagal menyambung ke Firebase. Periksa kembali apiKey & Security Rules Firestore Anda.');
+          sound.playWarning();
+        }
+      }
+    } catch (err) {
+      alert('Error: ' + err.message);
+      sound.playWarning();
+    }
+  };
+
+  document.getElementById('btn-clear-firebase-config').onclick = () => {
+    if (confirm('Hapus konfigurasi Firebase yang tersimpan? Aplikasi akan kembali ke mode penyimpanan lokal offline.')) {
+      if (window.FirebaseSync && typeof window.FirebaseSync.clearCustomConfig === 'function') {
+        window.FirebaseSync.clearCustomConfig();
+      }
+      cloudTextarea.value = '';
+      alert('Konfigurasi Firebase lokal berhasil dihapus.');
+      sound.playClick();
+    }
+  };
+
+  document.getElementById('btn-manual-sync-now').onclick = () => {
+    if (window.FirebaseSync && typeof window.FirebaseSync.pushLocalState === 'function') {
+      window.FirebaseSync.pushLocalState(true);
+      alert('Perintah sinkronisasi manual telah dikirim ke Cloud Firestore.');
+      sound.playSuccess();
+    }
   };
 
   // Safety Cap Settings on Tab Budget

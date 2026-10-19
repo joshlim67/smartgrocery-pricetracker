@@ -1,10 +1,12 @@
 // Service Worker for Smart Grocery PWA
-const CACHE_NAME = 'smart-grocery-v2';
+const CACHE_NAME = 'smart-grocery-v3';
 const ASSETS_TO_CACHE = [
   './',
   './index.html',
   './style.css',
   './main.js',
+  './firebase-config.js',
+  './firebase-sync.js',
   './manifest.webmanifest',
   './icon.svg',
   './vendor/lucide.min.js',
