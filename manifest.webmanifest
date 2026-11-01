@@ -1,12 +1,12 @@
 {
-  "name": "Smart Grocery - Budget Safety Tracker",
-  "short_name": "SmartGrocery",
-  "description": "Aplikasi PWA pelacak belanja supermarket dan pengaman anggaran belanja bulanan anak rantau.",
+  "name": "GroceryX - Smart Grocery Tracker",
+  "short_name": "GroceryX",
+  "description": "Aplikasi PWA modern pelacak belanja supermarket dan pengaman anggaran belanja bulanan.",
   "start_url": "./",
   "display": "standalone",
   "orientation": "portrait",
-  "background_color": "#090d16",
-  "theme_color": "#090d16",
+  "background_color": "#e8eef8",
+  "theme_color": "#2563eb",
   "icons": [
     {
       "src": "./icon.svg",
@@ -15,12 +15,16 @@
       "purpose": "any maskable"
     }
   ],
-  "categories": ["finance", "shopping", "utilities"],
+  "categories": [
+    "finance",
+    "shopping",
+    "utilities"
+  ],
   "shortcuts": [
     {
       "name": "Troli Belanja",
       "url": "./#cart",
-      "description": "Buka troli belanja aktif"
+      "description": "Buka troli belanja GroceryX"
     },
     {
       "name": "Pengendali Anggaran",
