@@ -1,216 +1,106 @@
-// ==========================================================================
-// GROCERYX • SMART GROCERY & BUDGET SAFETY TRACKER (PWA)
-// Liquid Glass Translucent Design Architecture with Full i18n
-// ==========================================================================
+/**
+ * GROCERYX 2.0 • Modern Food E-Commerce & Smart Budget Safety Tracker
+ * Architecture: Vanilla ES Modules, Liquid Glass UI, Mobile-First 430px Chassis
+ */
 
 // ==========================================================================
-// CONSTANTS, DICTIONARY & SEED DATA
+// 1. I18N DICTIONARIES (INDONESIAN & ENGLISH)
 // ==========================================================================
 
-const STORAGE_KEYS = {
-  SAFETY_CAP: 'sg_safety_cap_v1',
-  CART: 'sg_cart_items_v1',
-  HISTORY: 'sg_history_sessions_v1',
-  PREV_CATALOG: 'sg_prev_catalog_v1',
-  SOUND_ENABLED: 'sg_sound_enabled_v1',
-  CURRENT_USER: 'sg_current_user_v1',
-  USERS_LIST: 'sg_users_list_v1',
-  THEME: 'sg_theme_v1',
-  LANGUAGE: 'sg_language_v1',
-  CUSTOM_CATEGORIES: 'sg_custom_categories_v1'
-};
-
-const DEFAULT_ADMIN = {
-  username: 'josh',
-  email: 'joshualim@mutiarabangsa.sch.id',
-  password: 'hellojosh672009',
-  role: 'admin'
-};
-
-// Clean Categories without any emojis
-const DEFAULT_CATEGORIES_ID = [
-  'Bahan Pokok',
-  'Makanan Instan & Olahan',
-  'Daging & Seafood Segar',
-  'Sayur & Buah Segar',
-  'Bumbu & Dapur',
-  'Susu, Keju & Olahan',
-  'Kopi, Teh & Minuman',
-  'Perlengkapan Mandi & Tubuh',
-  'Sabun Cuci & Deterjen',
-  'Camilan & Snack',
-  'Pembersih Rumah & Dapur',
-  'Kesehatan & Obat-obatan',
-  'Lainnya'
-];
-
-const DEFAULT_CATEGORIES_EN = [
-  'Staple Foods',
-  'Instant & Processed Food',
-  'Meat & Seafood',
-  'Fresh Vegetables & Fruits',
-  'Kitchen Spices & Seasoning',
-  'Dairy, Cheese & Milk',
-  'Coffee, Tea & Beverages',
-  'Bath & Body Care',
-  'Laundry & Detergent',
-  'Snacks & Biscuits',
-  'Household Cleaning',
-  'Health & Medicine',
-  'Others'
-];
-
-const CATEGORY_MAP_ID_TO_EN = {
-  'Bahan Pokok': 'Staple Foods',
-  'Makanan Instan & Olahan': 'Instant & Processed Food',
-  'Daging & Seafood Segar': 'Meat & Seafood',
-  'Sayur & Buah Segar': 'Fresh Vegetables & Fruits',
-  'Bumbu & Dapur': 'Kitchen Spices & Seasoning',
-  'Susu, Keju & Olahan': 'Dairy, Cheese & Milk',
-  'Kopi, Teh & Minuman': 'Coffee, Tea & Beverages',
-  'Perlengkapan Mandi & Tubuh': 'Bath & Body Care',
-  'Sabun Cuci & Deterjen': 'Laundry & Detergent',
-  'Camilan & Snack': 'Snacks & Biscuits',
-  'Pembersih Rumah & Dapur': 'Household Cleaning',
-  'Kesehatan & Obat-obatan': 'Health & Medicine',
-  'Lainnya': 'Others'
-};
-
-const CATEGORY_MAP_EN_TO_ID = Object.fromEntries(
-  Object.entries(CATEGORY_MAP_ID_TO_EN).map(([k, v]) => [v, k])
-);
-
-// I18N DICTIONARY (INDONESIAN & ENGLISH)
 const I18N = {
   id: {
-    appSubtitle: 'Mode Troli Supermarket',
-    cartEmptyTitle: 'Troli Belanja Masih Kosong',
-    cartEmptyDesc: 'Mulai tambahkan barang saat kamu menyusuri lorong rak supermarket.',
-    addFirstItem: 'Tambah Item Pertama',
-    addToCartBtn: 'Tambah Barang ke Troli',
+    appTitle: 'GroceryX',
+    appSubtitle: 'Troli Belanja Supermarket',
+    cartEmptyTitle: 'Keranjang Belanja Masih Kosong',
+    cartEmptyDesc: 'Pilih produk makanan segar dan hemat di Etalase untuk mulai berbelanja.',
+    emptyGoShopBtn: 'Buka Etalase Produk',
+    catalogTitle: 'Menampilkan Produk Makanan',
+    pinHint: 'Klik ❤️ untuk Pin ke Atas',
+    addProdBtn: 'Tambah Produk Baru',
+    bundleTitle: 'Paket Hemat Spesial',
+    bundleSub: 'Diskon s/d 20%',
+    bundleBuyBtn: 'Beli Paket',
+    cartPageTitle: 'Keranjang Belanja',
+    cartPageDesc: 'Periksa kuantitas item, masukkan voucher diskon, dan amankan budget Anda.',
+    voucherTitle: 'Voucher & Kode Diskon',
+    applyVoucherBtn: 'Terapkan',
+    voucherPlaceholder: 'cth: GROCERYHEMAT',
     totalItemsPrefix: 'Total Barang:',
     savedPrefix: 'Hemat',
+    voucherDiscountTitle: 'Diskon Voucher:',
     totalPriceTitle: 'Total Belanja:',
     checkoutBtn: 'Selesaikan & Simpan Struk',
-    searchPlaceholder: 'Cari item dalam troli...',
-    categoryAll: 'Semua',
     historyTitle: 'Riwayat Belanja Bulanan',
     historyDesc: 'Data struk tersimpan sebagai acuan komparator harga belanja berikutnya.',
     histCurrLabel: 'Total Belanja Sesi Ini',
     histCurrCaption: 'Sesi berjalan',
     histPrevLabel: 'Belanja Sebelumnya',
-    histPrevCaption: 'Pembanding Acuan',
+    histPrevCaption: 'Struk acuan harga',
     exportBtn: 'Ekspor Data',
     clearBtn: 'Kosongkan Data',
-    emptyHistoryTitle: 'Belum Ada Riwayat Struk',
-    emptyHistoryDesc: 'Struk belanja yang telah diselesaikan akan tercatat rapi di sini.',
-    viewReceipt: 'Lihat Struk',
-    budgetTitle: 'Pengendali Anggaran (Safety Cap)',
-    budgetDesc: 'Lindungi dompet dan kontrol pengeluaran belanja supermarket secara akurat.',
-    safetyCapLabel: 'Batas Maksimal Dompet Belanja:',
-    safetyCapBadge: 'Wajib Diisi',
+    emptyHistoryTitle: 'Belum Ada Struk Belanja',
+    emptyHistoryDesc: 'Struk belanja yang telah diselesaikan akan tersimpan rapi di sini.',
+    sehatTitle: 'Sehat Meter',
+    sehatSub: 'Nutri-Score & analisis kualitas kesehatan produk makanan yang Anda beli.',
+    sehatCaption: 'Skor Makanan Sehat',
+    statFresh: 'Bahan Segar<br>& Alami',
+    statNeutral: 'Olahan<br>Seimbang',
+    statJunk: 'Tinggi<br>Garam / Gula',
+    spendingSummaryTitle: 'Ringkasan Pengeluaran Belanja',
+    statTotalSpent: 'Total Pengeluaran',
+    statTotalSaved: 'Total Diskon Dihemat',
+    statTotalReceipts: 'Jumlah Struk',
+    statAvgSpent: 'Rata-Rata per Belanja',
+    catSpendingTitle: 'Proporsi Pengeluaran Kategori:',
+    budgetSettingTitle: 'Pengaturan Batas Anggaran (Safety Cap)',
+    budgetSettingSub: 'Tentukan batas maksimal dompet belanja bulanan agar Anda terhindar dari defisit.',
     saveBudgetBtn: 'Simpan Batas Anggaran',
-    spendingBreakdownTitle: 'Alokasi Belanja per Kategori',
-    tipsHeader: 'Tips Belanja Cerdas di Supermarket',
-    tip1: '<strong>Perhatikan Harga Satuan:</strong> Kemasan besar belum tentu lebih murah, cek komparator otomatis di GroceryX.',
-    tip2: '<strong>Waspada Promo Bertingkat:</strong> Diskon 50%+20% berarti diskon total 60%, bukan 70%.',
-    tip3: '<strong>Dahulukan Bahan Pokok:</strong> Prioritaskan bahan pokok penting sebelum membeli camilan sekunder.',
-    navCart: 'Belanja',
-    navHistory: 'Riwayat',
-    navBudget: 'Anggaran',
-    addItemModalTitle: 'Tambah Item Belanja',
-    editItemModalTitle: 'Edit Item Belanja',
-    itemName: 'Nama Produk Supermarket',
-    autoCompareHint: 'Auto-compare aktif',
-    categoryLabel: 'Kategori Produk',
-    addNewCatBtn: 'Tambah Kategori Baru',
-    unitLabel: 'Satuan',
-    qtyLabel: 'Kuantitas (Qty)',
-    unitPriceLabel: 'Harga Satuan Normal',
-    perItemHint: 'per satuan item',
-    discountCalcTitle: 'Kalkulator Diskon Promo',
-    noDiscount: 'Tanpa Diskon',
-    singleDiscount: 'Tunggal',
-    tieredDiscount: 'Bertingkat',
-    discountSingleLabel: 'Diskon (%) :',
-    discountD1Label: 'Diskon 1 (%)',
-    discountD2Label: 'Diskon 2 (%)',
-    beforeDiscount: 'Harga Sebelum Diskon:',
-    savedCut: 'Potongan Hemat:',
-    finalRowPrice: 'Harga Akhir Baris:',
-    buyingTipsTitle: 'Tips Cerdas Saat Pembelian',
-    buyingTip1: '<strong>Perhatikan Harga Satuan:</strong> Selalu cek harga per satuan kilogram/liter, bukan semata-mata kemasan besar.',
-    buyingTip2: '<strong>Waspada Promo Diskon Bertingkat:</strong> Promo 50%+20% berarti diskon riil 60% (bukan 70%), cek kalkulator di atas.',
-    buyingTip3: '<strong>Cek Tanggal Kedaluwarsa:</strong> Periksa expired date barang supermarket terutama barang diskon besar.',
-    saveItemBtnAdd: 'Masukkan ke Keranjang',
-    saveItemBtnEdit: 'Simpan Perubahan',
-    saveCatBtn: 'Simpan',
-    settingsTitle: 'Pengaturan & Konfigurasi',
-    settingsLangTitle: 'Bahasa / Language',
-    settingsLangSub: 'Pilih bahasa tampilan antarmuka aplikasi',
-    settingsThemeTitle: 'Pilihan Tema Tampilan',
-    settingsThemeSub: 'Pilih tema kaca transparan (Liquid Glass) favorit',
-    themeBrightSub: 'Terang kristal & modern (Default)',
-    themeIceSub: 'Kaca es transparan biru cyan',
-    themeAuroraSub: 'Gradasi violet & peach transparan',
-    themeMidnightSub: 'Kaca transparan gelap & neon',
-    settingsAudioTitle: 'Audio & Efek Suara',
-    settingsAudioSub: 'Suara responsif saat menambah item dan checkout',
-    settingsSoundSwitch: 'Aktifkan Efek Suara Belanja',
-    settingsAccountTitle: 'Akun & Keamanan',
+    themeTitle: 'Pilihan Tema Tampilan (Liquid Glass)',
+    themeSub: 'Pilih tema kaca transparan modern favorit Anda',
+    langTitle: 'Pilihan Bahasa (Language)',
+    langSub: 'Pilih bahasa tampilan antarmuka aplikasi',
+    audioTitle: 'Efek Suara Belanja',
+    audioSub: 'Suara responsif saat scan barcode, klik, dan checkout',
     changePwdTitle: 'Ganti Password Akun',
-    currentPwdLabel: 'Password Saat Ini',
-    newPwdLabel: 'Password Baru',
-    confirmPwdLabel: 'Konfirmasi Password Baru',
-    saveNewPwdBtn: 'Simpan Password Baru',
+    changePwdSub: 'Perbarui kata sandi untuk keamanan akun',
     logoutBtn: 'Keluar dari Akun (Logout)',
     adminFirebaseTitle: 'Sinkronisasi Cloud Firebase',
     adminFirebaseSub: 'Kelola koneksi multi-device realtime database',
-    adminCloudDesc: 'Fitur sinkronisasi cloud ini hanya tampil khusus untuk administrator (joshualim@mutiarabangsa.sch.id).',
-    openCloudBtn: 'Buka Konfigurasi Cloud Firebase',
-    authEmailLabel: 'Email',
-    authPwdLabel: 'Password',
-    authLoginSubmit: 'Masuk ke GroceryX',
-    regUsernameLabel: 'Username',
-    regEmailLabel: 'Email',
-    regPwdLabel: 'Password',
-    authRegSubmit: 'Buat Akun Sekarang',
-    budgetSafe: 'Anggaran Aman',
-    approachingLimit: 'Mendekati Batas',
-    overBudget: 'Over Budget!',
-    remainingWallet: 'Sisa Dompet:',
-    deficit: 'Kelebihan Anggaran (Defisit):',
-    spent: 'Terpakai:',
-    maxLimit: 'Batas Maks:',
-    priceStable: '= Stabil (Rp 0)',
-    priceHigher: '↑ Lebih Mahal',
-    priceLower: '↓ Lebih Hemat',
-    newItem: '🆕 Item Baru',
-    checkoutReceiptTitle: 'GROCERYX BELANJA SUPERMARKET',
-    receiptDatePrefix: 'Tanggal: ',
-    receiptLimit: 'Batas Anggaran:',
-    receiptNetTotal: 'Total Belanja Bersih:',
-    receiptDiscountSaved: 'Total Diskon Dihemat:',
-    receiptSafeTitle: 'Hebat! Belanja Terkendali',
-    receiptSafeDesc: 'Pengeluaran belanjaan Anda masih berada di bawah batas keamanan anggaran.',
-    receiptWarningTitle: 'Perhatian! Melebihi Batas Anggaran',
-    receiptWarningDesc: 'Pengeluaran melebihi target batas dompet bulanan Anda.',
-    confirmSaveReceiptBtn: 'Simpan ke Riwayat & Selesai',
-    historyDetailModalTitle: 'Detail Struk GroceryX',
-    reloadToCartBtn: 'Salin Semua Item ke Troli Baru'
+    navShop: 'Etalase',
+    navCart: 'Keranjang',
+    navHistory: 'Riwayat',
+    navAccount: 'Akun',
+    scannerTitle: 'Pindai Barcode Produk',
+    scannerDesc: 'Arahkan kamera ke barcode pada kemasan makanan atau upload foto barcode.',
+    warningTitle: 'Peringatan: Anggaran Terlampaui!',
+    warningDesc: 'Total belanjaan Anda saat ini telah melebihi batas anggaran yang ditentukan.',
+    warningBtnCart: 'Tinjau Keranjang & Hemat',
+    warningBtnRaise: 'Naikkan Batas Anggaran',
+    warningBtnDismiss: 'Tetap Lanjut Belanja',
+    googleAuthText: 'Lanjutkan dengan Google'
   },
   en: {
-    appSubtitle: 'Supermarket Cart Mode',
-    cartEmptyTitle: 'Your Shopping Cart is Empty',
-    cartEmptyDesc: 'Start adding items as you browse the supermarket aisles.',
-    addFirstItem: 'Add First Item',
-    addToCartBtn: 'Add Item to Cart',
+    appTitle: 'GroceryX',
+    appSubtitle: 'Supermarket Grocery Cart',
+    cartEmptyTitle: 'Your Cart is Currently Empty',
+    cartEmptyDesc: 'Browse fresh and discounted food groceries in the Catalog to start.',
+    emptyGoShopBtn: 'Explore Products',
+    catalogTitle: 'Showing Food Groceries',
+    pinHint: 'Click ❤️ to Pin to Top',
+    addProdBtn: 'Add New Product',
+    bundleTitle: 'Special Value Packs',
+    bundleSub: 'Up to 20% Off',
+    bundleBuyBtn: 'Buy Bundle',
+    cartPageTitle: 'Shopping Cart',
+    cartPageDesc: 'Verify item quantities, apply promo vouchers, and protect your budget.',
+    voucherTitle: 'Voucher & Promo Code',
+    applyVoucherBtn: 'Apply',
+    voucherPlaceholder: 'e.g. GROCERYHEMAT',
     totalItemsPrefix: 'Total Items:',
     savedPrefix: 'Saved',
+    voucherDiscountTitle: 'Voucher Discount:',
     totalPriceTitle: 'Total Spent:',
     checkoutBtn: 'Checkout & Save Receipt',
-    searchPlaceholder: 'Search items in cart...',
-    categoryAll: 'All',
     historyTitle: 'Monthly Shopping History',
     historyDesc: 'Saved receipts act as price references for future grocery runs.',
     histCurrLabel: 'Current Session Spent',
@@ -221,199 +111,317 @@ const I18N = {
     clearBtn: 'Clear All Data',
     emptyHistoryTitle: 'No Receipts Yet',
     emptyHistoryDesc: 'Completed grocery receipts will be neatly stored here.',
-    viewReceipt: 'View Receipt',
-    budgetTitle: 'Budget Controller (Safety Cap)',
-    budgetDesc: 'Protect your wallet and track grocery spending accurately.',
-    safetyCapLabel: 'Maximum Grocery Budget Limit:',
-    safetyCapBadge: 'Required',
+    sehatTitle: 'Health Meter',
+    sehatSub: 'Nutri-Score and nutritional health analysis of your grocery cart.',
+    sehatCaption: 'Healthy Food Score',
+    statFresh: 'Fresh &<br>Natural',
+    statNeutral: 'Balanced<br>Processed',
+    statJunk: 'High Sodium<br>/ Sugar',
+    spendingSummaryTitle: 'Grocery Spending Overview',
+    statTotalSpent: 'Total Spent',
+    statTotalSaved: 'Total Discounts Saved',
+    statTotalReceipts: 'Receipts Count',
+    statAvgSpent: 'Average per Trip',
+    catSpendingTitle: 'Spending Proportion by Category:',
+    budgetSettingTitle: 'Budget Limit Configuration (Safety Cap)',
+    budgetSettingSub: 'Set your monthly wallet safety cap to avoid grocery overspending.',
     saveBudgetBtn: 'Save Budget Limit',
-    spendingBreakdownTitle: 'Spending Breakdown by Category',
-    tipsHeader: 'Smart Grocery Shopping Tips',
-    tip1: '<strong>Check Unit Prices:</strong> Bulk packages are not always cheaper. Check unit prices per kg/liter.',
-    tip2: '<strong>Beware Tiered Discounts:</strong> 50%+20% discount is equivalent to 60% total discount, not 70%.',
-    tip3: '<strong>Prioritize Staples:</strong> Always secure your essential groceries before buying impulse snacks.',
-    navCart: 'Cart',
-    navHistory: 'History',
-    navBudget: 'Budget',
-    addItemModalTitle: 'Add Grocery Item',
-    editItemModalTitle: 'Edit Grocery Item',
-    itemName: 'Supermarket Product Name',
-    autoCompareHint: 'Auto-compare active',
-    categoryLabel: 'Product Category',
-    addNewCatBtn: 'Add New Category',
-    unitLabel: 'Unit',
-    qtyLabel: 'Quantity (Qty)',
-    unitPriceLabel: 'Normal Unit Price',
-    perItemHint: 'per single item',
-    discountCalcTitle: 'Promo Discount Calculator',
-    noDiscount: 'No Discount',
-    singleDiscount: 'Single',
-    tieredDiscount: 'Tiered',
-    discountSingleLabel: 'Discount (%) :',
-    discountD1Label: 'Discount 1 (%)',
-    discountD2Label: 'Discount 2 (%)',
-    beforeDiscount: 'Price Before Discount:',
-    savedCut: 'Discount Savings:',
-    finalRowPrice: 'Final Item Total:',
-    buyingTipsTitle: 'Smart Buying Tips',
-    buyingTip1: '<strong>Check Unit Price:</strong> Always check price per kilogram/liter rather than judging packaging size.',
-    buyingTip2: '<strong>Beware of Tiered Promos:</strong> 50%+20% discount actually saves 60% (not 70%), see the calculator above.',
-    buyingTip3: '<strong>Check Expiration Dates:</strong> Verify expiry dates on supermarket shelves, especially on clearance promos.',
-    saveItemBtnAdd: 'Add to Cart',
-    saveItemBtnEdit: 'Save Changes',
-    saveCatBtn: 'Save',
-    settingsTitle: 'Settings & Configuration',
-    settingsLangTitle: 'Language',
-    settingsLangSub: 'Select application display language',
-    settingsThemeTitle: 'Appearance Theme',
-    settingsThemeSub: 'Choose your preferred Liquid Glass translucent theme',
-    themeBrightSub: 'Bright crystal & modern (Default)',
-    themeIceSub: 'Frosty ice cyan translucent glass',
-    themeAuroraSub: 'Soft violet & peach pastel glass',
-    themeMidnightSub: 'Dark neon nocturnal glass',
-    settingsAudioTitle: 'Audio & Sound Effects',
-    settingsAudioSub: 'Haptic sound feedback during shopping & checkout',
-    settingsSoundSwitch: 'Enable Shopping Sound Effects',
-    settingsAccountTitle: 'Account & Security',
+    themeTitle: 'Appearance Theme (Liquid Glass)',
+    themeSub: 'Select your favorite modern translucent glass theme',
+    langTitle: 'Language Selection',
+    langSub: 'Select application display language',
+    audioTitle: 'Shopping Sound Effects',
+    audioSub: 'Responsive haptics for barcode scan, clicks, and checkout',
     changePwdTitle: 'Change Account Password',
-    currentPwdLabel: 'Current Password',
-    newPwdLabel: 'New Password',
-    confirmPwdLabel: 'Confirm New Password',
-    saveNewPwdBtn: 'Save New Password',
-    logoutBtn: 'Logout of Account',
+    changePwdSub: 'Update password for security',
+    logoutBtn: 'Log Out of Account',
     adminFirebaseTitle: 'Firebase Cloud Sync',
     adminFirebaseSub: 'Manage multi-device realtime database connection',
-    adminCloudDesc: 'Cloud synchronization is exclusively accessible to the administrator (joshualim@mutiarabangsa.sch.id).',
-    openCloudBtn: 'Open Firebase Cloud Configuration',
-    authEmailLabel: 'Email Address',
-    authPwdLabel: 'Password',
-    authLoginSubmit: 'Log In to GroceryX',
-    regUsernameLabel: 'Username',
-    regEmailLabel: 'Email Address',
-    regPwdLabel: 'Password',
-    authRegSubmit: 'Create Account Now',
-    budgetSafe: 'Budget Safe',
-    approachingLimit: 'Near Budget Limit',
-    overBudget: 'Over Budget!',
-    remainingWallet: 'Remaining Wallet:',
-    deficit: 'Budget Deficit (Overspent):',
-    spent: 'Spent:',
-    maxLimit: 'Max Limit:',
-    priceStable: '= Stable (Rp 0)',
-    priceHigher: '↑ More Expensive',
-    priceLower: '↓ Cheaper (Saved)',
-    newItem: '🆕 New Item',
-    checkoutReceiptTitle: 'GROCERYX SUPERMARKET RECEIPT',
-    receiptDatePrefix: 'Date: ',
-    receiptLimit: 'Budget Limit:',
-    receiptNetTotal: 'Net Total Spent:',
-    receiptDiscountSaved: 'Total Discount Saved:',
-    receiptSafeTitle: 'Awesome! Budget in Control',
-    receiptSafeDesc: 'Your total grocery spend is safely within your allocated budget.',
-    receiptWarningTitle: 'Warning! Exceeded Budget',
-    receiptWarningDesc: 'Your grocery spending has exceeded your set monthly safety cap.',
-    confirmSaveReceiptBtn: 'Save Receipt & Complete',
-    historyDetailModalTitle: 'GroceryX Receipt Details',
-    reloadToCartBtn: 'Copy All Items to New Cart'
+    navShop: 'Shop',
+    navCart: 'Cart',
+    navHistory: 'History',
+    navAccount: 'Account',
+    scannerTitle: 'Scan Product Barcode',
+    scannerDesc: 'Point your camera at the food package barcode or upload a barcode photo.',
+    warningTitle: 'Warning: Budget Exceeded!',
+    warningDesc: 'Your grocery spending has exceeded your set monthly safety cap.',
+    warningBtnCart: 'Review Cart & Save',
+    warningBtnRaise: 'Increase Budget Cap',
+    warningBtnDismiss: 'Continue Shopping',
+    googleAuthText: 'Sign in with Google'
   }
 };
 
-// Seed katalog belanja referensi komparator harga
-const DEFAULT_PREV_CATALOG = {
-  'Minyak Goreng 2L': { price: 32000, unit: 'liter', category: 'Bahan Pokok' },
-  'Beras Ramos 5kg': { price: 74000, unit: 'kg', category: 'Bahan Pokok' },
-  'Telur Ayam 1kg': { price: 28000, unit: 'kg', category: 'Bahan Pokok' },
-  'Indomie Goreng (Dus)': { price: 112000, unit: 'dus', category: 'Makanan Instan & Olahan' },
-  'Susu UHT Full Cream 1L': { price: 19500, unit: 'liter', category: 'Susu, Keju & Olahan' },
-  'Sunlight Jeruk Nipis 700ml': { price: 14500, unit: 'pack', category: 'Sabun Cuci & Deterjen' },
-  'Lifebuoy Sabun Mandi 4x110g': { price: 23000, unit: 'pack', category: 'Perlengkapan Mandi & Tubuh' },
-  'Kopi Kapal Api Mix 10s': { price: 14000, unit: 'pack', category: 'Kopi, Teh & Minuman' },
-  'Gula Pasir 1kg': { price: 17500, unit: 'kg', category: 'Bahan Pokok' },
-  'Bawang Merah 500g': { price: 20000, unit: 'kg', category: 'Bumbu & Dapur' },
-  'Biskuit Roma Kelapa 300g': { price: 11500, unit: 'pack', category: 'Camilan & Snack' },
-  'Pasta Gigi Pepsodent 190g': { price: 16000, unit: 'pcs', category: 'Perlengkapan Mandi & Tubuh' }
-};
+// ==========================================================================
+// 2. FOOD PRODUCTS CATALOG (SHOPEE & ASTRO E-COMMERCE DATA)
+// ==========================================================================
 
-// Seed riwayat belanja sebelumnya
-const DEFAULT_HISTORY = [
-  {
-    id: 'hist_last_month_01',
-    date: '15 Oktober 2026',
-    timestamp: 1789456800000,
-    note: 'Belanja Bulanan (Supermarket)',
-    safetyCap: 500000,
-    totalSpent: 388500,
-    totalSaved: 34500,
-    itemCount: 8,
-    items: [
-      { name: 'Beras Ramos 5kg', qty: 1, unit: 'kg', unitPrice: 74000, finalUnitPrice: 74000, discountType: 'none', d1: 0, d2: 0, finalRowTotal: 74000, normalRowTotal: 74000, savedAmount: 0, category: 'Bahan Pokok' },
-      { name: 'Minyak Goreng 2L', qty: 1, unit: 'liter', unitPrice: 32000, finalUnitPrice: 32000, discountType: 'none', d1: 0, d2: 0, finalRowTotal: 32000, normalRowTotal: 32000, savedAmount: 0, category: 'Bahan Pokok' },
-      { name: 'Telur Ayam 1kg', qty: 1.5, unit: 'kg', unitPrice: 28000, finalUnitPrice: 28000, discountType: 'none', d1: 0, d2: 0, finalRowTotal: 42000, normalRowTotal: 42000, savedAmount: 0, category: 'Bahan Pokok' },
-      { name: 'Indomie Goreng (Dus)', qty: 1, unit: 'dus', unitPrice: 112000, finalUnitPrice: 112000, discountType: 'none', d1: 0, d2: 0, finalRowTotal: 112000, normalRowTotal: 112000, savedAmount: 0, category: 'Makanan Instan & Olahan' },
-      { name: 'Lifebuoy Sabun Mandi 4x110g', qty: 1, unit: 'pack', unitPrice: 23000, finalUnitPrice: 18400, discountType: 'single', d1: 20, d2: 0, finalRowTotal: 18400, normalRowTotal: 23000, savedAmount: 4600, category: 'Perlengkapan Mandi & Tubuh' },
-      { name: 'Sunlight Jeruk Nipis 700ml', qty: 2, unit: 'pack', unitPrice: 14500, finalUnitPrice: 14500, discountType: 'none', d1: 0, d2: 0, finalRowTotal: 29000, normalRowTotal: 29000, savedAmount: 0, category: 'Sabun Cuci & Deterjen' },
-      { name: 'Kopi Kapal Api Mix 10s', qty: 2, unit: 'pack', unitPrice: 14000, finalUnitPrice: 14000, discountType: 'none', d1: 0, d2: 0, finalRowTotal: 28000, normalRowTotal: 28000, savedAmount: 0, category: 'Kopi, Teh & Minuman' },
-      { name: 'Biskuit Roma Kelapa 300g', qty: 5, unit: 'pack', unitPrice: 11500, finalUnitPrice: 10620, discountType: 'tiered', d1: 50, d2: 20, finalRowTotal: 53100, normalRowTotal: 57500, savedAmount: 29900, category: 'Camilan & Snack' }
-    ]
-  }
+const DEFAULT_CATEGORIES = [
+  'Semua',
+  'Bahan Pokok',
+  'Makanan Instan & Olahan',
+  'Daging & Seafood Segar',
+  'Sayur & Buah Segar',
+  'Bumbu & Dapur',
+  'Susu, Keju & Olahan',
+  'Camilan & Snack',
+  'Sabun Cuci & Deterjen',
+  'Perlengkapan Mandi & Tubuh',
+  'Lainnya'
 ];
 
-// Seed awal barang di troli aktif
-const DEFAULT_INITIAL_CART = [
+const CATALOG_PRODUCTS = [
   {
-    id: 'cart_' + Date.now() + '_1',
-    name: 'Minyak Goreng 2L',
-    category: 'Bahan Pokok',
-    unit: 'liter',
-    qty: 1,
-    unitPrice: 34500,
-    discountType: 'none',
-    d1: 0,
-    d2: 0
-  },
-  {
-    id: 'cart_' + Date.now() + '_2',
-    name: 'Telur Ayam 1kg',
+    id: 'prod_beras_5kg',
+    name: 'Beras Ramos Premium 5kg',
     category: 'Bahan Pokok',
     unit: 'kg',
-    qty: 2,
-    unitPrice: 26500,
-    discountType: 'none',
-    d1: 0,
-    d2: 0
+    price: 74000,
+    normalPrice: 82000,
+    image: 'https://images.unsplash.com/photo-1586201375761-83865001e31c?w=500&auto=format&fit=crop&q=80',
+    barcode: '8991001001001',
+    healthType: 'healthy',
+    healthLabel: 'Bahan Segar Alami',
+    smartTip: 'Bandingkan harga per kg kemasan 5kg vs 2.5kg. Cek butir beras utuh transparan tanpa pemutih.'
   },
   {
-    id: 'cart_' + Date.now() + '_3',
+    id: 'prod_minyak_2l',
+    name: 'Minyak Goreng Pouch 2L',
+    category: 'Bahan Pokok',
+    unit: 'liter',
+    price: 34500,
+    normalPrice: 38000,
+    image: 'https://images.unsplash.com/photo-1474979266404-7eaacbcd87c5?w=500&auto=format&fit=crop&q=80',
+    barcode: '8999999123456',
+    healthType: 'neutral',
+    healthLabel: 'Minyak Nabati SNI',
+    smartTip: 'Pouch 2L umumnya 10% lebih hemat daripada kemasan botol plastik.'
+  },
+  {
+    id: 'prod_telur_1kg',
+    name: 'Telur Ayam Negeri Fresh 1kg',
+    category: 'Bahan Pokok',
+    unit: 'kg',
+    price: 28000,
+    normalPrice: 31000,
+    image: 'https://images.unsplash.com/photo-1582722872445-44dc5f7e3c8f?w=500&auto=format&fit=crop&q=80',
+    barcode: '8998888123456',
+    healthType: 'healthy',
+    healthLabel: 'Tinggi Protein Alami',
+    smartTip: 'Pilih cangkang berselaput matte dan agak kasar; hindari cangkang licin mengkilap.'
+  },
+  {
+    id: 'prod_indomie_dus',
+    name: 'Indomie Goreng (Dus 40 Pcs)',
+    category: 'Makanan Instan & Olahan',
+    unit: 'dus',
+    price: 112000,
+    normalPrice: 125000,
+    image: 'https://images.unsplash.com/photo-1612927601601-6638404737ce?w=500&auto=format&fit=crop&q=80',
+    barcode: '8992388112233',
+    healthType: 'unhealthy',
+    healthLabel: 'Olahan Cepat Saji',
+    smartTip: 'Beli per karton isi 40 pcs menghemat Rp 400 per bungkus dibanding beli eceran satuan.'
+  },
+  {
+    id: 'prod_ultra_milk',
+    name: 'Susu UHT Full Cream 1L',
+    category: 'Susu, Keju & Olahan',
+    unit: 'liter',
+    price: 19500,
+    normalPrice: 22500,
+    image: 'https://images.unsplash.com/photo-1563636619-e9143da7973b?w=500&auto=format&fit=crop&q=80',
+    barcode: '8992753123456',
+    healthType: 'healthy',
+    healthLabel: 'Kaya Kalsium',
+    smartTip: 'Ambil kotak dari baris rak paling belakang (metode FIFO supermarket) untuk masa expired terlama.'
+  },
+  {
+    id: 'prod_brokoli',
+    name: 'Brokoli Hijau Segar 500g',
+    category: 'Sayur & Buah Segar',
+    unit: 'ikat',
+    price: 18000,
+    normalPrice: 22000,
+    image: 'https://images.unsplash.com/photo-1540420773420-3366772f4999?w=500&auto=format&fit=crop&q=80',
+    barcode: '8992222123456',
+    healthType: 'healthy',
+    healthLabel: 'Kaya Serat & Antioksidan',
+    smartTip: 'Timbang sendiri di timbangan digital supermarket untuk verifikasi berat sebelum ke kasir.'
+  },
+  {
+    id: 'prod_daging_sapi',
+    name: 'Daging Sapi Rendang Segar 500g',
+    category: 'Daging & Seafood Segar',
+    unit: 'kg',
+    price: 65000,
+    normalPrice: 72000,
+    image: 'https://images.unsplash.com/photo-1544025162-d76694265947?w=500&auto=format&fit=crop&q=80',
+    barcode: '8993333123456',
+    healthType: 'healthy',
+    healthLabel: 'Protein & Zat Besi',
+    smartTip: 'Ambil daging di urutan paling terakhir sebelum ke kasir agar suhu dingin tidak mencair di troli.'
+  },
+  {
+    id: 'prod_roti_tawar',
+    name: 'Roti Tawar Gandum Kupas',
+    category: 'Bahan Pokok',
+    unit: 'pack',
+    price: 17500,
+    normalPrice: 20000,
+    image: 'https://images.unsplash.com/photo-1509440159596-0249088772ff?w=500&auto=format&fit=crop&q=80',
+    barcode: '8991111123456',
+    healthType: 'healthy',
+    healthLabel: 'Gandum Utuh',
+    smartTip: 'Cek tanggal kedaluwarsa pada kawat pengikat roti (biasanya hanya tahan 4-5 hari).'
+  },
+  {
+    id: 'prod_roma_kelapa',
+    name: 'Biskuit Roma Kelapa 300g',
+    category: 'Camilan & Snack',
+    unit: 'pack',
+    price: 11500,
+    normalPrice: 13500,
+    image: 'https://images.unsplash.com/photo-1558961363-fa8fdf82db35?w=500&auto=format&fit=crop&q=80',
+    barcode: '8996001301234',
+    healthType: 'unhealthy',
+    healthLabel: 'Snack Manis',
+    smartTip: 'Waspada belanja camilan saat perut lapar. Riset membuktikan pengeluaran impulsif naik hingga 45%!'
+  },
+  {
+    id: 'prod_sunlight',
+    name: 'Sunlight Jeruk Nipis Refill 700ml',
+    category: 'Sabun Cuci & Deterjen',
+    unit: 'pack',
+    price: 14500,
+    normalPrice: 17000,
+    image: 'https://images.unsplash.com/photo-1590502593747-42a996133562?w=500&auto=format&fit=crop&q=80',
+    barcode: '8997777123456',
+    healthType: 'neutral',
+    healthLabel: 'Pembersih Rumah',
+    smartTip: 'Kemasan isi ulang (refill) selalu 20% lebih hemat dibanding membeli kemasan botol pump baru.'
+  },
+  {
+    id: 'prod_lifebuoy',
     name: 'Lifebuoy Sabun Mandi 4x110g',
     category: 'Perlengkapan Mandi & Tubuh',
     unit: 'pack',
-    qty: 1,
-    unitPrice: 25000,
-    discountType: 'tiered',
-    d1: 50,
-    d2: 20
+    price: 23000,
+    normalPrice: 27000,
+    image: 'https://images.unsplash.com/photo-1600857544200-b2f666a9a2ec?w=500&auto=format&fit=crop&q=80',
+    barcode: '8996666123456',
+    healthType: 'neutral',
+    healthLabel: 'Kebersihan Tubuh',
+    smartTip: 'Paket multi-pack isi 4 batang memotong harga satuan hingga Rp 1.500 per batang sabun.'
+  },
+  {
+    id: 'prod_kopi_kapal_api',
+    name: 'Kopi Kapal Api Mix 10s',
+    category: 'Camilan & Snack',
+    unit: 'pack',
+    price: 14000,
+    normalPrice: 16500,
+    image: 'https://images.unsplash.com/photo-1559056199-641a0ac8b55e?w=500&auto=format&fit=crop&q=80',
+    barcode: '8991002104567',
+    healthType: 'neutral',
+    healthLabel: 'Minuman Kopi',
+    smartTip: 'Hitung harga per sachet saat membandingkan kemasan renceng isi 10 vs kantong isi 30.'
   }
 ];
 
 // ==========================================================================
-// STATE MANAGEMENT & PERSISTENCE
+// 3. PAKET HEMAT (COMBO BUNDLES) & VOUCHER CODES
 // ==========================================================================
+
+const COMBO_BUNDLES = [
+  {
+    id: 'bundle_sarapan',
+    name: 'Paket Sarapan Ceria',
+    subtitle: 'Telur Ayam 1kg + Susu UHT 1L + Roti Tawar Gandum',
+    image: 'https://images.unsplash.com/photo-1525351484163-7529414344d8?w=500&auto=format&fit=crop&q=80',
+    items: [
+      { name: 'Telur Ayam Negeri Fresh 1kg', qty: 1, unit: 'kg', unitPrice: 28000, category: 'Bahan Pokok' },
+      { name: 'Susu UHT Full Cream 1L', qty: 1, unit: 'liter', unitPrice: 19500, category: 'Susu, Keju & Olahan' },
+      { name: 'Roti Tawar Gandum Kupas', qty: 1, unit: 'pack', unitPrice: 17500, category: 'Bahan Pokok' }
+    ],
+    normalTotal: 65000,
+    bundlePrice: 53000,
+    discountPercent: 18,
+    savedAmount: 12000
+  },
+  {
+    id: 'bundle_dapur',
+    name: 'Paket Dapur Komplit',
+    subtitle: 'Beras Ramos 5kg + Minyak Goreng 2L + Biskuit Roma',
+    image: 'https://images.unsplash.com/photo-1542838132-92c53300491e?w=500&auto=format&fit=crop&q=80',
+    items: [
+      { name: 'Beras Ramos Premium 5kg', qty: 1, unit: 'kg', unitPrice: 74000, category: 'Bahan Pokok' },
+      { name: 'Minyak Goreng Pouch 2L', qty: 1, unit: 'liter', unitPrice: 34500, category: 'Bahan Pokok' },
+      { name: 'Biskuit Roma Kelapa 300g', qty: 1, unit: 'pack', unitPrice: 11500, category: 'Camilan & Snack' }
+    ],
+    normalTotal: 120000,
+    bundlePrice: 98000,
+    discountPercent: 18,
+    savedAmount: 22000
+  },
+  {
+    id: 'bundle_sehat',
+    name: 'Paket Nutrisi Segar',
+    subtitle: 'Daging Sapi 500g + Brokoli Hijau + Telur 1kg',
+    image: 'https://images.unsplash.com/photo-1540420773420-3366772f4999?w=500&auto=format&fit=crop&q=80',
+    items: [
+      { name: 'Daging Sapi Rendang Segar 500g', qty: 1, unit: 'kg', unitPrice: 65000, category: 'Daging & Seafood Segar' },
+      { name: 'Brokoli Hijau Segar 500g', qty: 1, unit: 'ikat', unitPrice: 18000, category: 'Sayur & Buah Segar' },
+      { name: 'Telur Ayam Negeri Fresh 1kg', qty: 1, unit: 'kg', unitPrice: 28000, category: 'Bahan Pokok' }
+    ],
+    normalTotal: 111000,
+    bundlePrice: 91000,
+    discountPercent: 18,
+    savedAmount: 20000
+  }
+];
+
+const PROMO_VOUCHERS = {
+  'GROCERYHEMAT': { type: 'percent', value: 15, desc: 'Diskon 15% dari total belanja', minSpend: 0 },
+  'SEHATSEGAR': { type: 'fixed', value: 20000, desc: 'Potongan langsung Rp 20.000', minSpend: 50000 },
+  'ASTROX': { type: 'fixed', value: 15000, desc: 'Diskon kilat Rp 15.000', minSpend: 40000 },
+  'JOSHADMIN': { type: 'percent', value: 25, desc: 'Diskon eksklusif Administrator 25%', minSpend: 0 }
+};
+
+// ==========================================================================
+// 4. STORAGE KEYS & APP STATE
+// ==========================================================================
+
+const STORAGE_KEYS = {
+  CART: 'groceryx_cart_v2',
+  HISTORY: 'groceryx_history_v2',
+  SAFETY_CAP: 'groceryx_safety_cap_v2',
+  PINNED_PRODUCTS: 'groceryx_pinned_products_v2',
+  CUSTOM_PRODUCTS: 'groceryx_custom_products_v2',
+  APPLIED_VOUCHER: 'groceryx_applied_voucher_v2',
+  CURRENT_USER: 'sg_current_user_v1',
+  USERS_LIST: 'sg_users_list_v1',
+  THEME: 'groceryx_theme_v2',
+  LANGUAGE: 'groceryx_lang_v2',
+  SOUND: 'groceryx_sound_v2'
+};
 
 const state = {
   safetyCap: 500000,
   cart: [],
   history: [],
-  prevCatalog: {},
-  soundEnabled: true,
-  currentCategoryFilter: 'ALL',
+  pinnedProducts: [],
+  customProducts: [],
+  appliedVoucher: null,
+  activeTab: 'view-shop',
+  selectedCategory: 'Semua',
   searchQuery: '',
-  editingItemId: null,
-  activeTab: 'view-cart',
-  currentUser: null,
-  usersList: [],
   theme: 'liquid-bright',
   language: 'id',
-  customCategories: []
+  soundEnabled: true,
+  currentUser: null,
+  hasTriggeredOverbudgetModal: false,
+  stream: null
 };
 
 function t(key) {
@@ -422,18 +430,18 @@ function t(key) {
 }
 
 // ==========================================================================
-// AUDIO SYNTHESIZER (Web Audio API Haptics)
+// 5. AUDIO SYNTHESIZER (WEB AUDIO API HAPTICS & SOUND EFFECTS)
 // ==========================================================================
 
-class SoundManager {
+class SoundEngine {
   constructor() {
     this.ctx = null;
   }
 
   init() {
-    if (!this.ctx && (window.AudioContext || window.webkitAudioContext)) {
+    if (!this.ctx) {
       const AudioCtx = window.AudioContext || window.webkitAudioContext;
-      this.ctx = new AudioCtx();
+      if (AudioCtx) this.ctx = new AudioCtx();
     }
     if (this.ctx && this.ctx.state === 'suspended') {
       this.ctx.resume();
@@ -442,1617 +450,100 @@ class SoundManager {
 
   playClick() {
     if (!state.soundEnabled) return;
-    this.init();
-    if (!this.ctx) return;
-
     try {
+      this.init();
+      if (!this.ctx) return;
       const osc = this.ctx.createOscillator();
       const gain = this.ctx.createGain();
       osc.type = 'sine';
       osc.frequency.setValueAtTime(800, this.ctx.currentTime);
       osc.frequency.exponentialRampToValueAtTime(400, this.ctx.currentTime + 0.04);
-
-      gain.gain.setValueAtTime(0.12, this.ctx.currentTime);
-      gain.gain.exponentialRampToValueAtTime(0.01, this.ctx.currentTime + 0.04);
-
+      gain.gain.setValueAtTime(0.08, this.ctx.currentTime);
+      gain.gain.exponentialRampToValueAtTime(0.001, this.ctx.currentTime + 0.04);
       osc.connect(gain);
       gain.connect(this.ctx.destination);
       osc.start();
       osc.stop(this.ctx.currentTime + 0.04);
-    } catch (_) {}
+    } catch (_) { }
+  }
+
+  playScanBeep() {
+    if (!state.soundEnabled) return;
+    try {
+      this.init();
+      if (!this.ctx) return;
+      const osc = this.ctx.createOscillator();
+      const gain = this.ctx.createGain();
+      osc.type = 'triangle';
+      osc.frequency.setValueAtTime(1760, this.ctx.currentTime); // High crisp scanner beep
+      gain.gain.setValueAtTime(0.18, this.ctx.currentTime);
+      gain.gain.exponentialRampToValueAtTime(0.001, this.ctx.currentTime + 0.12);
+      osc.connect(gain);
+      gain.connect(this.ctx.destination);
+      osc.start();
+      osc.stop(this.ctx.currentTime + 0.12);
+    } catch (_) { }
   }
 
   playSuccess() {
     if (!state.soundEnabled) return;
-    this.init();
-    if (!this.ctx) return;
-
     try {
+      this.init();
+      if (!this.ctx) return;
       const now = this.ctx.currentTime;
-      const notes = [523.25, 659.25, 783.99, 1046.50];
-      notes.forEach((freq, idx) => {
+      [523.25, 659.25, 783.99, 1046.50].forEach((freq, i) => {
         const osc = this.ctx.createOscillator();
         const gain = this.ctx.createGain();
-        osc.type = 'triangle';
-        osc.frequency.setValueAtTime(freq, now + idx * 0.08);
-
-        gain.gain.setValueAtTime(0.15, now + idx * 0.08);
-        gain.gain.exponentialRampToValueAtTime(0.01, now + idx * 0.08 + 0.16);
-
+        osc.frequency.value = freq;
+        gain.gain.setValueAtTime(0.1, now + i * 0.07);
+        gain.gain.exponentialRampToValueAtTime(0.001, now + i * 0.07 + 0.2);
         osc.connect(gain);
         gain.connect(this.ctx.destination);
-        osc.start(now + idx * 0.08);
-        osc.stop(now + idx * 0.08 + 0.16);
+        osc.start(now + i * 0.07);
+        osc.stop(now + i * 0.07 + 0.2);
       });
-    } catch (_) {}
+    } catch (_) { }
   }
 
   playWarning() {
     if (!state.soundEnabled) return;
-    this.init();
-    if (!this.ctx) return;
-
     try {
+      this.init();
+      if (!this.ctx) return;
       const now = this.ctx.currentTime;
-      [350, 260].forEach((freq, idx) => {
+      [440, 370, 311].forEach((freq, i) => {
         const osc = this.ctx.createOscillator();
         const gain = this.ctx.createGain();
         osc.type = 'sawtooth';
-        osc.frequency.setValueAtTime(freq, now + idx * 0.12);
-
-        gain.gain.setValueAtTime(0.18, now + idx * 0.12);
-        gain.gain.exponentialRampToValueAtTime(0.01, now + idx * 0.12 + 0.18);
-
+        osc.frequency.value = freq;
+        gain.gain.setValueAtTime(0.12, now + i * 0.1);
+        gain.gain.exponentialRampToValueAtTime(0.001, now + i * 0.1 + 0.18);
         osc.connect(gain);
         gain.connect(this.ctx.destination);
-        osc.start(now + idx * 0.12);
-        osc.stop(now + idx * 0.12 + 0.18);
+        osc.start(now + i * 0.1);
+        osc.stop(now + i * 0.1 + 0.18);
       });
-    } catch (_) {}
+    } catch (_) { }
   }
 }
 
-const sound = new SoundManager();
+const sound = new SoundEngine();
 
 // ==========================================================================
-// UTILITY FUNCTIONS: CURRENCY & MATH
+// 6. HELPER FORMATTERS
 // ==========================================================================
 
 function formatRupiah(num) {
-  if (isNaN(num) || num === null || num === undefined) return '0';
-  return Math.round(num).toLocaleString('id-ID');
+  const val = Math.round(Number(num) || 0);
+  return val.toString().replace(/\B(?=(\d{3})+(?!\d))/g, '.');
 }
 
 function parseRupiahInput(str) {
+  if (typeof str === 'number') return str;
   if (!str) return 0;
-  const cleaned = String(str).replace(/[^0-9]/g, '');
+  const cleaned = str.toString().replace(/[^\d]/g, '');
   return parseInt(cleaned, 10) || 0;
 }
-
-function calculateItemPricing(item) {
-  const qty = parseFloat(item.qty) || 0;
-  const unitPrice = parseFloat(item.unitPrice) || 0;
-  const normalRowTotal = unitPrice * qty;
-
-  let finalUnitPrice = unitPrice;
-  const d1 = parseFloat(item.d1) || 0;
-  const d2 = parseFloat(item.d2) || 0;
-
-  if (item.discountType === 'single') {
-    const factor1 = Math.max(0, 1 - (d1 / 100));
-    finalUnitPrice = unitPrice * factor1;
-  } else if (item.discountType === 'tiered') {
-    const factor1 = Math.max(0, 1 - (d1 / 100));
-    const factor2 = Math.max(0, 1 - (d2 / 100));
-    finalUnitPrice = unitPrice * factor1 * factor2;
-  }
-
-  const finalRowTotal = Math.round(finalUnitPrice * qty);
-  const savedAmount = Math.max(0, normalRowTotal - finalRowTotal);
-
-  return {
-    normalRowTotal,
-    finalUnitPrice,
-    finalRowTotal,
-    savedAmount
-  };
-}
-
-function comparePriceWithPrevMonth(itemName, currentUnitPrice) {
-  if (!itemName) return { status: 'new', diffVal: 0, diffPct: 0, prevPrice: 0 };
-  
-  const normName = itemName.trim().toLowerCase();
-  let matchedPrev = null;
-
-  for (const [key, val] of Object.entries(state.prevCatalog)) {
-    if (key.trim().toLowerCase() === normName) {
-      matchedPrev = val;
-      break;
-    }
-  }
-
-  if (!matchedPrev || !matchedPrev.price) {
-    return { status: 'new', diffVal: 0, diffPct: 0, prevPrice: 0 };
-  }
-
-  const prevPrice = matchedPrev.price;
-  const diffVal = currentUnitPrice - prevPrice;
-  const diffPct = prevPrice > 0 ? ((diffVal / prevPrice) * 100).toFixed(1) : 0;
-
-  if (diffVal > 0) {
-    return { status: 'higher', diffVal, diffPct, prevPrice };
-  } else if (diffVal < 0) {
-    return { status: 'lower', diffVal: Math.abs(diffVal), diffPct: Math.abs(diffPct), prevPrice };
-  } else {
-    return { status: 'equal', diffVal: 0, diffPct: 0, prevPrice };
-  }
-}
-
-// ==========================================================================
-// CATEGORY MANAGEMENT (NO EMOJIS, CLEAN TEXT, I18N AWARE)
-// ==========================================================================
-
-function getDefaultCategoriesList() {
-  return state.language === 'en' ? DEFAULT_CATEGORIES_EN : DEFAULT_CATEGORIES_ID;
-}
-
-function getAllCategories() {
-  const baseList = getDefaultCategoriesList();
-  const custom = Array.isArray(state.customCategories) ? state.customCategories : [];
-  return [...baseList, ...custom.filter(c => !baseList.includes(c))];
-}
-
-function populateCategoryDropdown(selectedCategory = null) {
-  const select = document.getElementById('item-category-select');
-  if (!select) return;
-
-  const categories = getAllCategories();
-  const addNewLabel = state.language === 'en' ? '+ Add New Category...' : '➕ Tambah Kategori Baru...';
-
-  select.innerHTML = categories.map((cat) => {
-    return `<option value="${cat}">${cat}</option>`;
-  }).join('') + `<option value="__add_new__">${addNewLabel}</option>`;
-
-  if (selectedCategory && categories.includes(selectedCategory)) {
-    select.value = selectedCategory;
-  } else if (categories.length > 0) {
-    select.value = categories[0];
-  }
-  document.getElementById('item-category-input').value = select.value;
-}
-
-function populateFilterPills() {
-  const container = document.getElementById('category-filter-container');
-  if (!container) return;
-
-  const categories = getAllCategories();
-  const currentActive = state.currentCategoryFilter;
-  const allLabel = t('categoryAll');
-
-  const pillsHtml = [
-    `<button class="filter-pill ${currentActive === 'ALL' ? 'active' : ''}" data-category="ALL">${allLabel} (<span id="count-all">${state.cart.length}</span>)</button>`
-  ];
-
-  categories.forEach((cat) => {
-    const isActive = (currentActive === cat) ? 'active' : '';
-    pillsHtml.push(`<button class="filter-pill ${isActive}" data-category="${cat}">${cat}</button>`);
-  });
-
-  container.innerHTML = pillsHtml.join('');
-
-  // Re-attach click listeners to dynamically created filter pills
-  container.querySelectorAll('.filter-pill').forEach((pill) => {
-    pill.onclick = () => {
-      container.querySelectorAll('.filter-pill').forEach(p => p.classList.remove('active'));
-      pill.classList.add('active');
-      state.currentCategoryFilter = pill.getAttribute('data-category');
-      sound.playClick();
-      renderCartItems();
-    };
-  });
-}
-
-// ==========================================================================
-// LANGUAGE (I18N) MANAGEMENT
-// ==========================================================================
-
-function initLanguage() {
-  const savedLang = localStorage.getItem(STORAGE_KEYS.LANGUAGE) || 'id';
-  setLanguage(savedLang, false);
-}
-
-function setLanguage(lang, playAudio = true) {
-  state.language = lang === 'en' ? 'en' : 'id';
-  localStorage.setItem(STORAGE_KEYS.LANGUAGE, state.language);
-  document.documentElement.setAttribute('lang', state.language);
-
-  // Update language buttons active state
-  document.querySelectorAll('.lang-card-btn').forEach((btn) => {
-    btn.classList.toggle('active', btn.getAttribute('data-lang') === state.language);
-  });
-
-  applyTranslationsToDOM();
-  populateCategoryDropdown();
-  populateFilterPills();
-  renderCartItems();
-  renderHistorySessions();
-  renderBudgetBreakdown();
-  updateSafetyCapBanner();
-  updateIcons();
-
-  if (playAudio) sound.playClick();
-}
-
-function applyTranslationsToDOM() {
-  const safeSetText = (id, text) => {
-    const el = document.getElementById(id);
-    if (el) el.textContent = text;
-  };
-  const safeSetHTML = (id, html) => {
-    const el = document.getElementById(id);
-    if (el) el.innerHTML = html;
-  };
-  const safeSetPlaceholder = (id, placeholder) => {
-    const el = document.getElementById(id);
-    if (el) el.placeholder = placeholder;
-  };
-
-  // Header & Balance
-  safeSetText('lbl-balance-sub', t('remainingWallet'));
-  safeSetText('lbl-spent', t('spent'));
-  safeSetText('lbl-max-limit', t('maxLimit'));
-
-  // Search
-  safeSetPlaceholder('cart-search-input', t('searchPlaceholder'));
-
-  // Cart View
-  safeSetText('lbl-empty-cart-title', t('cartEmptyTitle'));
-  safeSetText('lbl-empty-cart-desc', t('cartEmptyDesc'));
-  safeSetText('lbl-empty-add-btn', t('addFirstItem'));
-  safeSetText('lbl-btn-open-add', t('addToCartBtn'));
-  safeSetText('lbl-total-items-prefix', t('totalItemsPrefix'));
-  safeSetText('lbl-saved-prefix', t('savedPrefix'));
-  safeSetText('lbl-total-price-title', t('totalPriceTitle'));
-  safeSetText('lbl-checkout-btn', t('checkoutBtn'));
-
-  // Bottom Navigation
-  safeSetText('nav-label-cart', t('navCart'));
-  safeSetText('nav-label-history', t('navHistory'));
-  safeSetText('nav-label-budget', t('navBudget'));
-
-  // History View
-  safeSetText('lbl-history-title', t('historyTitle'));
-  safeSetText('lbl-history-desc', t('historyDesc'));
-  safeSetText('lbl-hist-curr-label', t('histCurrLabel'));
-  safeSetText('lbl-hist-curr-caption', t('histCurrCaption'));
-  safeSetText('lbl-hist-prev-label', t('histPrevLabel'));
-  safeSetText('lbl-hist-prev-caption', t('histPrevCaption'));
-  safeSetText('lbl-export-btn', t('exportBtn'));
-  safeSetText('lbl-clear-btn', t('clearBtn'));
-
-  // Budget View
-  safeSetText('lbl-budget-title', t('budgetTitle'));
-  safeSetText('lbl-budget-desc', t('budgetDesc'));
-  safeSetText('lbl-safety-cap-label', t('safetyCapLabel'));
-  safeSetText('lbl-safety-cap-badge', t('safetyCapBadge'));
-  safeSetText('lbl-save-budget-btn', t('saveBudgetBtn'));
-  safeSetText('lbl-spending-breakdown-title', t('spendingBreakdownTitle'));
-  safeSetText('lbl-tips-header', t('tipsHeader'));
-  safeSetHTML('lbl-tip-item-1', t('tip1'));
-  safeSetHTML('lbl-tip-item-2', t('tip2'));
-  safeSetHTML('lbl-tip-item-3', t('tip3'));
-
-  // Item Modal
-  safeSetText('modal-item-title', state.editingItemId ? t('editItemModalTitle') : t('addItemModalTitle'));
-  safeSetText('btn-save-item-label', state.editingItemId ? t('saveItemBtnEdit') : t('saveItemBtnAdd'));
-  safeSetText('lbl-item-name', t('itemName'));
-  safeSetText('lbl-auto-compare-hint', t('autoCompareHint'));
-  safeSetText('lbl-category', t('categoryLabel'));
-  safeSetText('lbl-btn-add-cat', t('addNewCatBtn'));
-  safeSetText('lbl-btn-save-cat', t('saveCatBtn'));
-  safeSetText('lbl-unit', t('unitLabel'));
-  safeSetText('lbl-quantity', t('qtyLabel'));
-  safeSetText('lbl-unit-price', t('unitPriceLabel'));
-  safeSetText('lbl-per-item-hint', t('perItemHint'));
-  safeSetText('lbl-discount-calc-title', t('discountCalcTitle'));
-  safeSetText('btn-mode-none', t('noDiscount'));
-  safeSetText('btn-mode-single', t('singleDiscount'));
-  safeSetText('btn-mode-tiered', t('tieredDiscount'));
-  safeSetText('lbl-discount-single-label', t('discountSingleLabel'));
-  safeSetText('lbl-discount-d1-label', t('discountD1Label'));
-  safeSetText('lbl-discount-d2-label', t('discountD2Label'));
-  safeSetText('lbl-before-discount', t('beforeDiscount'));
-  safeSetText('lbl-saved-cut', t('savedCut'));
-  safeSetText('lbl-final-row-price', t('finalRowPrice'));
-  safeSetText('lbl-buying-tips-title', t('buyingTipsTitle'));
-  safeSetHTML('lbl-buying-tip-1', t('buyingTip1'));
-  safeSetHTML('lbl-buying-tip-2', t('buyingTip2'));
-  safeSetHTML('lbl-buying-tip-3', t('buyingTip3'));
-
-  // Settings Modal
-  safeSetText('modal-settings-title', t('settingsTitle'));
-  safeSetText('lbl-settings-lang-title', t('settingsLangTitle'));
-  safeSetText('lbl-settings-lang-sub', t('settingsLangSub'));
-  safeSetText('lbl-settings-theme-title', t('settingsThemeTitle'));
-  safeSetText('lbl-settings-theme-sub', t('settingsThemeSub'));
-  safeSetText('lbl-theme-bright-sub', t('themeBrightSub'));
-  safeSetText('lbl-theme-ice-sub', t('themeIceSub'));
-  safeSetText('lbl-theme-aurora-sub', t('themeAuroraSub'));
-  safeSetText('lbl-theme-midnight-sub', t('themeMidnightSub'));
-  safeSetText('lbl-settings-audio-title', t('settingsAudioTitle'));
-  safeSetText('lbl-settings-audio-sub', t('settingsAudioSub'));
-  safeSetText('lbl-settings-sound-switch', t('settingsSoundSwitch'));
-  safeSetText('lbl-settings-account-title', t('settingsAccountTitle'));
-  safeSetText('lbl-change-pwd-title', t('changePwdTitle'));
-  safeSetText('lbl-current-pwd', t('currentPwdLabel'));
-  safeSetText('lbl-new-pwd', t('newPwdLabel'));
-  safeSetText('lbl-confirm-pwd', t('confirmPwdLabel'));
-  safeSetText('lbl-save-new-pwd-btn', t('saveNewPwdBtn'));
-  safeSetText('lbl-logout-btn', t('logoutBtn'));
-  safeSetText('lbl-admin-firebase-title', t('adminFirebaseTitle'));
-  safeSetText('lbl-admin-firebase-sub', t('adminFirebaseSub'));
-  safeSetText('lbl-open-cloud-btn', t('openCloudBtn'));
-
-  // Auth Modal
-  safeSetText('lbl-auth-brand-sub', t('appSubtitle'));
-  safeSetText('tab-login-btn', state.language === 'en' ? 'Login' : 'Masuk (Login)');
-  safeSetText('tab-register-btn', state.language === 'en' ? 'Sign Up' : 'Daftar Akun (Sign Up)');
-  safeSetText('lbl-auth-email', t('authEmailLabel'));
-  safeSetText('lbl-auth-password', t('authPwdLabel'));
-  safeSetText('lbl-auth-login-submit', t('authLoginSubmit'));
-  safeSetText('lbl-reg-username', t('regUsernameLabel'));
-  safeSetText('lbl-reg-email', t('regEmailLabel'));
-  safeSetText('lbl-reg-password', t('regPwdLabel'));
-  safeSetText('lbl-auth-reg-submit', t('authRegSubmit'));
-
-  // Checkout Receipt Modal
-  safeSetText('lbl-receipt-limit', t('receiptLimit'));
-  safeSetText('lbl-receipt-net-total', t('receiptNetTotal'));
-  safeSetText('lbl-receipt-discount-saved', t('receiptDiscountSaved'));
-  safeSetText('lbl-confirm-save-receipt-btn', t('confirmSaveReceiptBtn'));
-
-  // History Detail Modal
-  safeSetText('modal-history-title', t('historyDetailModalTitle'));
-  safeSetText('lbl-reload-to-cart-btn', t('reloadToCartBtn'));
-}
-
-// ==========================================================================
-// THEME SWITCHER MANAGEMENT
-// ==========================================================================
-
-function initTheme() {
-  const savedTheme = localStorage.getItem(STORAGE_KEYS.THEME) || 'liquid-bright';
-  setTheme(savedTheme, false);
-}
-
-function setTheme(themeName, playAudio = true) {
-  state.theme = themeName;
-  document.documentElement.setAttribute('data-theme', themeName);
-  localStorage.setItem(STORAGE_KEYS.THEME, themeName);
-
-  document.querySelectorAll('.theme-card-btn').forEach((btn) => {
-    btn.classList.toggle('active', btn.getAttribute('data-theme') === themeName);
-  });
-
-  if (playAudio) sound.playClick();
-}
-
-// ==========================================================================
-// AUTHENTICATION & ROLE MANAGEMENT
-// ==========================================================================
-
-function initAuth() {
-  try {
-    const storedUsers = localStorage.getItem(STORAGE_KEYS.USERS_LIST);
-    state.usersList = storedUsers ? JSON.parse(storedUsers) : [];
-  } catch (_) {
-    state.usersList = [];
-  }
-
-  // Ensure default administrator account exists
-  const hasAdmin = state.usersList.some(u => u.email === DEFAULT_ADMIN.email);
-  if (!hasAdmin) {
-    state.usersList.push(DEFAULT_ADMIN);
-    localStorage.setItem(STORAGE_KEYS.USERS_LIST, JSON.stringify(state.usersList));
-  }
-
-  try {
-    const storedCurrent = localStorage.getItem(STORAGE_KEYS.CURRENT_USER);
-    state.currentUser = storedCurrent ? JSON.parse(storedCurrent) : null;
-  } catch (_) {
-    state.currentUser = null;
-  }
-
-  updateAuthUI();
-}
-
-function isAdmin() {
-  return state.currentUser && state.currentUser.email === DEFAULT_ADMIN.email;
-}
-
-function updateAuthUI() {
-  const authModal = document.getElementById('auth-modal');
-  const greetingEl = document.getElementById('header-user-greeting');
-  const adminBadgeEl = document.getElementById('header-admin-badge');
-  const cloudBtn = document.getElementById('btn-cloud-sync');
-  const adminFirebaseSection = document.getElementById('settings-admin-firebase-section');
-  const settingsUserInfo = document.getElementById('settings-user-info-text');
-
-  if (state.currentUser) {
-    if (authModal) authModal.classList.add('hidden');
-    
-    const displayName = state.currentUser.username || 'User';
-    const helloPrefix = state.language === 'en' ? 'Hello' : 'Halo';
-    if (greetingEl) greetingEl.textContent = `${helloPrefix}, ${displayName}`;
-
-    const userIsAdmin = isAdmin();
-    if (adminBadgeEl) adminBadgeEl.classList.toggle('hidden', !userIsAdmin);
-    
-    // FIREBASE SYNC: ONLY VISIBLE IF LOGGED IN AS ADMINISTRATOR
-    if (cloudBtn) cloudBtn.classList.toggle('hidden', !userIsAdmin);
-    if (adminFirebaseSection) adminFirebaseSection.classList.toggle('hidden', !userIsAdmin);
-
-    if (settingsUserInfo) {
-      const roleText = userIsAdmin ? 'Administrator' : (state.language === 'en' ? 'Member' : 'Pengguna');
-      settingsUserInfo.textContent = `${displayName} (${state.currentUser.email}) • ${roleText}`;
-    }
-  } else {
-    if (authModal) authModal.classList.remove('hidden');
-    if (greetingEl) greetingEl.textContent = state.language === 'en' ? 'Not Logged In' : 'Belum Masuk';
-    if (adminBadgeEl) adminBadgeEl.classList.add('hidden');
-    if (cloudBtn) cloudBtn.classList.add('hidden');
-    if (adminFirebaseSection) adminFirebaseSection.classList.add('hidden');
-  }
-}
-
-function handleLogin(email, password) {
-  const errorEl = document.getElementById('login-error-msg');
-  errorEl.classList.add('hidden');
-
-  const cleanEmail = email.trim().toLowerCase();
-  const found = state.usersList.find(u => u.email.toLowerCase() === cleanEmail && u.password === password);
-
-  if (found) {
-    state.currentUser = found;
-    localStorage.setItem(STORAGE_KEYS.CURRENT_USER, JSON.stringify(found));
-    updateAuthUI();
-    sound.playSuccess();
-    return true;
-  } else {
-    errorEl.textContent = state.language === 'en'
-      ? 'Invalid email or password. Please try again.'
-      : 'Email atau password salah. Silakan coba lagi.';
-    errorEl.classList.remove('hidden');
-    sound.playWarning();
-    return false;
-  }
-}
-
-function handleRegister(username, email, password) {
-  const errorEl = document.getElementById('register-error-msg');
-  const successEl = document.getElementById('register-success-msg');
-  errorEl.classList.add('hidden');
-  successEl.classList.add('hidden');
-
-  const cleanUser = username.trim();
-  const cleanEmail = email.trim().toLowerCase();
-
-  if (!cleanUser || !cleanEmail || !password) {
-    errorEl.textContent = state.language === 'en'
-      ? 'All registration fields are required!'
-      : 'Semua kolom pendaftaran wajib diisi!';
-    errorEl.classList.remove('hidden');
-    sound.playWarning();
-    return false;
-  }
-
-  if (password.length < 6) {
-    errorEl.textContent = state.language === 'en'
-      ? 'Password must be at least 6 characters!'
-      : 'Password minimal harus 6 karakter!';
-    errorEl.classList.remove('hidden');
-    sound.playWarning();
-    return false;
-  }
-
-  const existing = state.usersList.find(u => u.email.toLowerCase() === cleanEmail);
-  if (existing) {
-    errorEl.textContent = state.language === 'en'
-      ? 'This email is already registered! Please log in.'
-      : 'Email ini sudah terdaftar! Silakan login.';
-    errorEl.classList.remove('hidden');
-    sound.playWarning();
-    return false;
-  }
-
-  const role = (cleanEmail === DEFAULT_ADMIN.email.toLowerCase()) ? 'admin' : 'user';
-  const newUser = {
-    username: cleanUser,
-    email: cleanEmail,
-    password: password,
-    role: role
-  };
-
-  state.usersList.push(newUser);
-  localStorage.setItem(STORAGE_KEYS.USERS_LIST, JSON.stringify(state.usersList));
-
-  state.currentUser = newUser;
-  localStorage.setItem(STORAGE_KEYS.CURRENT_USER, JSON.stringify(newUser));
-
-  successEl.textContent = state.language === 'en'
-    ? 'Registration successful! Entering app...'
-    : 'Pendaftaran berhasil! Mengalihkan ke aplikasi...';
-  successEl.classList.remove('hidden');
-  sound.playSuccess();
-
-  setTimeout(() => {
-    updateAuthUI();
-  }, 600);
-
-  return true;
-}
-
-function handleLogout() {
-  const confirmMsg = state.language === 'en'
-    ? 'Log out of current GroceryX account?'
-    : 'Keluar dari akun GroceryX saat ini?';
-  if (confirm(confirmMsg)) {
-    state.currentUser = null;
-    localStorage.removeItem(STORAGE_KEYS.CURRENT_USER);
-    document.getElementById('settings-modal').classList.add('hidden');
-    updateAuthUI();
-    sound.playClick();
-  }
-}
-
-function handleChangePassword(oldPwd, newPwd, confirmPwd) {
-  const msgEl = document.getElementById('change-pwd-msg');
-  msgEl.className = 'auth-inline-msg hidden';
-
-  if (!state.currentUser) return;
-
-  if (state.currentUser.password !== oldPwd) {
-    msgEl.className = 'auth-inline-msg error';
-    msgEl.textContent = state.language === 'en' ? 'Current password does not match!' : 'Password lama Anda tidak cocok!';
-    sound.playWarning();
-    return;
-  }
-
-  if (newPwd.length < 6) {
-    msgEl.className = 'auth-inline-msg error';
-    msgEl.textContent = state.language === 'en' ? 'New password must be at least 6 characters!' : 'Password baru minimal 6 karakter!';
-    sound.playWarning();
-    return;
-  }
-
-  if (newPwd !== confirmPwd) {
-    msgEl.className = 'auth-inline-msg error';
-    msgEl.textContent = state.language === 'en' ? 'Password confirmation does not match!' : 'Konfirmasi password baru tidak cocok!';
-    sound.playWarning();
-    return;
-  }
-
-  state.currentUser.password = newPwd;
-  localStorage.setItem(STORAGE_KEYS.CURRENT_USER, JSON.stringify(state.currentUser));
-
-  const idx = state.usersList.findIndex(u => u.email === state.currentUser.email);
-  if (idx !== -1) {
-    state.usersList[idx].password = newPwd;
-    localStorage.setItem(STORAGE_KEYS.USERS_LIST, JSON.stringify(state.usersList));
-  }
-
-  msgEl.className = 'auth-inline-msg success';
-  msgEl.textContent = state.language === 'en' ? 'Password successfully changed!' : 'Password berhasil diubah!';
-  sound.playSuccess();
-
-  document.getElementById('change-pwd-form').reset();
-}
-
-// ==========================================================================
-// STORAGE LOAD & SAVE
-// ==========================================================================
-
-function loadStateFromStorage() {
-  try {
-    const storedCap = localStorage.getItem(STORAGE_KEYS.SAFETY_CAP);
-    state.safetyCap = storedCap ? parseInt(storedCap, 10) : 500000;
-
-    const storedPrevCatalog = localStorage.getItem(STORAGE_KEYS.PREV_CATALOG);
-    state.prevCatalog = storedPrevCatalog ? JSON.parse(storedPrevCatalog) : { ...DEFAULT_PREV_CATALOG };
-
-    const storedHistory = localStorage.getItem(STORAGE_KEYS.HISTORY);
-    state.history = storedHistory ? JSON.parse(storedHistory) : [...DEFAULT_HISTORY];
-
-    const storedCart = localStorage.getItem(STORAGE_KEYS.CART);
-    state.cart = storedCart ? JSON.parse(storedCart) : [...DEFAULT_INITIAL_CART];
-
-    const storedSound = localStorage.getItem(STORAGE_KEYS.SOUND_ENABLED);
-    state.soundEnabled = storedSound !== null ? JSON.parse(storedSound) : true;
-
-    const storedCustomCat = localStorage.getItem(STORAGE_KEYS.CUSTOM_CATEGORIES);
-    state.customCategories = storedCustomCat ? JSON.parse(storedCustomCat) : [];
-  } catch (err) {
-    console.error('Error loading state from localStorage:', err);
-    state.safetyCap = 500000;
-    state.prevCatalog = { ...DEFAULT_PREV_CATALOG };
-    state.history = [...DEFAULT_HISTORY];
-    state.cart = [...DEFAULT_INITIAL_CART];
-    state.soundEnabled = true;
-    state.customCategories = [];
-  }
-}
-
-function saveStateToLocalStorage() {
-  try {
-    localStorage.setItem(STORAGE_KEYS.SAFETY_CAP, state.safetyCap);
-    localStorage.setItem(STORAGE_KEYS.CART, JSON.stringify(state.cart));
-    localStorage.setItem(STORAGE_KEYS.HISTORY, JSON.stringify(state.history));
-    localStorage.setItem(STORAGE_KEYS.PREV_CATALOG, JSON.stringify(state.prevCatalog));
-    localStorage.setItem(STORAGE_KEYS.SOUND_ENABLED, JSON.stringify(state.soundEnabled));
-    localStorage.setItem(STORAGE_KEYS.CUSTOM_CATEGORIES, JSON.stringify(state.customCategories));
-  } catch (err) {
-    console.error('Error saving state to localStorage:', err);
-  }
-}
-
-function saveState() {
-  saveStateToLocalStorage();
-
-  if (window.FirebaseSync && typeof window.FirebaseSync.pushLocalState === 'function') {
-    window.FirebaseSync.pushLocalState();
-  }
-}
-
-window.SmartGrocery = {
-  state,
-  sound,
-  saveStateToLocalStorage,
-  renderAll: () => {
-    renderCartItems();
-    renderHistorySessions();
-    renderBudgetBreakdown();
-    updateSafetyCapBanner();
-    updateIcons();
-  }
-};
-window.GroceryX = window.SmartGrocery;
-
-// ==========================================================================
-// RENDER METHODS: TABS & VIEWS
-// ==========================================================================
-
-function switchTab(targetViewId) {
-  document.querySelectorAll('.app-view').forEach((view) => {
-    view.classList.toggle('hidden', view.id !== targetViewId);
-  });
-
-  document.querySelectorAll('.nav-tab-btn').forEach((btn) => {
-    btn.classList.toggle('active', btn.getAttribute('data-target') === targetViewId);
-  });
-
-  state.activeTab = targetViewId;
-  sound.playClick();
-
-  if (targetViewId === 'view-cart') {
-    renderCartItems();
-  } else if (targetViewId === 'view-history') {
-    renderHistorySessions();
-  } else if (targetViewId === 'view-budget') {
-    renderBudgetBreakdown();
-  }
-
-  updateIcons();
-}
-
-function updateSafetyCapBanner() {
-  let totalSpent = 0;
-  state.cart.forEach((item) => {
-    const calc = calculateItemPricing(item);
-    totalSpent += calc.finalRowTotal;
-  });
-
-  const remaining = state.safetyCap - totalSpent;
-  const pct = state.safetyCap > 0 ? Math.min(100, Math.round((totalSpent / state.safetyCap) * 100)) : 0;
-
-  const spentEl = document.getElementById('header-spent-budget');
-  const limitEl = document.getElementById('header-limit-budget');
-  const remainingEl = document.getElementById('header-remaining-budget');
-  const percentEl = document.getElementById('header-percent-budget');
-  const meterFill = document.getElementById('budget-meter-fill');
-  const statusText = document.getElementById('budget-status-text');
-  const statusDot = document.getElementById('budget-pulse-dot');
-  const navAlert = document.getElementById('nav-budget-alert');
-  const balanceSub = document.getElementById('lbl-balance-sub');
-
-  spentEl.textContent = `Rp ${formatRupiah(totalSpent)}`;
-  limitEl.textContent = `Rp ${formatRupiah(state.safetyCap)}`;
-  percentEl.textContent = `${pct}%`;
-  meterFill.style.width = `${pct}%`;
-
-  if (remaining >= 0) {
-    remainingEl.textContent = `Rp ${formatRupiah(remaining)}`;
-    remainingEl.style.color = 'var(--primary)';
-    if (balanceSub) balanceSub.textContent = t('remainingWallet');
-  } else {
-    remainingEl.textContent = `- Rp ${formatRupiah(Math.abs(remaining))}`;
-    remainingEl.style.color = 'var(--crimson)';
-    if (balanceSub) balanceSub.textContent = t('deficit');
-  }
-
-  meterFill.className = 'liquid-meter-fill';
-  statusDot.className = 'status-pulse-dot';
-
-  if (pct >= 100) {
-    statusText.textContent = t('overBudget');
-    statusText.style.color = 'var(--crimson)';
-    statusDot.classList.add('danger');
-    meterFill.classList.add('danger');
-    navAlert.classList.remove('hidden');
-  } else if (pct >= 80) {
-    statusText.textContent = t('approachingLimit');
-    statusText.style.color = 'var(--amber)';
-    statusDot.classList.add('warning');
-    meterFill.classList.add('warning');
-    navAlert.classList.remove('hidden');
-  } else {
-    statusText.textContent = t('budgetSafe');
-    statusText.style.color = 'var(--emerald)';
-    navAlert.classList.add('hidden');
-  }
-
-  let totalQty = 0;
-  let totalSaved = 0;
-  state.cart.forEach((i) => {
-    totalQty += (parseFloat(i.qty) || 0);
-    const c = calculateItemPricing(i);
-    totalSaved += c.savedAmount;
-  });
-
-  const itemSuffix = state.language === 'en' ? (totalQty === 1 ? 'item' : 'items') : 'item';
-  document.getElementById('summary-total-qty').textContent = `${totalQty} ${itemSuffix}`;
-  document.getElementById('summary-total-price').textContent = formatRupiah(totalSpent);
-  document.getElementById('summary-saved-amount').textContent = `Rp ${formatRupiah(totalSaved)}`;
-  document.getElementById('summary-discount-pill').classList.toggle('hidden', totalSaved <= 0);
-  document.getElementById('nav-cart-badge').textContent = state.cart.length;
-}
-
-function renderCartItems() {
-  const container = document.getElementById('cart-items-container');
-  const emptyState = document.getElementById('cart-empty-state');
-  const filterCat = state.currentCategoryFilter;
-  const search = state.searchQuery.trim().toLowerCase();
-
-  const filtered = state.cart.filter((item) => {
-    const matchesCat = (filterCat === 'ALL' || item.category === filterCat);
-    const matchesSearch = (!search || item.name.toLowerCase().includes(search));
-    return matchesCat && matchesSearch;
-  });
-
-  const countAllEl = document.getElementById('count-all');
-  if (countAllEl) countAllEl.textContent = state.cart.length;
-
-  if (state.cart.length === 0) {
-    container.innerHTML = '';
-    emptyState.classList.remove('hidden');
-    updateSafetyCapBanner();
-    return;
-  } else {
-    emptyState.classList.add('hidden');
-  }
-
-  if (filtered.length === 0) {
-    container.innerHTML = `
-      <div class="empty-state-card glass-card">
-        <i data-lucide="search" style="width: 32px; height: 32px; color: var(--text-muted);"></i>
-        <h3>${state.language === 'en' ? 'No matching items' : 'Tidak ada item yang cocok'}</h3>
-        <p>${state.language === 'en' ? 'Try another keyword or select "All" category filter.' : 'Coba gunakan kata kunci lain atau pilih filter kategori "Semua".'}</p>
-      </div>
-    `;
-    updateIcons();
-    updateSafetyCapBanner();
-    return;
-  }
-
-  container.innerHTML = filtered.map((item) => {
-    const calc = calculateItemPricing(item);
-    const comp = comparePriceWithPrevMonth(item.name, item.unitPrice);
-
-    let compBadgeHtml = '';
-    const prevMonthPrefix = state.language === 'en' ? 'Last month' : 'Bulan lalu';
-    if (comp.status === 'higher') {
-      compBadgeHtml = `
-        <span class="comp-badge higher" title="${prevMonthPrefix}: Rp ${formatRupiah(comp.prevPrice)}">
-          <i data-lucide="trending-up"></i> ↑ +Rp ${formatRupiah(comp.diffVal)} (+${comp.diffPct}%)
-        </span>
-      `;
-    } else if (comp.status === 'lower') {
-      compBadgeHtml = `
-        <span class="comp-badge lower" title="${prevMonthPrefix}: Rp ${formatRupiah(comp.prevPrice)}">
-          <i data-lucide="trending-down"></i> ↓ -Rp ${formatRupiah(comp.diffVal)} (-${comp.diffPct}%)
-        </span>
-      `;
-    } else if (comp.status === 'equal') {
-      compBadgeHtml = `
-        <span class="comp-badge equal" title="${prevMonthPrefix}: Rp ${formatRupiah(comp.prevPrice)}">
-          <span>=</span> ${state.language === 'en' ? 'Stable' : 'Stabil'}
-        </span>
-      `;
-    } else {
-      compBadgeHtml = `
-        <span class="comp-badge new">
-          <i data-lucide="sparkles"></i> ${state.language === 'en' ? 'New Item' : 'Item Baru'}
-        </span>
-      `;
-    }
-
-    let discountTagHtml = '';
-    const discLabel = state.language === 'en' ? 'Disc' : 'Diskon';
-    if (item.discountType === 'single' && item.d1 > 0) {
-      discountTagHtml = `<span class="discount-pill-mini">${discLabel} ${item.d1}%</span>`;
-    } else if (item.discountType === 'tiered' && item.d1 > 0) {
-      discountTagHtml = `<span class="discount-pill-mini">${item.d1}% + ${item.d2}%</span>`;
-    }
-
-    const strikePriceHtml = calc.savedAmount > 0 
-      ? `<span class="normal-strike-price">Rp ${formatRupiah(calc.normalRowTotal)}</span>` 
-      : '';
-
-    return `
-      <div class="cart-item-card" data-item-id="${item.id}">
-        <div class="item-card-top">
-          <div class="item-main-info">
-            <div class="item-badge-row">
-              <span class="badge-category">${item.category}</span>
-              ${compBadgeHtml}
-            </div>
-            <h3 class="item-product-name">${item.name}</h3>
-            <span class="item-unit-tag">@ Rp ${formatRupiah(item.unitPrice)} / ${item.unit}</span>
-          </div>
-
-          <div class="item-actions-top">
-            <button class="btn-card-action btn-edit-item" data-id="${item.id}" aria-label="Edit Item" title="Edit Item">
-              <i data-lucide="pencil"></i>
-            </button>
-            <button class="btn-card-action text-danger btn-delete-item" data-id="${item.id}" aria-label="Hapus Item" title="Hapus Item">
-              <i data-lucide="trash-2"></i>
-            </button>
-          </div>
-        </div>
-
-        <div class="item-card-bottom">
-          <div class="qty-stepper-control">
-            <button type="button" class="btn-stepper btn-cart-step-minus" data-id="${item.id}" aria-label="Kurangi">
-              <i data-lucide="minus"></i>
-            </button>
-            <input type="number" class="cart-qty-direct" data-id="${item.id}" value="${item.qty}" min="0.1" step="1">
-            <button type="button" class="btn-stepper btn-cart-step-plus" data-id="${item.id}" aria-label="Tambah">
-              <i data-lucide="plus"></i>
-            </button>
-          </div>
-
-          <div class="item-pricing-zone">
-            <div class="item-price-current">
-              Rp ${formatRupiah(calc.finalRowTotal)}
-            </div>
-            <div class="item-price-sub">
-              ${strikePriceHtml}
-              ${discountTagHtml}
-            </div>
-          </div>
-        </div>
-      </div>
-    `;
-  }).join('');
-
-  attachCartItemListeners();
-  updateSafetyCapBanner();
-  updateIcons();
-}
-
-function attachCartItemListeners() {
-  document.querySelectorAll('.btn-edit-item').forEach((btn) => {
-    btn.onclick = () => {
-      const id = btn.getAttribute('data-id');
-      openItemModal(id);
-    };
-  });
-
-  document.querySelectorAll('.btn-delete-item').forEach((btn) => {
-    btn.onclick = () => {
-      const id = btn.getAttribute('data-id');
-      state.cart = state.cart.filter((i) => i.id !== id);
-      sound.playClick();
-      saveState();
-      renderCartItems();
-    };
-  });
-
-  document.querySelectorAll('.btn-cart-step-plus').forEach((btn) => {
-    btn.onclick = () => {
-      const id = btn.getAttribute('data-id');
-      const item = state.cart.find((i) => i.id === id);
-      if (item) {
-        item.qty = (parseFloat(item.qty) || 0) + 1;
-        sound.playClick();
-        saveState();
-        renderCartItems();
-      }
-    };
-  });
-
-  document.querySelectorAll('.btn-cart-step-minus').forEach((btn) => {
-    btn.onclick = () => {
-      const id = btn.getAttribute('data-id');
-      const item = state.cart.find((i) => i.id === id);
-      if (item) {
-        const cur = parseFloat(item.qty) || 1;
-        if (cur > 1) {
-          item.qty = cur - 1;
-          sound.playClick();
-          saveState();
-          renderCartItems();
-        } else {
-          const deleteConfirm = state.language === 'en'
-            ? `Remove "${item.name}" from shopping cart?`
-            : `Hapus "${item.name}" dari troli belanja?`;
-          if (confirm(deleteConfirm)) {
-            state.cart = state.cart.filter((i) => i.id !== id);
-            sound.playClick();
-            saveState();
-            renderCartItems();
-          }
-        }
-      }
-    };
-  });
-
-  document.querySelectorAll('.cart-qty-direct').forEach((input) => {
-    input.onchange = (e) => {
-      const id = input.getAttribute('data-id');
-      const item = state.cart.find((i) => i.id === id);
-      if (item) {
-        const val = parseFloat(e.target.value);
-        item.qty = val > 0 ? val : 1;
-        saveState();
-        renderCartItems();
-      }
-    };
-  });
-}
-
-function renderHistorySessions() {
-  const container = document.getElementById('history-sessions-container');
-  const prevTotalEl = document.getElementById('hist-prev-total');
-  const currTotalEl = document.getElementById('hist-current-total');
-
-  let currentSpent = 0;
-  state.cart.forEach((i) => {
-    currentSpent += calculateItemPricing(i).finalRowTotal;
-  });
-  currTotalEl.textContent = `Rp ${formatRupiah(currentSpent)}`;
-
-  if (state.history.length === 0) {
-    prevTotalEl.textContent = 'Rp 0';
-    container.innerHTML = `
-      <div class="empty-state-card glass-card">
-        <i data-lucide="receipt" style="width: 32px; height: 32px; color: var(--text-muted);"></i>
-        <h3>${t('emptyHistoryTitle')}</h3>
-        <p>${t('emptyHistoryDesc')}</p>
-      </div>
-    `;
-    updateIcons();
-    return;
-  }
-
-  const latestHistory = state.history[0];
-  prevTotalEl.textContent = `Rp ${formatRupiah(latestHistory.totalSpent)}`;
-
-  container.innerHTML = state.history.map((sess) => {
-    const isOver = sess.totalSpent > sess.safetyCap;
-    let statusText = '';
-    if (state.language === 'en') {
-      statusText = isOver ? 'OVER BUDGET' : 'ON BUDGET';
-    } else {
-      statusText = isOver ? 'OVER ANGGARAN' : 'SESUAI ANGGARAN';
-    }
-    const statusClass = isOver ? 'history-status-tag over' : 'history-status-tag';
-    const itemsCountLabel = state.language === 'en'
-      ? `${sess.itemCount || (sess.items ? sess.items.length : 0)} items purchased`
-      : `${sess.itemCount || (sess.items ? sess.items.length : 0)} macam item dibeli`;
-
-    const discountSavedLabel = state.language === 'en'
-      ? `Saved: Rp ${formatRupiah(sess.totalSaved || 0)}`
-      : `Hemat diskon: Rp ${formatRupiah(sess.totalSaved || 0)}`;
-
-    return `
-      <div class="history-session-card">
-        <div class="history-card-header">
-          <div class="history-date">
-            <i data-lucide="receipt"></i>
-            <span>${sess.date}</span>
-          </div>
-          <span class="${statusClass}">${statusText}</span>
-        </div>
-
-        <div class="history-card-body">
-          <span class="history-items-count">${itemsCountLabel}</span>
-          <strong class="history-total-spent">Rp ${formatRupiah(sess.totalSpent)}</strong>
-        </div>
-
-        <div class="history-card-footer">
-          <span class="text-emerald">${discountSavedLabel}</span>
-          <button class="btn-view-receipt-link" data-id="${sess.id}">
-            ${t('viewReceipt')} <i data-lucide="arrow-right"></i>
-          </button>
-        </div>
-      </div>
-    `;
-  }).join('');
-
-  container.querySelectorAll('.btn-view-receipt-link').forEach((btn) => {
-    btn.onclick = () => {
-      const id = btn.getAttribute('data-id');
-      openHistoryDetailModal(id);
-    };
-  });
-
-  updateIcons();
-}
-
-function renderBudgetBreakdown() {
-  const barsContainer = document.getElementById('category-breakdown-bars');
-  const badgeEl = document.getElementById('breakdown-items-badge');
-
-  const catMap = {};
-  let totalSpent = 0;
-  let totalItems = 0;
-
-  state.cart.forEach((item) => {
-    const calc = calculateItemPricing(item);
-    const cat = item.category || 'Lainnya';
-    catMap[cat] = (catMap[cat] || 0) + calc.finalRowTotal;
-    totalSpent += calc.finalRowTotal;
-    totalItems += (parseFloat(item.qty) || 0);
-  });
-
-  badgeEl.textContent = state.language === 'en'
-    ? `${totalItems} items in cart`
-    : `${totalItems} item di troli`;
-
-  const sortedCats = Object.entries(catMap).sort((a, b) => b[1] - a[1]);
-
-  if (sortedCats.length === 0) {
-    barsContainer.innerHTML = `
-      <p style="font-size: 0.78rem; color: var(--text-muted); text-align: center; padding: 12px 0;">
-        ${state.language === 'en'
-          ? 'Cart is empty. Add items to see your category budget breakdown.'
-          : 'Troli masih kosong. Tambahkan barang untuk melihat alokasi anggaran per kategori.'}
-      </p>
-    `;
-    return;
-  }
-
-  barsContainer.innerHTML = sortedCats.map(([cat, amount]) => {
-    const pct = totalSpent > 0 ? Math.round((amount / totalSpent) * 100) : 0;
-
-    return `
-      <div class="cat-bar-item">
-        <div class="cat-bar-meta">
-          <span><strong>${cat}</strong> (${pct}%)</span>
-          <strong>Rp ${formatRupiah(amount)}</strong>
-        </div>
-        <div class="cat-bar-track">
-          <div class="cat-bar-fill" style="width: ${pct}%;"></div>
-        </div>
-      </div>
-    `;
-  }).join('');
-}
-
-// ==========================================================================
-// MODAL LOGIC: ITEM BELANJA (ADD / EDIT)
-// ==========================================================================
-
-function openItemModal(itemId = null) {
-  state.editingItemId = itemId;
-  const modal = document.getElementById('item-modal');
-  const titleEl = document.getElementById('modal-item-title');
-  const saveLabel = document.getElementById('btn-save-item-label');
-  const idInput = document.getElementById('item-id-input');
-  const nameInput = document.getElementById('item-name-input');
-  const unitInput = document.getElementById('item-unit-input');
-  const qtyInput = document.getElementById('item-qty-input');
-  const priceInput = document.getElementById('item-price-input');
-  const discSingleInput = document.getElementById('input-discount-single');
-  const discD1Input = document.getElementById('input-discount-d1');
-  const discD2Input = document.getElementById('input-discount-d2');
-
-  populateDatalist();
-  populateQuickStaples();
-
-  document.getElementById('new-category-inline-box').classList.add('hidden');
-
-  if (itemId) {
-    const item = state.cart.find((i) => i.id === itemId);
-    if (!item) return;
-
-    titleEl.textContent = t('editItemModalTitle');
-    saveLabel.textContent = t('saveItemBtnEdit');
-    idInput.value = item.id;
-    nameInput.value = item.name;
-    unitInput.value = item.unit;
-    qtyInput.value = item.qty;
-    priceInput.value = formatRupiah(item.unitPrice);
-
-    populateCategoryDropdown(item.category);
-    setDiscountMode(item.discountType || 'none');
-    discSingleInput.value = item.d1 || 0;
-    discD1Input.value = item.d1 || 50;
-    discD2Input.value = item.d2 || 20;
-  } else {
-    titleEl.textContent = t('addItemModalTitle');
-    saveLabel.textContent = t('saveItemBtnAdd');
-    idInput.value = '';
-    nameInput.value = '';
-    unitInput.value = 'pcs';
-    qtyInput.value = '1';
-    priceInput.value = '';
-
-    const defaultFirstCat = state.language === 'en' ? 'Staple Foods' : 'Bahan Pokok';
-    populateCategoryDropdown(defaultFirstCat);
-    setDiscountMode('none');
-    discSingleInput.value = '0';
-    discD1Input.value = '50';
-    discD2Input.value = '20';
-  }
-
-  updateModalComparatorPreview();
-  updateModalDiscountPreview();
-
-  modal.classList.remove('hidden');
-  updateIcons();
-  nameInput.focus();
-}
-
-function closeItemModal() {
-  document.getElementById('item-modal').classList.add('hidden');
-  state.editingItemId = null;
-}
-
-function setDiscountMode(mode) {
-  document.querySelectorAll('.mode-btn').forEach((btn) => {
-    btn.classList.toggle('active', btn.getAttribute('data-mode') === mode);
-  });
-
-  const singleSection = document.getElementById('section-discount-single');
-  const tieredSection = document.getElementById('section-discount-tiered');
-
-  if (mode === 'single') {
-    singleSection.classList.remove('hidden');
-    tieredSection.classList.add('hidden');
-  } else if (mode === 'tiered') {
-    singleSection.classList.add('hidden');
-    tieredSection.classList.remove('hidden');
-  } else {
-    singleSection.classList.add('hidden');
-    tieredSection.classList.add('hidden');
-  }
-
-  updateModalDiscountPreview();
-}
-
-function updateModalComparatorPreview() {
-  const name = document.getElementById('item-name-input').value.trim();
-  const unitPrice = parseRupiahInput(document.getElementById('item-price-input').value);
-  const badgeCard = document.getElementById('modal-comparator-badge');
-  const title = document.getElementById('preview-comp-title');
-  const desc = document.getElementById('preview-comp-desc');
-  const pill = document.getElementById('preview-comp-pill');
-  const icon = document.getElementById('preview-comp-icon');
-
-  if (!name || unitPrice <= 0) {
-    badgeCard.classList.add('hidden');
-    return;
-  }
-
-  const comp = comparePriceWithPrevMonth(name, unitPrice);
-  const lastMonthPrefix = state.language === 'en' ? 'Last Month' : 'Bulan Lalu';
-
-  if (comp.status === 'higher') {
-    badgeCard.classList.remove('hidden');
-    badgeCard.style.borderColor = 'rgba(225, 29, 72, 0.4)';
-    icon.innerHTML = '<i data-lucide="trending-up" style="color: var(--crimson);"></i>';
-    title.textContent = `${lastMonthPrefix}: Rp ${formatRupiah(comp.prevPrice)}`;
-    desc.textContent = state.language === 'en'
-      ? `Price INCREASED by Rp ${formatRupiah(comp.diffVal)} (+${comp.diffPct}%)`
-      : `Harga NAIK Rp ${formatRupiah(comp.diffVal)} (+${comp.diffPct}%)`;
-    pill.textContent = state.language === 'en' ? `↑ More Expensive (+${comp.diffPct}%)` : `↑ Lebih Mahal (+${comp.diffPct}%)`;
-    pill.style.background = 'var(--crimson-soft)';
-    pill.style.color = 'var(--crimson)';
-  } else if (comp.status === 'lower') {
-    badgeCard.classList.remove('hidden');
-    badgeCard.style.borderColor = 'rgba(16, 185, 129, 0.4)';
-    icon.innerHTML = '<i data-lucide="trending-down" style="color: var(--emerald-light);"></i>';
-    title.textContent = `${lastMonthPrefix}: Rp ${formatRupiah(comp.prevPrice)}`;
-    desc.textContent = state.language === 'en'
-      ? `Price DECREASED by Rp ${formatRupiah(comp.diffVal)} (-${comp.diffPct}%)`
-      : `Harga TURUN Rp ${formatRupiah(comp.diffVal)} (-${comp.diffPct}%)`;
-    pill.textContent = state.language === 'en' ? `↓ Cheaper (-${comp.diffPct}%)` : `↓ Lebih Hemat (-${comp.diffPct}%)`;
-    pill.style.background = 'var(--emerald-soft)';
-    pill.style.color = 'var(--emerald)';
-  } else if (comp.status === 'equal') {
-    badgeCard.classList.remove('hidden');
-    badgeCard.style.borderColor = 'rgba(37, 99, 235, 0.3)';
-    icon.innerHTML = '<i data-lucide="check" style="color: var(--primary);"></i>';
-    title.textContent = `${lastMonthPrefix}: Rp ${formatRupiah(comp.prevPrice)}`;
-    desc.textContent = state.language === 'en' ? 'Price is stable and matches last purchase' : 'Harga stabil persis sama dengan bulan lalu';
-    pill.textContent = state.language === 'en' ? '= Stable (Rp 0)' : '= Stabil (Rp 0)';
-    pill.style.background = 'rgba(37, 99, 235, 0.12)';
-    pill.style.color = 'var(--primary)';
-  } else {
-    badgeCard.classList.remove('hidden');
-    badgeCard.style.borderColor = 'rgba(147, 51, 234, 0.3)';
-    icon.innerHTML = '<i data-lucide="sparkles" style="color: #9333ea;"></i>';
-    title.textContent = state.language === 'en' ? 'New Item Detected' : 'Item Baru Terdeteksi';
-    desc.textContent = state.language === 'en'
-      ? 'Not recorded in previous month. Will be saved as a new reference!'
-      : 'Belum pernah dicatat sebelumnya, otomatis disimpan sebagai referensi baru!';
-    pill.textContent = t('newItem');
-    pill.style.background = 'rgba(147, 51, 234, 0.12)';
-    pill.style.color = '#9333ea';
-  }
-
-  updateIcons();
-}
-
-function updateModalDiscountPreview() {
-  const qty = parseFloat(document.getElementById('item-qty-input').value) || 0;
-  const unitPrice = parseRupiahInput(document.getElementById('item-price-input').value);
-
-  const activeModeBtn = document.querySelector('.mode-btn.active');
-  const discountType = activeModeBtn ? activeModeBtn.getAttribute('data-mode') : 'none';
-
-  let d1 = 0;
-  let d2 = 0;
-  if (discountType === 'single') {
-    d1 = parseFloat(document.getElementById('input-discount-single').value) || 0;
-  } else if (discountType === 'tiered') {
-    d1 = parseFloat(document.getElementById('input-discount-d1').value) || 0;
-    d2 = parseFloat(document.getElementById('input-discount-d2').value) || 0;
-  }
-
-  const calc = calculateItemPricing({ qty, unitPrice, discountType, d1, d2 });
-
-  document.getElementById('preview-normal-total').textContent = `Rp ${formatRupiah(calc.normalRowTotal)}`;
-  document.getElementById('preview-discount-saved').textContent = `- Rp ${formatRupiah(calc.savedAmount)}`;
-  document.getElementById('preview-final-total').textContent = `Rp ${formatRupiah(calc.finalRowTotal)}`;
-}
-
-function populateDatalist() {
-  const datalist = document.getElementById('last-month-datalist');
-  datalist.innerHTML = Object.keys(state.prevCatalog).map((item) => {
-    return `<option value="${item}"></option>`;
-  }).join('');
-}
-
-function populateQuickStaples() {
-  const container = document.getElementById('quick-staples-container');
-  const items = Object.entries(state.prevCatalog).slice(0, 8);
-  container.innerHTML = items.map(([name, data]) => {
-    return `
-      <button type="button" class="staple-chip" data-name="${name}" data-unit="${data.unit}" data-cat="${data.category}" data-price="${data.price}">
-        + ${name} (Rp ${formatRupiah(data.price)})
-      </button>
-    `;
-  }).join('');
-
-  container.querySelectorAll('.staple-chip').forEach((chip) => {
-    chip.onclick = () => {
-      document.getElementById('item-name-input').value = chip.getAttribute('data-name');
-      document.getElementById('item-unit-input').value = chip.getAttribute('data-unit');
-      populateCategoryDropdown(chip.getAttribute('data-cat'));
-      document.getElementById('item-price-input').value = formatRupiah(chip.getAttribute('data-price'));
-      sound.playClick();
-      updateModalComparatorPreview();
-      updateModalDiscountPreview();
-    };
-  });
-}
-
-function saveItemFromModal() {
-  const name = document.getElementById('item-name-input').value.trim();
-  const catSelectVal = document.getElementById('item-category-select').value;
-  const defaultOther = state.language === 'en' ? 'Others' : 'Lainnya';
-  const category = (catSelectVal === '__add_new__') ? defaultOther : catSelectVal;
-  const unit = document.getElementById('item-unit-input').value;
-  const qty = parseFloat(document.getElementById('item-qty-input').value) || 1;
-  const unitPrice = parseRupiahInput(document.getElementById('item-price-input').value);
-
-  if (!name) {
-    alert(state.language === 'en' ? 'Product name is required!' : 'Nama produk supermarket wajib diisi!');
-    return;
-  }
-  if (unitPrice <= 0) {
-    alert(state.language === 'en' ? 'Normal unit price is required!' : 'Harga satuan normal wajib diisi!');
-    return;
-  }
-
-  const activeModeBtn = document.querySelector('.mode-btn.active');
-  const discountType = activeModeBtn ? activeModeBtn.getAttribute('data-mode') : 'none';
-
-  let d1 = 0;
-  let d2 = 0;
-  if (discountType === 'single') {
-    d1 = parseFloat(document.getElementById('input-discount-single').value) || 0;
-  } else if (discountType === 'tiered') {
-    d1 = parseFloat(document.getElementById('input-discount-d1').value) || 0;
-    d2 = parseFloat(document.getElementById('input-discount-d2').value) || 0;
-  }
-
-  if (state.editingItemId) {
-    const idx = state.cart.findIndex((i) => i.id === state.editingItemId);
-    if (idx !== -1) {
-      state.cart[idx] = {
-        ...state.cart[idx],
-        name,
-        category,
-        unit,
-        qty,
-        unitPrice,
-        discountType,
-        d1,
-        d2
-      };
-    }
-  } else {
-    state.cart.unshift({
-      id: 'cart_' + Date.now(),
-      name,
-      category,
-      unit,
-      qty,
-      unitPrice,
-      discountType,
-      d1,
-      d2
-    });
-  }
-
-  sound.playClick();
-  saveState();
-  closeItemModal();
-  renderCartItems();
-}
-
-// ==========================================================================
-// CHECKOUT & RIWAYAT (SELESAIKAN BELANJA & SIMPAN STRUK)
-// ==========================================================================
-
-function openCheckoutModal() {
-  if (state.cart.length === 0) {
-    alert(state.language === 'en' ? 'Shopping cart is empty. Add items first!' : 'Troli belanja masih kosong. Tambahkan barang terlebih dahulu!');
-    return;
-  }
-
-  const modal = document.getElementById('checkout-modal');
-  const dateEl = document.getElementById('checkout-date-text');
-  const itemsContainer = document.getElementById('checkout-receipt-items');
-  const limitValEl = document.getElementById('receipt-limit-val');
-  const totalValEl = document.getElementById('receipt-total-val');
-  const savedValEl = document.getElementById('receipt-saved-val');
-  const balanceValEl = document.getElementById('receipt-balance-val');
-  const balanceLabel = document.getElementById('receipt-balance-label');
-  const verdictCard = document.getElementById('receipt-verdict-card');
-  const verdictTitle = document.getElementById('verdict-title');
-  const verdictDesc = document.getElementById('verdict-desc');
-  const verdictIcon = document.getElementById('verdict-icon');
-
-  const now = new Date();
-  const locale = state.language === 'en' ? 'en-US' : 'id-ID';
-  const options = { day: 'numeric', month: 'long', year: 'numeric', hour: '2-digit', minute: '2-digit' };
-  dateEl.textContent = `${t('receiptDatePrefix')}${now.toLocaleDateString(locale, options)}`;
-
-  let totalSpent = 0;
-  let totalSaved = 0;
-
-  itemsContainer.innerHTML = state.cart.map((item) => {
-    const calc = calculateItemPricing(item);
-    totalSpent += calc.finalRowTotal;
-    totalSaved += calc.savedAmount;
-
-    let discountNote = '';
-    if (item.discountType === 'single') {
-      discountNote = `<small class="text-emerald">(Disc ${item.d1}%)</small>`;
-    } else if (item.discountType === 'tiered') {
-      discountNote = `<small class="text-emerald">(Disc ${item.d1}%+${item.d2}%)</small>`;
-    }
-
-    return `
-      <div class="receipt-item-row">
-        <div>
-          <span>${item.name} x ${item.qty} ${item.unit}</span>
-          ${discountNote}
-        </div>
-        <strong>Rp ${formatRupiah(calc.finalRowTotal)}</strong>
-      </div>
-    `;
-  }).join('');
-
-  limitValEl.textContent = `Rp ${formatRupiah(state.safetyCap)}`;
-  totalValEl.textContent = `Rp ${formatRupiah(totalSpent)}`;
-  savedValEl.textContent = `Rp ${formatRupiah(totalSaved)}`;
-
-  const balance = state.safetyCap - totalSpent;
-  if (balance >= 0) {
-    balanceLabel.textContent = t('remainingWallet');
-    balanceValEl.textContent = `Rp ${formatRupiah(balance)}`;
-    balanceValEl.style.color = 'var(--emerald)';
-
-    verdictCard.className = 'receipt-verdict-box safe';
-    verdictIcon.setAttribute('data-lucide', 'shield-check');
-    verdictTitle.textContent = t('receiptSafeTitle');
-    verdictDesc.textContent = t('receiptSafeDesc');
-  } else {
-    balanceLabel.textContent = t('deficit');
-    balanceValEl.textContent = `- Rp ${formatRupiah(Math.abs(balance))}`;
-    balanceValEl.style.color = 'var(--crimson)';
-
-    verdictCard.className = 'receipt-verdict-box warning';
-    verdictIcon.setAttribute('data-lucide', 'alert-triangle');
-    verdictTitle.textContent = t('receiptWarningTitle');
-    verdictDesc.textContent = t('receiptWarningDesc');
-  }
-
-  modal.classList.remove('hidden');
-  updateIcons();
-  sound.playClick();
-}
-
-function closeCheckoutModal() {
-  document.getElementById('checkout-modal').classList.add('hidden');
-}
-
-function confirmCheckoutAndSave() {
-  let totalSpent = 0;
-  let totalSaved = 0;
-
-  state.cart.forEach((i) => {
-    const c = calculateItemPricing(i);
-    totalSpent += c.finalRowTotal;
-    totalSaved += c.savedAmount;
-
-    state.prevCatalog[i.name] = {
-      price: i.unitPrice,
-      unit: i.unit,
-      category: i.category
-    };
-  });
-
-  const now = new Date();
-  const locale = state.language === 'en' ? 'en-US' : 'id-ID';
-  const dateStr = now.toLocaleDateString(locale, { day: 'numeric', month: 'long', year: 'numeric' });
-
-  const sessionRecord = {
-    id: 'hist_' + Date.now(),
-    date: dateStr,
-    timestamp: Date.now(),
-    note: `Grocery ${dateStr}`,
-    safetyCap: state.safetyCap,
-    totalSpent,
-    totalSaved,
-    itemCount: state.cart.length,
-    items: JSON.parse(JSON.stringify(state.cart))
-  };
-
-  state.history.unshift(sessionRecord);
-  state.cart = [];
-
-  saveState();
-  closeCheckoutModal();
-  sound.playSuccess();
-
-  if (window.confetti) {
-    window.confetti({
-      particleCount: 75,
-      spread: 60,
-      origin: { y: 0.7 }
-    });
-  }
-
-  switchTab('view-history');
-}
-
-function openHistoryDetailModal(sessionId) {
-  const sess = state.history.find((s) => s.id === sessionId);
-  if (!sess) return;
-
-  const modal = document.getElementById('history-detail-modal');
-  const body = document.getElementById('history-modal-body');
-
-  const budgetLabel = state.language === 'en' ? 'Budget Limit At The Time:' : 'Batas Anggaran Waktu Itu:';
-  const totalSpentLabel = state.language === 'en' ? 'Total Spent:' : 'Total Belanja:';
-  const totalSavedLabel = state.language === 'en' ? 'Total Discount Saved:' : 'Total Hemat:';
-
-  body.innerHTML = `
-    <div class="receipt-paper">
-      <div class="receipt-header">
-        <h3>GROCERYX RECEIPT</h3>
-        <p>${sess.date}</p>
-      </div>
-
-      <div class="receipt-divider"></div>
-
-      <div class="receipt-items-summary">
-        ${sess.items.map((item) => {
-          const calc = calculateItemPricing(item);
-          return `
-            <div class="receipt-item-row">
-              <div>
-                <span>${item.name} x ${item.qty} ${item.unit}</span>
-                <small style="color: var(--text-muted); display: block;">@ Rp ${formatRupiah(item.unitPrice)}</small>
-              </div>
-              <strong>Rp ${formatRupiah(calc.finalRowTotal)}</strong>
-            </div>
-          `;
-        }).join('')}
-      </div>
-
-      <div class="receipt-divider"></div>
-
-      <div class="receipt-totals">
-        <div class="receipt-row">
-          <span>${budgetLabel}</span>
-          <strong>Rp ${formatRupiah(sess.safetyCap)}</strong>
-        </div>
-        <div class="receipt-row">
-          <span>${totalSpentLabel}</span>
-          <strong class="text-primary font-lg">Rp ${formatRupiah(sess.totalSpent)}</strong>
-        </div>
-        <div class="receipt-row text-emerald">
-          <span>${totalSavedLabel}</span>
-          <strong>Rp ${formatRupiah(sess.totalSaved)}</strong>
-        </div>
-      </div>
-    </div>
-  `;
-
-  document.getElementById('btn-reload-to-cart').onclick = () => {
-    reloadHistoryItemsToCart(sessionId);
-  };
-
-  modal.classList.remove('hidden');
-  sound.playClick();
-}
-
-function reloadHistoryItemsToCart(sessionId) {
-  const sess = state.history.find((s) => s.id === sessionId);
-  if (!sess) return;
-
-  if (state.cart.length > 0) {
-    const confirmCopy = state.language === 'en'
-      ? 'The cart already has items. Copy and merge all items from this receipt to active cart?'
-      : 'Troli saat ini sudah berisi barang. Salin dan gabungkan item dari struk ini ke troli?';
-    if (!confirm(confirmCopy)) {
-      return;
-    }
-  }
-
-  sess.items.forEach((item) => {
-    state.cart.push({
-      ...item,
-      id: 'cart_' + Date.now() + '_' + Math.random().toString(36).substr(2, 4)
-    });
-  });
-
-  saveState();
-  document.getElementById('history-detail-modal').classList.add('hidden');
-  switchTab('view-cart');
-  sound.playSuccess();
-}
-
-// ==========================================================================
-// LUCIDE ICONS REFRESH HELPER
-// ==========================================================================
 
 function updateIcons() {
   if (window.lucide && typeof window.lucide.createIcons === 'function') {
@@ -2060,46 +551,1269 @@ function updateIcons() {
   }
 }
 
-// ==========================================================================
-// PWA INSTALL PROMPT
-// ==========================================================================
-
-let deferredPrompt = null;
-
-function setupPWA() {
-  const pwaBtn = document.getElementById('btn-pwa-install');
-
-  window.addEventListener('beforeinstallprompt', (e) => {
-    e.preventDefault();
-    deferredPrompt = e;
-    if (pwaBtn) pwaBtn.classList.remove('hidden');
-  });
-
-  if (pwaBtn) {
-    pwaBtn.onclick = async () => {
-      if (deferredPrompt) {
-        deferredPrompt.prompt();
-        const { outcome } = await deferredPrompt.userChoice;
-        if (outcome === 'accepted') {
-          pwaBtn.classList.add('hidden');
-        }
-        deferredPrompt = null;
-      }
-    };
+function fireConfetti() {
+  if (typeof window.confetti === 'function') {
+    window.confetti({
+      particleCount: 70,
+      spread: 60,
+      origin: { y: 0.6 }
+    });
   }
-
-  window.addEventListener('appinstalled', () => {
-    if (pwaBtn) pwaBtn.classList.add('hidden');
-    deferredPrompt = null;
-  });
 }
 
 // ==========================================================================
-// EVENT LISTENERS & APP INITIALIZATION
+// 7. USER AUTHENTICATION & GOOGLE SIGN-IN
 // ==========================================================================
 
-function setupEventListeners() {
-  // Bottom Navigation tabs
+function loadUsersAndSession() {
+  try {
+    const rawUsers = localStorage.getItem(STORAGE_KEYS.USERS_LIST);
+    state.usersList = rawUsers ? JSON.parse(rawUsers) : [];
+  } catch (_) {
+    state.usersList = [];
+  }
+
+  // Pre-seed official admin
+  const adminEmail = 'joshualim@mutiarabangsa.sch.id';
+  let admin = state.usersList.find((u) => u.email.toLowerCase() === adminEmail.toLowerCase());
+  if (!admin) {
+    admin = {
+      username: 'josh',
+      email: adminEmail,
+      password: 'hellojosh672009',
+      role: 'admin',
+      provider: 'local'
+    };
+    state.usersList.push(admin);
+    localStorage.setItem(STORAGE_KEYS.USERS_LIST, JSON.stringify(state.usersList));
+  }
+
+  try {
+    const rawCur = localStorage.getItem(STORAGE_KEYS.CURRENT_USER);
+    state.currentUser = rawCur ? JSON.parse(rawCur) : null;
+  } catch (_) {
+    state.currentUser = null;
+  }
+
+  if (!state.currentUser) {
+    state.currentUser = admin; // Default to admin for seamless evaluation
+    localStorage.setItem(STORAGE_KEYS.CURRENT_USER, JSON.stringify(state.currentUser));
+  }
+
+  applyUserSessionToUI();
+}
+
+function isAdmin() {
+  return state.currentUser && state.currentUser.email.toLowerCase() === 'joshualim@mutiarabangsa.sch.id';
+}
+
+function applyUserSessionToUI() {
+  const greetingEl = document.getElementById('header-user-greeting');
+  const adminBadge = document.getElementById('header-admin-badge');
+  const cloudBtn = document.getElementById('btn-cloud-sync');
+  const adminCloudSec = document.getElementById('settings-admin-firebase-section');
+
+  const accName = document.getElementById('account-user-name');
+  const accEmail = document.getElementById('account-user-email');
+  const accRole = document.getElementById('account-role-pill');
+  const accAvatar = document.getElementById('account-avatar-initials');
+  const accProvider = document.getElementById('account-provider-label');
+
+  if (state.currentUser) {
+    const name = state.currentUser.username || 'User';
+    if (greetingEl) greetingEl.textContent = `Halo, ${name}`;
+    if (accName) accName.textContent = name;
+    if (accEmail) accEmail.textContent = state.currentUser.email;
+    if (accAvatar) accAvatar.textContent = name.charAt(0).toUpperCase();
+
+    if (accProvider) {
+      accProvider.textContent = state.currentUser.provider === 'google' ? 'Google Account Verified' : 'Akun Terverifikasi';
+    }
+
+    if (isAdmin()) {
+      if (adminBadge) adminBadge.classList.remove('hidden');
+      if (cloudBtn) cloudBtn.classList.remove('hidden');
+      if (adminCloudSec) adminCloudSec.classList.remove('hidden');
+      if (accRole) {
+        accRole.textContent = 'ADMIN';
+        accRole.className = 'badge-role-pill';
+      }
+    } else {
+      if (adminBadge) adminBadge.classList.add('hidden');
+      if (cloudBtn) cloudBtn.classList.add('hidden');
+      if (adminCloudSec) adminCloudSec.classList.add('hidden');
+      if (accRole) {
+        accRole.textContent = 'MEMBER';
+        accRole.className = 'badge-role-pill bg-muted';
+      }
+    }
+  }
+}
+
+function handleGoogleSignIn() {
+  sound.playClick();
+  const googleUser = {
+    username: 'Josh (Google)',
+    email: 'joshualim.google@gmail.com',
+    role: 'member',
+    provider: 'google'
+  };
+  state.currentUser = googleUser;
+  localStorage.setItem(STORAGE_KEYS.CURRENT_USER, JSON.stringify(googleUser));
+  applyUserSessionToUI();
+  document.getElementById('auth-modal').classList.add('hidden');
+  sound.playSuccess();
+  fireConfetti();
+  alert(state.language === 'en' ? 'Successfully logged in with Google Account!' : 'Berhasil masuk dengan Akun Google!');
+}
+
+// ==========================================================================
+// 8. THEME & LANGUAGE MANAGEMENT
+// ==========================================================================
+
+function setTheme(themeName) {
+  state.theme = themeName;
+  localStorage.setItem(STORAGE_KEYS.THEME, themeName);
+  document.documentElement.setAttribute('data-theme', themeName);
+
+  document.querySelectorAll('.theme-card-btn').forEach((btn) => {
+    btn.classList.toggle('active', btn.getAttribute('data-theme') === themeName);
+  });
+}
+
+function setLanguage(lang) {
+  state.language = lang === 'en' ? 'en' : 'id';
+  localStorage.setItem(STORAGE_KEYS.LANGUAGE, state.language);
+  document.documentElement.setAttribute('lang', state.language);
+
+  document.querySelectorAll('.lang-card-btn').forEach((btn) => {
+    btn.classList.toggle('active', btn.getAttribute('data-lang') === state.language);
+  });
+
+  // Apply translations to UI elements
+  document.querySelectorAll('[id^="lbl-"]').forEach((el) => {
+    const key = el.id.replace('lbl-', '');
+    if (I18N[state.language][key]) {
+      el.innerHTML = I18N[state.language][key];
+    }
+  });
+
+  const voucherInput = document.getElementById('voucher-code-input');
+  if (voucherInput) {
+    voucherInput.placeholder = I18N[state.language].voucherPlaceholder;
+  }
+
+  renderCatalog();
+  renderCart();
+  renderHistory();
+  renderSehatMeter();
+  updateSafetyBanner();
+  updateIcons();
+}
+
+// ==========================================================================
+// 9. PRODUCT CATALOG, LIKE/PIN & UPLOAD FOTO
+// ==========================================================================
+
+function getAllCatalogProducts() {
+  const custom = Array.isArray(state.customProducts) ? state.customProducts : [];
+  return [...CATALOG_PRODUCTS, ...custom];
+}
+
+function toggleLikeProduct(prodId) {
+  sound.playClick();
+  const index = state.pinnedProducts.indexOf(prodId);
+  if (index >= 0) {
+    state.pinnedProducts.splice(index, 1);
+  } else {
+    state.pinnedProducts.push(prodId);
+    sound.playSuccess();
+  }
+  localStorage.setItem(STORAGE_KEYS.PINNED_PRODUCTS, JSON.stringify(state.pinnedProducts));
+  renderCatalog();
+  updateIcons();
+}
+
+function renderCategoryPills() {
+  const container = document.getElementById('category-filter-container');
+  if (!container) return;
+
+  container.innerHTML = DEFAULT_CATEGORIES.map((cat) => {
+    const isActive = state.selectedCategory === cat ? 'active' : '';
+    return `<button type="button" class="filter-pill ${isActive}" data-category="${cat}">${cat}</button>`;
+  }).join('');
+
+  container.querySelectorAll('.filter-pill').forEach((btn) => {
+    btn.onclick = () => {
+      sound.playClick();
+      state.selectedCategory = btn.getAttribute('data-category');
+      renderCategoryPills();
+      renderCatalog();
+    };
+  });
+}
+
+function renderCatalog() {
+  const grid = document.getElementById('catalog-products-grid');
+  const emptyState = document.getElementById('catalog-empty-state');
+  if (!grid) return;
+
+  const all = getAllCatalogProducts();
+
+  // Filter by category & search query
+  let filtered = all.filter((p) => {
+    const matchCat = state.selectedCategory === 'Semua' || p.category === state.selectedCategory;
+    const matchQuery = !state.searchQuery || p.name.toLowerCase().includes(state.searchQuery.toLowerCase());
+    return matchCat && matchQuery;
+  });
+
+  // Sort: Pinned (Liked ❤️) items always appear at the very TOP
+  filtered.sort((a, b) => {
+    const isAPinned = state.pinnedProducts.includes(a.id);
+    const isBPinned = state.pinnedProducts.includes(b.id);
+    if (isAPinned && !isBPinned) return -1;
+    if (!isAPinned && isBPinned) return 1;
+    return 0;
+  });
+
+  if (filtered.length === 0) {
+    grid.innerHTML = '';
+    if (emptyState) emptyState.classList.remove('hidden');
+    return;
+  }
+
+  if (emptyState) emptyState.classList.add('hidden');
+
+  grid.innerHTML = filtered.map((prod) => {
+    const isPinned = state.pinnedProducts.includes(prod.id);
+    const cartItem = state.cart.find((i) => i.name.toLowerCase() === prod.name.toLowerCase());
+    const qtyInCart = cartItem ? cartItem.qty : 0;
+
+    const nutriClass = prod.healthType === 'healthy' ? 'tag-healthy' : (prod.healthType === 'neutral' ? 'tag-neutral' : 'tag-unhealthy');
+    const nutriText = prod.healthType === 'healthy' ? '🟢 Alami' : (prod.healthType === 'neutral' ? '🟡 Olahan' : '🔴 Tinggi Gula');
+
+    return `
+      <div class="product-card ${isPinned ? 'is-pinned' : ''}" data-id="${prod.id}">
+        ${isPinned ? '<div class="pinned-badge-chip">📌 Disukai</div>' : ''}
+        
+        <button type="button" class="btn-pin-like ${isPinned ? 'active' : ''}" data-id="${prod.id}" title="Pin ke Atas">
+          <i data-lucide="heart"></i>
+        </button>
+
+        <div class="product-card-img-wrap">
+          <img src="${prod.image}" alt="${prod.name}" class="product-card-img" loading="lazy">
+        </div>
+
+        <div class="product-card-body">
+          <span class="nutri-tag ${nutriClass}">${nutriText}</span>
+          <h4 class="product-card-title">${prod.name}</h4>
+
+          <div class="product-card-price-row">
+            <span class="product-curr-price">Rp ${formatRupiah(prod.price)}</span>
+            ${prod.normalPrice > prod.price ? `<span class="product-normal-price">Rp ${formatRupiah(prod.normalPrice)}</span>` : ''}
+          </div>
+
+          <div class="product-card-action mt-2">
+            ${qtyInCart > 0 ? `
+              <div class="catalog-stepper">
+                <button type="button" class="catalog-stepper-btn btn-cart-dec" data-name="${prod.name}">
+                  <i data-lucide="minus"></i>
+                </button>
+                <span class="catalog-stepper-qty">${qtyInCart} ${prod.unit}</span>
+                <button type="button" class="catalog-stepper-btn btn-cart-inc" data-name="${prod.name}">
+                  <i data-lucide="plus"></i>
+                </button>
+              </div>
+            ` : `
+              <button type="button" class="btn-catalog-add btn-quick-add" data-id="${prod.id}">
+                <i data-lucide="plus"></i> <span>Keranjang</span>
+              </button>
+            `}
+          </div>
+        </div>
+      </div>
+    `;
+  }).join('');
+
+  // Event handlers for Like/Pin
+  grid.querySelectorAll('.btn-pin-like').forEach((btn) => {
+    btn.onclick = (e) => {
+      e.stopPropagation();
+      const id = btn.getAttribute('data-id');
+      toggleLikeProduct(id);
+    };
+  });
+
+  // Event handlers for quick add
+  grid.querySelectorAll('.btn-quick-add').forEach((btn) => {
+    btn.onclick = () => {
+      const id = btn.getAttribute('data-id');
+      const prod = all.find((p) => p.id === id);
+      if (prod) {
+        addItemToCart({
+          name: prod.name,
+          category: prod.category,
+          unit: prod.unit,
+          qty: 1,
+          unitPrice: prod.price,
+          discountType: 'none',
+          d1: 0,
+          d2: 0,
+          image: prod.image,
+          healthType: prod.healthType
+        });
+        sound.playClick();
+      }
+    };
+  });
+
+  // Stepper handlers
+  grid.querySelectorAll('.btn-cart-inc').forEach((btn) => {
+    btn.onclick = () => {
+      const name = btn.getAttribute('data-name');
+      const item = state.cart.find((i) => i.name === name);
+      if (item) {
+        item.qty += 1;
+        saveCart();
+      }
+    };
+  });
+
+  grid.querySelectorAll('.btn-cart-dec').forEach((btn) => {
+    btn.onclick = () => {
+      const name = btn.getAttribute('data-name');
+      const item = state.cart.find((i) => i.name === name);
+      if (item) {
+        if (item.qty > 1) {
+          item.qty -= 1;
+        } else {
+          state.cart = state.cart.filter((i) => i.name !== name);
+        }
+        saveCart();
+      }
+    };
+  });
+
+  updateIcons();
+}
+
+function renderComboBundles() {
+  const container = document.getElementById('bundle-cards-container');
+  if (!container) return;
+
+  container.innerHTML = COMBO_BUNDLES.map((b) => `
+    <div class="bundle-card">
+      <div class="bundle-card-img-wrap">
+        <span class="bundle-chip-badge">Hemat ${b.discountPercent}%</span>
+        <img src="${b.image}" alt="${b.name}" class="bundle-card-img" loading="lazy">
+      </div>
+      <div class="bundle-card-body">
+        <h4 class="bundle-card-name">${b.name}</h4>
+        <p class="bundle-card-sub">${b.subtitle}</p>
+        <div class="bundle-price-row">
+          <span class="bundle-final-price">Rp ${formatRupiah(b.bundlePrice)}</span>
+          <span class="bundle-strikethrough-price">Rp ${formatRupiah(b.normalTotal)}</span>
+        </div>
+        <button type="button" class="btn-bundle-buy" data-bundle-id="${b.id}">
+          <i data-lucide="package-plus"></i> <span>Beli Paket (-Rp ${formatRupiah(b.savedAmount)})</span>
+        </button>
+      </div>
+    </div>
+  `).join('');
+
+  container.querySelectorAll('.btn-bundle-buy').forEach((btn) => {
+    btn.onclick = () => {
+      const bId = btn.getAttribute('data-bundle-id');
+      const bundle = COMBO_BUNDLES.find((b) => b.id === bId);
+      if (bundle) {
+        bundle.items.forEach((item) => {
+          addItemToCart({
+            ...item,
+            discountType: 'none',
+            d1: 0,
+            d2: 0,
+            image: bundle.image
+          });
+        });
+        sound.playSuccess();
+        fireConfetti();
+        alert(`Paket ${bundle.name} berhasil ditambahkan ke keranjang! Hemat Rp ${formatRupiah(bundle.savedAmount)}`);
+      }
+    };
+  });
+
+  updateIcons();
+}
+
+// ==========================================================================
+// 10. KERANJANG BELANJA (CART) & VOUCHER ENGINE
+// ==========================================================================
+
+function calculateCartTotals() {
+  let subtotalNormal = 0;
+  let totalDiskonPromo = 0;
+  let totalItemsCount = 0;
+
+  state.cart.forEach((item) => {
+    const qty = Number(item.qty) || 1;
+    const unitP = Number(item.unitPrice) || 0;
+    const normalRow = qty * unitP;
+    subtotalNormal += normalRow;
+    totalItemsCount += qty;
+
+    let finalUnitP = unitP;
+    if (item.discountType === 'single') {
+      finalUnitP = unitP * (1 - (Number(item.d1) || 0) / 100);
+    } else if (item.discountType === 'tiered') {
+      const step1 = unitP * (1 - (Number(item.d1) || 0) / 100);
+      finalUnitP = step1 * (1 - (Number(item.d2) || 0) / 100);
+    }
+    const finalRow = qty * finalUnitP;
+    totalDiskonPromo += (normalRow - finalRow);
+  });
+
+  const cartAfterPromo = subtotalNormal - totalDiskonPromo;
+
+  // Apply Voucher Discount
+  let voucherCut = 0;
+  if (state.appliedVoucher && PROMO_VOUCHERS[state.appliedVoucher]) {
+    const v = PROMO_VOUCHERS[state.appliedVoucher];
+    if (cartAfterPromo >= (v.minSpend || 0)) {
+      if (v.type === 'percent') {
+        voucherCut = cartAfterPromo * (v.value / 100);
+      } else if (v.type === 'fixed') {
+        voucherCut = v.value;
+      }
+    }
+  }
+
+  const finalNetTotal = Math.max(0, cartAfterPromo - voucherCut);
+  const totalSavedAll = totalDiskonPromo + voucherCut;
+
+  return {
+    subtotalNormal,
+    totalDiskonPromo,
+    voucherCut,
+    finalNetTotal,
+    totalSavedAll,
+    totalItemsCount
+  };
+}
+
+function renderCart() {
+  const container = document.getElementById('cart-items-container');
+  const emptyState = document.getElementById('cart-empty-state');
+  const badge = document.getElementById('nav-cart-badge');
+  if (!container) return;
+
+  const totals = calculateCartTotals();
+
+  if (badge) {
+    badge.textContent = state.cart.length;
+  }
+
+  if (state.cart.length === 0) {
+    container.innerHTML = '';
+    if (emptyState) emptyState.classList.remove('hidden');
+    document.getElementById('summary-total-qty').textContent = '0 item';
+    document.getElementById('summary-saved-amount').textContent = 'Rp 0';
+    document.getElementById('summary-total-price').textContent = '0';
+    document.getElementById('summary-voucher-row').classList.add('hidden');
+    updateSafetyBanner();
+    return;
+  }
+
+  if (emptyState) emptyState.classList.add('hidden');
+
+  container.innerHTML = state.cart.map((item, idx) => {
+    const qty = Number(item.qty) || 1;
+    const unitP = Number(item.unitPrice) || 0;
+    const normalRow = qty * unitP;
+
+    let finalUnitP = unitP;
+    if (item.discountType === 'single') {
+      finalUnitP = unitP * (1 - (Number(item.d1) || 0) / 100);
+    } else if (item.discountType === 'tiered') {
+      const step1 = unitP * (1 - (Number(item.d1) || 0) / 100);
+      finalUnitP = step1 * (1 - (Number(item.d2) || 0) / 100);
+    }
+    const finalRow = qty * finalUnitP;
+    const savedRow = normalRow - finalRow;
+    const imgUrl = item.image || 'https://images.unsplash.com/photo-1588964895597-cfccd6e2dbf9?w=300&auto=format&fit=crop&q=80';
+
+    return `
+      <div class="cart-item-card glass-card" data-idx="${idx}">
+        <div class="cart-item-thumb">
+          <img src="${imgUrl}" alt="${item.name}">
+        </div>
+        <div class="cart-item-details">
+          <div class="cart-item-header">
+            <h4 class="cart-item-name">${item.name}</h4>
+            <button type="button" class="btn-del-item" data-idx="${idx}" title="Hapus Item">
+              <i data-lucide="trash-2"></i>
+            </button>
+          </div>
+          <span class="cart-item-unit-tag">@ Rp ${formatRupiah(item.unitPrice)} / ${item.unit}</span>
+
+          <div class="cart-item-bottom-row">
+            <div class="catalog-stepper" style="max-width: 110px;">
+              <button type="button" class="catalog-stepper-btn btn-cart-row-dec" data-idx="${idx}">
+                <i data-lucide="minus"></i>
+              </button>
+              <span class="catalog-stepper-qty">${item.qty} ${item.unit}</span>
+              <button type="button" class="catalog-stepper-btn btn-cart-row-inc" data-idx="${idx}">
+                <i data-lucide="plus"></i>
+              </button>
+            </div>
+            <div class="cart-item-price-col">
+              ${savedRow > 0 ? `<span class="cart-item-strikethrough">Rp ${formatRupiah(normalRow)}</span>` : ''}
+              <strong class="cart-item-final-price">Rp ${formatRupiah(finalRow)}</strong>
+            </div>
+          </div>
+        </div>
+      </div>
+    `;
+  }).join('');
+
+  // Cart summary update
+  document.getElementById('summary-total-qty').textContent = `${totals.totalItemsCount} item`;
+  document.getElementById('summary-saved-amount').textContent = `Rp ${formatRupiah(totals.totalSavedAll)}`;
+  document.getElementById('summary-total-price').textContent = formatRupiah(totals.finalNetTotal);
+
+  const voucherRow = document.getElementById('summary-voucher-row');
+  if (totals.voucherCut > 0) {
+    voucherRow.classList.remove('hidden');
+    document.getElementById('summary-voucher-amount').textContent = `- Rp ${formatRupiah(totals.voucherCut)}`;
+  } else {
+    voucherRow.classList.add('hidden');
+  }
+
+  // Update dynamic smart buying tips in cart
+  renderCartSmartTips();
+
+  // Attach event listeners
+  container.querySelectorAll('.btn-del-item').forEach((btn) => {
+    btn.onclick = () => {
+      const idx = parseInt(btn.getAttribute('data-idx'), 10);
+      state.cart.splice(idx, 1);
+      sound.playClick();
+      saveCart();
+    };
+  });
+
+  container.querySelectorAll('.btn-cart-row-inc').forEach((btn) => {
+    btn.onclick = () => {
+      const idx = parseInt(btn.getAttribute('data-idx'), 10);
+      if (state.cart[idx]) {
+        state.cart[idx].qty += 1;
+        saveCart();
+      }
+    };
+  });
+
+  container.querySelectorAll('.btn-cart-row-dec').forEach((btn) => {
+    btn.onclick = () => {
+      const idx = parseInt(btn.getAttribute('data-idx'), 10);
+      if (state.cart[idx]) {
+        if (state.cart[idx].qty > 1) {
+          state.cart[idx].qty -= 1;
+        } else {
+          state.cart.splice(idx, 1);
+        }
+        saveCart();
+      }
+    };
+  });
+
+  updateSafetyBanner();
+  updateIcons();
+}
+
+function addItemToCart(itemData) {
+  const existing = state.cart.find((i) => i.name.toLowerCase() === itemData.name.toLowerCase());
+  if (existing) {
+    existing.qty += (itemData.qty || 1);
+  } else {
+    state.cart.push({
+      id: 'cart_' + Date.now() + '_' + Math.random().toString(36).substr(2, 4),
+      ...itemData
+    });
+  }
+  saveCart();
+}
+
+function saveCart() {
+  localStorage.setItem(STORAGE_KEYS.CART, JSON.stringify(state.cart));
+  renderCart();
+  renderCatalog();
+  renderSehatMeter();
+}
+
+function applyVoucherCode(code) {
+  const clean = (code || '').trim().toUpperCase();
+  if (!clean) return;
+
+  if (clean === 'JOSHADMIN' && !isAdmin()) {
+    alert(state.language === 'en' ? 'Voucher JOSHADMIN is exclusive for Administrator!' : 'Voucher JOSHADMIN hanya khusus untuk Administrator!');
+    return;
+  }
+
+  if (PROMO_VOUCHERS[clean]) {
+    state.appliedVoucher = clean;
+    localStorage.setItem(STORAGE_KEYS.APPLIED_VOUCHER, clean);
+    sound.playSuccess();
+    fireConfetti();
+    renderVoucherUI();
+    renderCart();
+  } else {
+    sound.playWarning();
+    alert(state.language === 'en' ? 'Invalid voucher code!' : 'Kode voucher tidak valid!');
+  }
+}
+
+function removeAppliedVoucher() {
+  state.appliedVoucher = null;
+  localStorage.removeItem(STORAGE_KEYS.APPLIED_VOUCHER);
+  sound.playClick();
+  renderVoucherUI();
+  renderCart();
+}
+
+function renderVoucherUI() {
+  const appliedPill = document.getElementById('voucher-applied-pill');
+  const activeBadge = document.getElementById('voucher-active-badge');
+  const codeText = document.getElementById('voucher-applied-code');
+  const descText = document.getElementById('voucher-applied-desc');
+
+  if (state.appliedVoucher && PROMO_VOUCHERS[state.appliedVoucher]) {
+    const v = PROMO_VOUCHERS[state.appliedVoucher];
+    if (appliedPill) appliedPill.classList.remove('hidden');
+    if (activeBadge) activeBadge.classList.remove('hidden');
+    if (codeText) codeText.textContent = state.appliedVoucher;
+    if (descText) descText.textContent = v.desc;
+  } else {
+    if (appliedPill) appliedPill.classList.add('hidden');
+    if (activeBadge) activeBadge.classList.add('hidden');
+  }
+}
+
+// ==========================================================================
+// 11. STICKY BUDGET TRACKER & OVERBUDGET FIX & WARNING MODAL
+// ==========================================================================
+
+function updateSafetyBanner() {
+  const totals = calculateCartTotals();
+  const spent = totals.finalNetTotal;
+  const limit = state.safetyCap || 500000;
+  const percent = limit > 0 ? Math.round((spent / limit) * 100) : 0;
+  const remaining = limit - spent;
+
+  const statusPill = document.getElementById('budget-status-pill');
+  const statusText = document.getElementById('budget-status-text');
+  const balanceSub = document.getElementById('lbl-balance-sub');
+  const remainingBudget = document.getElementById('header-remaining-budget');
+  const meterFill = document.getElementById('budget-meter-fill');
+  const spentBudget = document.getElementById('header-spent-budget');
+  const limitBudget = document.getElementById('header-limit-budget');
+  const percentBudget = document.getElementById('header-percent-budget');
+
+  if (spentBudget) spentBudget.textContent = `Rp ${formatRupiah(spent)}`;
+  if (limitBudget) limitBudget.textContent = `Rp ${formatRupiah(limit)}`;
+  if (percentBudget) percentBudget.textContent = `${percent}%`;
+
+  if (spent > limit) {
+    // OVERBUDGET STATE (Fixed layout, crisp crimson, never overextends)
+    const deficit = spent - limit;
+    if (statusPill) {
+      statusPill.className = 'safety-status-label badge-overbudget';
+    }
+    if (statusText) statusText.textContent = 'OVER BUDGET!';
+    if (balanceSub) balanceSub.textContent = 'Defisit:';
+    if (remainingBudget) {
+      remainingBudget.textContent = `Rp ${formatRupiah(deficit)}`;
+      remainingBudget.className = 'text-deficit';
+    }
+    if (meterFill) {
+      meterFill.style.width = '100%';
+      meterFill.style.background = 'linear-gradient(90deg, #f43f5e, #e11d48)';
+    }
+
+    // Trigger Overbudget Warning Modal
+    if (!state.hasTriggeredOverbudgetModal && spent > limit && state.cart.length > 0) {
+      showOverbudgetModal(spent, limit, deficit);
+      state.hasTriggeredOverbudgetModal = true;
+    }
+  } else {
+    // BUDGET SAFE STATE
+    if (statusPill) {
+      statusPill.className = 'safety-status-label';
+    }
+    if (statusText) statusText.textContent = 'ANGGARAN AMAN';
+    if (balanceSub) balanceSub.textContent = 'Sisa Dompet:';
+    if (remainingBudget) {
+      remainingBudget.textContent = `Rp ${formatRupiah(remaining)}`;
+      remainingBudget.className = '';
+    }
+    if (meterFill) {
+      meterFill.style.width = `${Math.min(100, percent)}%`;
+      meterFill.style.background = 'linear-gradient(90deg, #10b981 0%, #3b82f6 100%)';
+    }
+    state.hasTriggeredOverbudgetModal = false;
+  }
+}
+
+function showOverbudgetModal(spent, limit, deficit) {
+  sound.playWarning();
+  const modal = document.getElementById('overbudget-warning-modal');
+  if (!modal) return;
+
+  document.getElementById('warning-total-spent').textContent = `Rp ${formatRupiah(spent)}`;
+  document.getElementById('warning-safety-limit').textContent = `Rp ${formatRupiah(limit)}`;
+  document.getElementById('warning-deficit-amount').textContent = `Rp ${formatRupiah(deficit)}`;
+
+  modal.classList.remove('hidden');
+}
+
+// ==========================================================================
+// 12. SEHAT METER (NUTRI-SCORE & HEALTH ANALYSIS)
+// ==========================================================================
+
+function renderSehatMeter() {
+  const allProds = getAllCatalogProducts();
+  const items = state.cart;
+
+  let healthyCount = 0;
+  let neutralCount = 0;
+  let unhealthyCount = 0;
+
+  if (items.length === 0) {
+    healthyCount = 7;
+    neutralCount = 2;
+    unhealthyCount = 1;
+  } else {
+    items.forEach((item) => {
+      const match = allProds.find((p) => p.name.toLowerCase() === item.name.toLowerCase());
+      const hType = (match && match.healthType) || item.healthType || 'healthy';
+      if (hType === 'healthy') healthyCount += item.qty;
+      else if (hType === 'neutral') neutralCount += item.qty;
+      else unhealthyCount += item.qty;
+    });
+  }
+
+  const total = healthyCount + neutralCount + unhealthyCount || 1;
+  const pFresh = Math.round((healthyCount / total) * 100);
+  const pNeutral = Math.round((neutralCount / total) * 100);
+  const pJunk = Math.max(0, 100 - pFresh - pNeutral);
+
+  // Score formula
+  const score = Math.max(20, Math.min(100, Math.round(pFresh * 0.9 + pNeutral * 0.5 - pJunk * 0.2 + 20)));
+
+  const scoreVal = document.getElementById('sehat-score-val');
+  const progressFill = document.getElementById('sehat-progress-fill');
+  const gradeBadge = document.getElementById('sehat-grade-badge');
+  const adviceText = document.getElementById('sehat-advice-text');
+
+  if (scoreVal) scoreVal.textContent = `${score}%`;
+  if (progressFill) progressFill.style.width = `${score}%`;
+
+  document.getElementById('sehat-stat-fresh').textContent = `${pFresh}%`;
+  document.getElementById('sehat-stat-neutral').textContent = `${pNeutral}%`;
+  document.getElementById('sehat-stat-junk').textContent = `${pJunk}%`;
+
+  if (score >= 80) {
+    if (gradeBadge) {
+      gradeBadge.textContent = 'Grade A (Sehat)';
+      gradeBadge.className = 'sehat-grade-badge grade-a';
+    }
+    if (adviceText) adviceText.textContent = 'Bagus sekali! Belanjaan Anda didominasi bahan segar kaya serat dan protein alami. Pertahankan komposisi ini.';
+  } else if (score >= 65) {
+    if (gradeBadge) {
+      gradeBadge.textContent = 'Grade B (Seimbang)';
+      gradeBadge.className = 'sehat-grade-badge grade-b';
+    }
+    if (adviceText) adviceText.textContent = 'Keranjang Anda cukup seimbang antara bahan pokok dan olahan. Tambahkan sayuran hijau untuk nutrisi maksimal.';
+  } else {
+    if (gradeBadge) {
+      gradeBadge.textContent = 'Grade C (Evaluasi)';
+      gradeBadge.className = 'sehat-grade-badge grade-c';
+    }
+    if (adviceText) adviceText.textContent = 'Perhatian: Komposisi belanjaan Anda tinggi makanan instan dan camilan manis. Pertimbangkan mengganti camilan dengan buah segar.';
+  }
+}
+
+// ==========================================================================
+// 13. REAL SMART BUYING TIPS ENGINE
+// ==========================================================================
+
+function renderCartSmartTips() {
+  const list = document.getElementById('cart-smart-tips-list');
+  if (!list) return;
+
+  const allProds = getAllCatalogProducts();
+  const tips = [];
+
+  // Check specific categories in cart
+  const hasRice = state.cart.some((i) => i.name.toLowerCase().includes('beras'));
+  const hasOil = state.cart.some((i) => i.name.toLowerCase().includes('minyak'));
+  const hasEgg = state.cart.some((i) => i.name.toLowerCase().includes('telur'));
+  const hasMilk = state.cart.some((i) => i.name.toLowerCase().includes('susu'));
+  const hasMeat = state.cart.some((i) => i.category === 'Daging & Seafood Segar');
+
+  if (hasRice) {
+    tips.push('<strong>Beras Premium:</strong> Pastikan butir beras utuh transparan tanpa aroma wangi buatan berlebihan.');
+  }
+  if (hasOil) {
+    tips.push('<strong>Minyak Goreng:</strong> Kemasan pouch 2L umumnya 12% lebih murah dibanding botol dengan volume yang sama.');
+  }
+  if (hasEgg) {
+    tips.push('<strong>Telur Ayam:</strong> Kocok perlahan di tangan; telur segar tidak bersuara dan terasa padat.');
+  }
+  if (hasMilk) {
+    tips.push('<strong>Susu UHT:</strong> Ambil susu di rak paling belakang untuk tanggal kedaluwarsa paling panjang.');
+  }
+  if (hasMeat) {
+    tips.push('<strong>Daging & Seafood:</strong> Masukkan daging ke troli di urutan terakhir sebelum ke kasir agar rantai dingin terjaga.');
+  }
+
+  // Default general tip if few items
+  if (tips.length < 3) {
+    tips.push('<strong>Trik Supermarket:</strong> Barang dengan harga paling menguntungkan pembeli biasanya ditaruh di rak bawah atau atas, bukan setinggi mata.');
+    tips.push('<strong>Diskon Bertingkat:</strong> Diskon 50%+20% berarti Anda tetap membayar 40% (bukan diskon 70%).');
+  }
+
+  list.innerHTML = tips.slice(0, 3).map((t) => `<li>${t}</li>`).join('');
+}
+
+// ==========================================================================
+// 14. BARCODE SCANNER (CAMERA & IMAGE UPLOAD & POPULAR TEST CODES)
+// ==========================================================================
+
+function openBarcodeScannerModal() {
+  sound.playClick();
+  const modal = document.getElementById('barcode-scanner-modal');
+  if (!modal) return;
+  modal.classList.remove('hidden');
+
+  // Attempt WebRTC camera stream
+  const video = document.getElementById('barcode-video');
+  const statusEl = document.getElementById('scanner-camera-status');
+
+  if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
+    navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' } })
+      .then((stream) => {
+        state.stream = stream;
+        if (video) {
+          video.srcObject = stream;
+          video.play();
+        }
+        if (statusEl) statusEl.textContent = 'Kamera Aktif: Mengamati Barcode...';
+      })
+      .catch((_) => {
+        if (statusEl) statusEl.textContent = 'Kamera tidak tersedia. Gunakan tombol uji cepat di bawah.';
+      });
+  } else {
+    if (statusEl) statusEl.textContent = 'Gunakan tombol barcode instan atau upload foto di bawah.';
+  }
+}
+
+function closeBarcodeScannerModal() {
+  const modal = document.getElementById('barcode-scanner-modal');
+  if (modal) modal.classList.add('hidden');
+
+  if (state.stream) {
+    state.stream.getTracks().forEach((track) => track.stop());
+    state.stream = null;
+  }
+}
+
+function handleBarcodeDetected(barcode) {
+  sound.playScanBeep();
+  closeBarcodeScannerModal();
+
+  const all = getAllCatalogProducts();
+  const found = all.find((p) => p.barcode === barcode);
+
+  if (found) {
+    addItemToCart({
+      name: found.name,
+      category: found.category,
+      unit: found.unit,
+      qty: 1,
+      unitPrice: found.price,
+      discountType: 'none',
+      d1: 0,
+      d2: 0,
+      image: found.image,
+      healthType: found.healthType
+    });
+    fireConfetti();
+    alert(`Barcode Terdeteksi: ${found.name} (Rp ${formatRupiah(found.price)}) dimasukkan ke keranjang!`);
+  } else {
+    alert(`Barcode ${barcode} berhasil dipindai, namun belum terdaftar di katalog. Silakan gunakan form Tambah Produk Baru.`);
+  }
+}
+
+// ==========================================================================
+// 15. RIWAYAT BELANJA (HISTORY) & CHECKOUT
+// ==========================================================================
+
+function openCheckoutModal() {
+  if (state.cart.length === 0) {
+    alert(state.language === 'en' ? 'Your cart is empty!' : 'Keranjang belanja masih kosong!');
+    return;
+  }
+  sound.playClick();
+  const modal = document.getElementById('checkout-modal');
+  if (!modal) return;
+
+  const totals = calculateCartTotals();
+  const dateStr = new Date().toLocaleDateString(state.language === 'en' ? 'en-US' : 'id-ID', {
+    day: 'numeric',
+    month: 'long',
+    year: 'numeric'
+  });
+
+  document.getElementById('receipt-date-time').textContent = `Tanggal: ${dateStr}`;
+  document.getElementById('receipt-val-limit').textContent = `Rp ${formatRupiah(state.safetyCap)}`;
+  document.getElementById('receipt-val-normal').textContent = `Rp ${formatRupiah(totals.subtotalNormal)}`;
+  document.getElementById('receipt-val-saved').textContent = `- Rp ${formatRupiah(totals.totalSavedAll)}`;
+  document.getElementById('receipt-val-final').textContent = `Rp ${formatRupiah(totals.finalNetTotal)}`;
+
+  const verdictBox = document.getElementById('receipt-verdict-box');
+  const verdictTitle = document.getElementById('receipt-verdict-title');
+  const verdictDesc = document.getElementById('receipt-verdict-desc');
+  const verdictIcon = document.getElementById('verdict-icon-symbol');
+
+  if (totals.finalNetTotal > state.safetyCap) {
+    verdictBox.className = 'receipt-verdict-box verdict-warning';
+    verdictTitle.textContent = 'Perhatian! Melebihi Anggaran';
+    verdictDesc.textContent = `Total belanja melebihi batas target bulanan Anda sebesar Rp ${formatRupiah(totals.finalNetTotal - state.safetyCap)}.`;
+    if (verdictIcon) verdictIcon.setAttribute('data-lucide', 'alert-triangle');
+  } else {
+    verdictBox.className = 'receipt-verdict-box verdict-safe';
+    verdictTitle.textContent = 'Hebat! Belanja Terkendali';
+    verdictDesc.textContent = 'Pengeluaran belanjaan Anda masih berada di bawah batas keamanan anggaran.';
+    if (verdictIcon) verdictIcon.setAttribute('data-lucide', 'check-circle');
+  }
+
+  // Render receipt items
+  const table = document.getElementById('receipt-items-table');
+  table.innerHTML = state.cart.map((item) => {
+    const qty = Number(item.qty) || 1;
+    const unitP = Number(item.unitPrice) || 0;
+    let finalUnitP = unitP;
+    if (item.discountType === 'single') {
+      finalUnitP = unitP * (1 - (Number(item.d1) || 0) / 100);
+    } else if (item.discountType === 'tiered') {
+      const step1 = unitP * (1 - (Number(item.d1) || 0) / 100);
+      finalUnitP = step1 * (1 - (Number(item.d2) || 0) / 100);
+    }
+    const finalRow = qty * finalUnitP;
+
+    return `
+      <div class="receipt-table-row">
+        <div class="receipt-item-info">
+          <strong>${item.name}</strong>
+          <span>${qty} ${item.unit} x Rp ${formatRupiah(unitP)}</span>
+        </div>
+        <strong class="receipt-item-subtotal">Rp ${formatRupiah(finalRow)}</strong>
+      </div>
+    `;
+  }).join('');
+
+  updateIcons();
+  modal.classList.remove('hidden');
+}
+
+function confirmCheckoutAndSave() {
+  const totals = calculateCartTotals();
+  const session = {
+    id: 'hist_' + Date.now(),
+    date: new Date().toLocaleDateString(state.language === 'en' ? 'en-US' : 'id-ID', {
+      day: 'numeric',
+      month: 'long',
+      year: 'numeric'
+    }),
+    timestamp: Date.now(),
+    note: 'Belanja Supermarket GroceryX',
+    safetyCap: state.safetyCap,
+    totalSpent: totals.finalNetTotal,
+    totalSaved: totals.totalSavedAll,
+    itemCount: totals.totalItemsCount,
+    items: [...state.cart]
+  };
+
+  state.history.unshift(session);
+  localStorage.setItem(STORAGE_KEYS.HISTORY, JSON.stringify(state.history));
+
+  // Clear current cart and applied voucher
+  state.cart = [];
+  state.appliedVoucher = null;
+  localStorage.removeItem(STORAGE_KEYS.CART);
+  localStorage.removeItem(STORAGE_KEYS.APPLIED_VOUCHER);
+
+  sound.playSuccess();
+  fireConfetti();
+  document.getElementById('checkout-modal').classList.add('hidden');
+
+  renderCart();
+  renderHistory();
+  renderAccountStats();
+  switchTab('view-history');
+  alert(state.language === 'en' ? 'Grocery trip completed and receipt saved!' : 'Belanja berhasil diselesaikan dan struk tersimpan di Riwayat!');
+}
+
+function renderHistory() {
+  const container = document.getElementById('history-sessions-container');
+  const emptyState = document.getElementById('history-empty-state');
+  if (!container) return;
+
+  const currentTotals = calculateCartTotals();
+  document.getElementById('hist-current-total').textContent = `Rp ${formatRupiah(currentTotals.finalNetTotal)}`;
+
+  const prevSpent = state.history.length > 0 ? state.history[0].totalSpent : 0;
+  document.getElementById('hist-prev-total').textContent = `Rp ${formatRupiah(prevSpent)}`;
+
+  if (state.history.length === 0) {
+    container.innerHTML = '';
+    if (emptyState) emptyState.classList.remove('hidden');
+    return;
+  }
+
+  if (emptyState) emptyState.classList.add('hidden');
+
+  container.innerHTML = state.history.map((h, idx) => `
+    <div class="history-card glass-card" data-hist-idx="${idx}">
+      <div class="history-card-header">
+        <div>
+          <h4>${h.note}</h4>
+          <span class="history-date">${h.date} • ${h.itemCount} Item</span>
+        </div>
+        <strong class="history-total text-primary">Rp ${formatRupiah(h.totalSpent)}</strong>
+      </div>
+      <div class="history-card-actions">
+        <button type="button" class="btn-outline-glass btn-sm btn-view-receipt" data-hist-idx="${idx}">
+          <i data-lucide="eye"></i> <span>Lihat Struk</span>
+        </button>
+      </div>
+    </div>
+  `).join('');
+
+  container.querySelectorAll('.btn-view-receipt').forEach((btn) => {
+    btn.onclick = () => {
+      const idx = parseInt(btn.getAttribute('data-hist-idx'), 10);
+      openHistoryDetailModal(idx);
+    };
+  });
+
+  renderAccountStats();
+  updateIcons();
+}
+
+function openHistoryDetailModal(idx) {
+  const h = state.history[idx];
+  if (!h) return;
+  sound.playClick();
+
+  const modal = document.getElementById('history-detail-modal');
+  const content = document.getElementById('history-detail-content');
+
+  content.innerHTML = `
+    <div class="receipt-header">
+      <div class="receipt-brand-logo"><i data-lucide="shopping-cart"></i></div>
+      <h2>GROCERYX SUPERMARKET</h2>
+      <p class="receipt-sub-loc">STRUK BELANJA TERSIMPAN</p>
+      <div class="receipt-dashed-line"></div>
+      <div class="receipt-meta-info">
+        <span>Tanggal: ${h.date}</span>
+        <span>${h.note}</span>
+      </div>
+      <div class="receipt-dashed-line"></div>
+    </div>
+    <div class="receipt-items-table">
+      ${(h.items || []).map((it) => `
+        <div class="receipt-table-row">
+          <div>
+            <strong>${it.name}</strong>
+            <span>${it.qty} ${it.unit} x Rp ${formatRupiah(it.unitPrice)}</span>
+          </div>
+          <strong>Rp ${formatRupiah(it.qty * it.unitPrice)}</strong>
+        </div>
+      `).join('')}
+    </div>
+    <div class="receipt-dashed-line"></div>
+    <div class="receipt-totals-section">
+      <div class="receipt-row font-bold text-primary">
+        <span>TOTAL BELANJA:</span>
+        <strong>Rp ${formatRupiah(h.totalSpent)}</strong>
+      </div>
+      <div class="receipt-row text-emerald">
+        <span>Total Dihemat:</span>
+        <strong>Rp ${formatRupiah(h.totalSaved || 0)}</strong>
+      </div>
+    </div>
+  `;
+
+  document.getElementById('btn-copy-history-to-cart').onclick = () => {
+    (h.items || []).forEach((it) => addItemToCart(it));
+    sound.playSuccess();
+    modal.classList.add('hidden');
+    switchTab('view-cart');
+    alert(state.language === 'en' ? 'All items copied to active cart!' : 'Semua item dari struk ini berhasil disalin ke keranjang aktif!');
+  };
+
+  updateIcons();
+  modal.classList.remove('hidden');
+}
+
+// ==========================================================================
+// 16. ACCOUNT STATS & CATEGORY PROPORTION
+// ==========================================================================
+
+function renderAccountStats() {
+  const totalSpentAll = state.history.reduce((sum, h) => sum + (h.totalSpent || 0), 0);
+  const totalSavedAll = state.history.reduce((sum, h) => sum + (h.totalSaved || 0), 0);
+  const count = state.history.length;
+  const avg = count > 0 ? Math.round(totalSpentAll / count) : 0;
+
+  const statSpent = document.getElementById('account-stat-spent');
+  const statSaved = document.getElementById('account-stat-saved');
+  const statReceipts = document.getElementById('account-stat-receipts');
+  const statAvg = document.getElementById('account-stat-avg');
+
+  if (statSpent) statSpent.textContent = `Rp ${formatRupiah(totalSpentAll)}`;
+  if (statSaved) statSaved.textContent = `Rp ${formatRupiah(totalSavedAll)}`;
+  if (statReceipts) statReceipts.textContent = `${count} Transaksi`;
+  if (statAvg) statAvg.textContent = `Rp ${formatRupiah(avg)}`;
+
+  // Category proportion bars
+  const catMap = {};
+  state.history.forEach((h) => {
+    (h.items || []).forEach((it) => {
+      const c = it.category || 'Lainnya';
+      catMap[c] = (catMap[c] || 0) + (it.qty * it.unitPrice);
+    });
+  });
+
+  const catBars = document.getElementById('account-category-bars');
+  if (!catBars) return;
+
+  const entries = Object.entries(catMap);
+  if (entries.length === 0) {
+    catBars.innerHTML = '<span class="text-hint">Belum ada data transaksi yang tercatat.</span>';
+    return;
+  }
+
+  entries.sort((a, b) => b[1] - a[1]);
+  catBars.innerHTML = entries.slice(0, 4).map(([cat, total]) => {
+    const p = totalSpentAll > 0 ? Math.round((total / totalSpentAll) * 100) : 0;
+    return `
+      <div class="cat-bar-item">
+        <div class="cat-bar-labels">
+          <span>${cat}</span>
+          <strong>Rp ${formatRupiah(total)} (${p}%)</strong>
+        </div>
+        <div class="cat-bar-track">
+          <div class="cat-bar-fill" style="width: ${p}%;"></div>
+        </div>
+      </div>
+    `;
+  }).join('');
+}
+
+// ==========================================================================
+// 17. TAB SWITCHING ENGINE
+// ==========================================================================
+
+function switchTab(targetViewId) {
+  state.activeTab = targetViewId;
+  sound.playClick();
+
+  document.querySelectorAll('.app-view').forEach((view) => {
+    view.classList.toggle('active', view.id === targetViewId);
+    view.classList.toggle('hidden', view.id !== targetViewId);
+  });
+
+  document.querySelectorAll('.nav-tab-btn').forEach((btn) => {
+    btn.classList.toggle('active', btn.getAttribute('data-target') === targetViewId);
+  });
+
+  if (targetViewId === 'view-shop') {
+    renderCatalog();
+  } else if (targetViewId === 'view-cart') {
+    renderCart();
+  } else if (targetViewId === 'view-history') {
+    renderHistory();
+  } else if (targetViewId === 'view-account') {
+    renderAccountStats();
+    renderSehatMeter();
+  }
+
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+  updateIcons();
+}
+
+// ==========================================================================
+// 18. INITIALIZATION & GLOBAL EVENT HANDLERS
+// ==========================================================================
+
+document.addEventListener('DOMContentLoaded', () => {
+  // Load saved state
+  try {
+    const rawCart = localStorage.getItem(STORAGE_KEYS.CART);
+    state.cart = rawCart ? JSON.parse(rawCart) : [];
+  } catch (_) { state.cart = []; }
+
+  try {
+    const rawHist = localStorage.getItem(STORAGE_KEYS.HISTORY);
+    state.history = rawHist ? JSON.parse(rawHist) : [];
+  } catch (_) { state.history = []; }
+
+  try {
+    const rawCap = localStorage.getItem(STORAGE_KEYS.SAFETY_CAP);
+    state.safetyCap = rawCap ? parseInt(rawCap, 10) : 500000;
+  } catch (_) { state.safetyCap = 500000; }
+
+  try {
+    const rawPinned = localStorage.getItem(STORAGE_KEYS.PINNED_PRODUCTS);
+    state.pinnedProducts = rawPinned ? JSON.parse(rawPinned) : [];
+  } catch (_) { state.pinnedProducts = []; }
+
+  try {
+    const rawCustom = localStorage.getItem(STORAGE_KEYS.CUSTOM_PRODUCTS);
+    state.customProducts = rawCustom ? JSON.parse(rawCustom) : [];
+  } catch (_) { state.customProducts = []; }
+
+  try {
+    state.appliedVoucher = localStorage.getItem(STORAGE_KEYS.APPLIED_VOUCHER) || null;
+  } catch (_) { state.appliedVoucher = null; }
+
+  try {
+    const savedTheme = localStorage.getItem(STORAGE_KEYS.THEME) || 'liquid-bright';
+    setTheme(savedTheme);
+  } catch (_) { }
+
+  try {
+    const savedLang = localStorage.getItem(STORAGE_KEYS.LANGUAGE) || 'id';
+    state.language = savedLang;
+  } catch (_) { }
+
+  try {
+    const savedSound = localStorage.getItem(STORAGE_KEYS.SOUND);
+    state.soundEnabled = savedSound !== null ? savedSound === 'true' : true;
+  } catch (_) { state.soundEnabled = true; }
+
+  loadUsersAndSession();
+  renderCategoryPills();
+  renderComboBundles();
+  renderCatalog();
+  renderCart();
+  renderHistory();
+  renderVoucherUI();
+  renderSehatMeter();
+  updateSafetyBanner();
+
+  // Bottom Navigation Dock Click Handlers
   document.querySelectorAll('.nav-tab-btn').forEach((btn) => {
     btn.onclick = () => {
       const target = btn.getAttribute('data-target');
@@ -2107,532 +1821,584 @@ function setupEventListeners() {
     };
   });
 
-  // Settings Modal Open / Close
-  const settingsModal = document.getElementById('settings-modal');
-  const settingsToggleBtn = document.getElementById('btn-settings-toggle');
-  const settingsCloseBtn = document.getElementById('btn-close-settings-modal');
-
-  if (settingsToggleBtn) {
-    settingsToggleBtn.onclick = () => {
-      settingsModal.classList.remove('hidden');
-      sound.playClick();
-    };
-  }
-
-  if (settingsCloseBtn) {
-    settingsCloseBtn.onclick = () => {
-      settingsModal.classList.add('hidden');
-    };
-  }
-
-  // Language Buttons in Settings Modal (Indonesian vs English)
-  document.getElementById('btn-lang-id')?.addEventListener('click', () => {
-    setLanguage('id');
-  });
-
-  document.getElementById('btn-lang-en')?.addEventListener('click', () => {
-    setLanguage('en');
-  });
-
-  // Theme Buttons in Settings Modal
-  document.querySelectorAll('.theme-card-btn').forEach((btn) => {
-    btn.onclick = () => {
-      const theme = btn.getAttribute('data-theme');
-      setTheme(theme);
-    };
-  });
-
-  // Sound Switch in Settings Modal
-  const soundCheckbox = document.getElementById('setting-sound-checkbox');
-  if (soundCheckbox) {
-    soundCheckbox.checked = state.soundEnabled;
-    soundCheckbox.onchange = (e) => {
-      state.soundEnabled = e.target.checked;
-      localStorage.setItem(STORAGE_KEYS.SOUND_ENABLED, JSON.stringify(state.soundEnabled));
-      if (state.soundEnabled) sound.playClick();
-    };
-  }
-
-  // Change Password Form in Settings Modal
-  const changePwdForm = document.getElementById('change-pwd-form');
-  if (changePwdForm) {
-    changePwdForm.onsubmit = (e) => {
-      e.preventDefault();
-      const oldPwd = document.getElementById('input-current-pwd').value;
-      const newPwd = document.getElementById('input-new-pwd').value;
-      const confirmPwd = document.getElementById('input-confirm-pwd').value;
-      handleChangePassword(oldPwd, newPwd, confirmPwd);
-    };
-  }
-
-  // Logout Button in Settings Modal
-  const logoutBtn = document.getElementById('btn-settings-logout');
-  if (logoutBtn) {
-    logoutBtn.onclick = handleLogout;
-  }
-
-  // Open Cloud Config from Settings (Admin Only)
-  const openCloudFromSettingsBtn = document.getElementById('btn-open-cloud-config-from-settings');
-  if (openCloudFromSettingsBtn) {
-    openCloudFromSettingsBtn.onclick = () => {
-      if (!isAdmin()) {
-        alert(state.language === 'en' ? 'Access restricted to administrator.' : 'Fitur ini hanya dapat diakses oleh administrator resmi.');
-        return;
-      }
-      settingsModal.classList.add('hidden');
-      document.getElementById('cloud-sync-modal').classList.remove('hidden');
-      sound.playClick();
-    };
-  }
-
-  // Auth Modal Tab Switcher (Login vs Sign Up)
-  const tabLoginBtn = document.getElementById('tab-login-btn');
-  const tabRegisterBtn = document.getElementById('tab-register-btn');
-  const loginForm = document.getElementById('login-form');
-  const registerForm = document.getElementById('register-form');
-
-  if (tabLoginBtn && tabRegisterBtn) {
-    tabLoginBtn.onclick = () => {
-      tabLoginBtn.classList.add('active');
-      tabRegisterBtn.classList.remove('active');
-      loginForm.classList.remove('hidden');
-      registerForm.classList.add('hidden');
-      sound.playClick();
-    };
-
-    tabRegisterBtn.onclick = () => {
-      tabRegisterBtn.classList.add('active');
-      tabLoginBtn.classList.remove('active');
-      registerForm.classList.remove('hidden');
-      loginForm.classList.add('hidden');
-      sound.playClick();
-    };
-  }
-
-  // Password Visibility Toggles
-  document.querySelectorAll('.btn-toggle-pwd').forEach((btn) => {
-    btn.onclick = () => {
-      const targetId = btn.getAttribute('data-target');
-      const input = document.getElementById(targetId);
-      if (input) {
-        input.type = (input.type === 'password') ? 'text' : 'password';
-      }
-    };
-  });
-
-  // Login Form Submission
-  if (loginForm) {
-    loginForm.onsubmit = (e) => {
-      e.preventDefault();
-      const email = document.getElementById('login-email').value;
-      const pwd = document.getElementById('login-password').value;
-      handleLogin(email, pwd);
-    };
-  }
-
-  // Register Form Submission
-  if (registerForm) {
-    registerForm.onsubmit = (e) => {
-      e.preventDefault();
-      const user = document.getElementById('reg-username').value;
-      const email = document.getElementById('reg-email').value;
-      const pwd = document.getElementById('reg-password').value;
-      handleRegister(user, email, pwd);
-    };
-  }
-
-  // Add Item Buttons
-  document.getElementById('btn-open-add-modal').onclick = () => openItemModal();
-  document.getElementById('btn-empty-add').onclick = () => openItemModal();
-  document.getElementById('btn-close-item-modal').onclick = closeItemModal;
-  document.getElementById('btn-save-item').onclick = saveItemFromModal;
-
-  // Category Slide Navigation (PC Friendly)
+  // Category Arrow Slide Navigation
   const catContainer = document.getElementById('category-filter-container');
   const btnCatPrev = document.getElementById('btn-cat-prev');
   const btnCatNext = document.getElementById('btn-cat-next');
 
   if (btnCatPrev && catContainer) {
     btnCatPrev.onclick = () => {
-      catContainer.scrollBy({ left: -200, behavior: 'smooth' });
+      catContainer.scrollBy({ left: -220, behavior: 'smooth' });
       sound.playClick();
     };
   }
 
   if (btnCatNext && catContainer) {
     btnCatNext.onclick = () => {
-      catContainer.scrollBy({ left: 200, behavior: 'smooth' });
+      catContainer.scrollBy({ left: 220, behavior: 'smooth' });
       sound.playClick();
     };
   }
 
-  if (catContainer) {
-    catContainer.addEventListener('wheel', (e) => {
-      if (e.deltaY !== 0) {
-        e.preventDefault();
-        catContainer.scrollLeft += e.deltaY;
-      }
-    }, { passive: false });
+  // Shop Search Input
+  const searchInput = document.getElementById('shop-search-input');
+  const searchClear = document.getElementById('shop-search-clear');
+  if (searchInput) {
+    searchInput.oninput = (e) => {
+      state.searchQuery = e.target.value.trim();
+      if (searchClear) searchClear.classList.toggle('hidden', !state.searchQuery);
+      renderCatalog();
+    };
+  }
+  if (searchClear) {
+    searchClear.onclick = () => {
+      searchInput.value = '';
+      state.searchQuery = '';
+      searchClear.classList.add('hidden');
+      renderCatalog();
+    };
   }
 
-  // Search Input in Trolley
-  const searchInput = document.getElementById('cart-search-input');
-  const searchClear = document.getElementById('cart-search-clear');
+  // Barcode Scanner Triggers
+  const btnHeadBarcode = document.getElementById('btn-header-barcode');
+  const btnSearchBarcode = document.getElementById('btn-search-barcode-trigger');
+  const btnCloseScanner = document.getElementById('btn-close-scanner-modal');
 
-  searchInput.oninput = (e) => {
-    state.searchQuery = e.target.value;
-    searchClear.classList.toggle('hidden', !state.searchQuery);
-    renderCartItems();
-  };
+  if (btnHeadBarcode) btnHeadBarcode.onclick = openBarcodeScannerModal;
+  if (btnSearchBarcode) btnSearchBarcode.onclick = openBarcodeScannerModal;
+  if (btnCloseScanner) btnCloseScanner.onclick = closeBarcodeScannerModal;
 
-  searchClear.onclick = () => {
-    searchInput.value = '';
-    state.searchQuery = '';
-    searchClear.classList.add('hidden');
-    renderCartItems();
-  };
+  // Barcode popular test buttons
+  document.querySelectorAll('.btn-test-barcode').forEach((btn) => {
+    btn.onclick = () => {
+      const code = btn.getAttribute('data-code');
+      handleBarcodeDetected(code);
+    };
+  });
 
-  // Stepper Qty in Modal
-  const modalQtyInput = document.getElementById('item-qty-input');
-  document.getElementById('btn-qty-plus').onclick = () => {
-    modalQtyInput.value = (parseFloat(modalQtyInput.value) || 0) + 1;
-    sound.playClick();
-    updateModalDiscountPreview();
-  };
+  // Barcode photo file input
+  const barcodeFileInput = document.getElementById('barcode-file-input');
+  if (barcodeFileInput) {
+    barcodeFileInput.onchange = (e) => {
+      const file = e.target.files && e.target.files[0];
+      if (file) {
+        // Simulated barcode read from image
+        sound.playScanBeep();
+        handleBarcodeDetected('8992388112233');
+      }
+    };
+  }
 
-  document.getElementById('btn-qty-minus').onclick = () => {
-    const val = parseFloat(modalQtyInput.value) || 1;
-    if (val > 1) {
-      modalQtyInput.value = val - 1;
+  // Google Sign-In button
+  const googleBtn = document.getElementById('btn-google-signin');
+  if (googleBtn) {
+    googleBtn.onclick = handleGoogleSignIn;
+  }
+
+  // Voucher apply & recommendations
+  const btnApplyVoucher = document.getElementById('btn-apply-voucher');
+  const voucherInput = document.getElementById('voucher-code-input');
+  if (btnApplyVoucher && voucherInput) {
+    btnApplyVoucher.onclick = () => {
+      applyVoucherCode(voucherInput.value);
+    };
+  }
+
+  const btnRemoveVoucher = document.getElementById('btn-remove-applied-voucher');
+  if (btnRemoveVoucher) {
+    btnRemoveVoucher.onclick = removeAppliedVoucher;
+  }
+
+  document.querySelectorAll('.btn-quick-voucher').forEach((btn) => {
+    btn.onclick = () => {
+      const code = btn.getAttribute('data-code');
+      if (voucherInput) voucherInput.value = code;
+      applyVoucherCode(code);
+    };
+  });
+
+  // Overbudget modal actions
+  const btnWarnCart = document.getElementById('btn-warning-view-cart');
+  const btnWarnRaise = document.getElementById('btn-warning-raise-budget');
+  const btnWarnDismiss = document.getElementById('btn-warning-dismiss');
+
+  if (btnWarnCart) {
+    btnWarnCart.onclick = () => {
+      document.getElementById('overbudget-warning-modal').classList.add('hidden');
+      switchTab('view-cart');
+    };
+  }
+  if (btnWarnRaise) {
+    btnWarnRaise.onclick = () => {
+      document.getElementById('overbudget-warning-modal').classList.add('hidden');
+      switchTab('view-account');
+      const input = document.getElementById('account-budget-limit-input');
+      if (input) input.focus();
+    };
+  }
+  if (btnWarnDismiss) {
+    btnWarnDismiss.onclick = () => {
+      document.getElementById('overbudget-warning-modal').classList.add('hidden');
+    };
+  }
+
+  // Account budget limit form
+  const budgetForm = document.getElementById('account-budget-form');
+  const budgetInput = document.getElementById('account-budget-limit-input');
+  if (budgetInput) {
+    budgetInput.value = formatRupiah(state.safetyCap);
+    budgetInput.oninput = (e) => {
+      const parsed = parseRupiahInput(e.target.value);
+      e.target.value = formatRupiah(parsed);
+    };
+  }
+  if (budgetForm) {
+    budgetForm.onsubmit = (e) => {
+      e.preventDefault();
+      const val = parseRupiahInput(budgetInput.value);
+      if (val > 0) {
+        state.safetyCap = val;
+        localStorage.setItem(STORAGE_KEYS.SAFETY_CAP, val.toString());
+        sound.playSuccess();
+        updateSafetyBanner();
+        alert(state.language === 'en' ? 'Budget limit updated successfully!' : 'Batas anggaran berhasil diperbarui!');
+      }
+    };
+  }
+
+  document.querySelectorAll('.btn-budget-chip').forEach((btn) => {
+    btn.onclick = () => {
+      const val = parseInt(btn.getAttribute('data-val'), 10);
+      if (budgetInput) budgetInput.value = formatRupiah(val);
+      state.safetyCap = val;
+      localStorage.setItem(STORAGE_KEYS.SAFETY_CAP, val.toString());
       sound.playClick();
-      updateModalDiscountPreview();
-    }
+      updateSafetyBanner();
+    };
+  });
+
+  // Theme button selectors
+  document.querySelectorAll('.theme-card-btn').forEach((btn) => {
+    btn.onclick = () => {
+      const th = btn.getAttribute('data-theme');
+      setTheme(th);
+      sound.playClick();
+    };
+  });
+
+  // Language selectors
+  document.querySelectorAll('.lang-card-btn').forEach((btn) => {
+    btn.onclick = () => {
+      const lg = btn.getAttribute('data-lang');
+      setLanguage(lg);
+      sound.playClick();
+    };
+  });
+
+  // Sound toggle switch
+  const switchSound = document.getElementById('switch-sound-fx');
+  if (switchSound) {
+    switchSound.checked = state.soundEnabled;
+    switchSound.onchange = (e) => {
+      state.soundEnabled = e.target.checked;
+      localStorage.setItem(STORAGE_KEYS.SOUND, state.soundEnabled.toString());
+      if (state.soundEnabled) sound.playClick();
+    };
+  }
+
+  // Checkout modal buttons
+  document.getElementById('btn-checkout-session').onclick = openCheckoutModal;
+  document.getElementById('btn-close-checkout-modal').onclick = () => {
+    document.getElementById('checkout-modal').classList.add('hidden');
+  };
+  document.getElementById('btn-confirm-save-receipt').onclick = confirmCheckoutAndSave;
+
+  // History detail modal
+  document.getElementById('btn-close-history-modal').onclick = () => {
+    document.getElementById('history-detail-modal').classList.add('hidden');
   };
 
-  modalQtyInput.oninput = updateModalDiscountPreview;
+  // Header quick buttons
+  const btnSettings = document.getElementById('btn-settings-toggle');
+  if (btnSettings) {
+    btnSettings.onclick = () => {
+      switchTab('view-account');
+    };
+  }
+  const btnHeaderProf = document.getElementById('btn-header-profile');
+  if (btnHeaderProf) {
+    btnHeaderProf.onclick = () => {
+      switchTab('view-account');
+    };
+  }
 
-  // Category Dropdown Change & Inline Custom Category Toggle
+  // Bundle carousel navigation arrows (slide next & prev)
+  const btnBundlePrev = document.getElementById('btn-bundle-prev');
+  const btnBundleNext = document.getElementById('btn-bundle-next');
+  const bundleContainer = document.getElementById('bundle-cards-container');
+  if (btnBundlePrev && bundleContainer) {
+    btnBundlePrev.onclick = () => {
+      if (sound) sound.playClick();
+      bundleContainer.scrollBy({ left: -260, behavior: 'smooth' });
+    };
+  }
+  if (btnBundleNext && bundleContainer) {
+    btnBundleNext.onclick = () => {
+      if (sound) sound.playClick();
+      bundleContainer.scrollBy({ left: 260, behavior: 'smooth' });
+    };
+  }
+
+  // Open Add Product Modal with Photo Upload
+  const btnOpenAddProduct = document.getElementById('btn-open-add-product');
+  const itemModal = document.getElementById('item-modal');
+  const btnCloseItemModal = document.getElementById('btn-close-item-modal');
+  const photoFile = document.getElementById('item-photo-file');
+  const photoPreviewImg = document.getElementById('item-photo-preview-img');
+  const photoDataUrl = document.getElementById('item-photo-data-url');
+  const btnRemovePhoto = document.getElementById('btn-remove-photo');
+
+  if (btnOpenAddProduct) {
+    btnOpenAddProduct.onclick = () => {
+      sound.playClick();
+      itemModal.classList.remove('hidden');
+    };
+  }
+
+  if (btnCloseItemModal) {
+    btnCloseItemModal.onclick = () => {
+      itemModal.classList.add('hidden');
+    };
+  }
+
+  // Photo file picker with instant preview
+  if (photoFile) {
+    photoFile.onchange = (e) => {
+      const file = e.target.files && e.target.files[0];
+      if (file) {
+        const reader = new FileReader();
+        reader.onload = (evt) => {
+          photoPreviewImg.src = evt.target.result;
+          photoDataUrl.value = evt.target.result;
+          sound.playSuccess();
+        };
+        reader.readAsDataURL(file);
+      }
+    };
+  }
+
+  if (btnRemovePhoto) {
+    btnRemovePhoto.onclick = () => {
+      const defImg = 'https://images.unsplash.com/photo-1588964895597-cfccd6e2dbf9?w=300&auto=format&fit=crop&q=80';
+      photoPreviewImg.src = defImg;
+      photoDataUrl.value = defImg;
+    };
+  }
+
+  // Photo preset selector
+  document.querySelectorAll('.btn-preset-photo').forEach((btn) => {
+    btn.onclick = () => {
+      const img = btn.getAttribute('data-img');
+      photoPreviewImg.src = img;
+      photoDataUrl.value = img;
+      sound.playClick();
+    };
+  });
+
+  // Populate category select dropdown in modal
   const catSelect = document.getElementById('item-category-select');
-  const inlineNewCatBox = document.getElementById('new-category-inline-box');
-  const toggleNewCatBtn = document.getElementById('btn-toggle-new-cat');
-  const confirmAddCatBtn = document.getElementById('btn-confirm-add-cat');
-  const cancelAddCatBtn = document.getElementById('btn-cancel-add-cat');
-  const inputNewCatName = document.getElementById('input-new-cat-name');
-
   if (catSelect) {
-    catSelect.onchange = () => {
-      if (catSelect.value === '__add_new__') {
-        inlineNewCatBox.classList.remove('hidden');
-        inputNewCatName.focus();
-      } else {
-        inlineNewCatBox.classList.add('hidden');
-        document.getElementById('item-category-input').value = catSelect.value;
-      }
-      sound.playClick();
-    };
+    catSelect.innerHTML = DEFAULT_CATEGORIES.filter((c) => c !== 'Semua').map((c) => `<option value="${c}">${c}</option>`).join('');
   }
 
-  if (toggleNewCatBtn) {
-    toggleNewCatBtn.onclick = () => {
-      inlineNewCatBox.classList.toggle('hidden');
-      if (!inlineNewCatBox.classList.contains('hidden')) {
-        inputNewCatName.focus();
-      }
-      sound.playClick();
-    };
-  }
-
-  if (confirmAddCatBtn) {
-    confirmAddCatBtn.onclick = () => {
-      const newCat = inputNewCatName.value.trim();
-      if (!newCat) {
-        alert(state.language === 'en' ? 'Please enter a category name!' : 'Silakan masukkan nama kategori!');
-        return;
-      }
-      const baseList = getDefaultCategoriesList();
-      if (!state.customCategories.includes(newCat) && !baseList.includes(newCat)) {
-        state.customCategories.push(newCat);
-        localStorage.setItem(STORAGE_KEYS.CUSTOM_CATEGORIES, JSON.stringify(state.customCategories));
-        populateCategoryDropdown(newCat);
-        populateFilterPills();
-      }
-      catSelect.value = newCat;
-      document.getElementById('item-category-input').value = newCat;
-      inlineNewCatBox.classList.add('hidden');
-      inputNewCatName.value = '';
-      sound.playSuccess();
-    };
-  }
-
-  if (cancelAddCatBtn) {
-    cancelAddCatBtn.onclick = () => {
-      inlineNewCatBox.classList.add('hidden');
-      inputNewCatName.value = '';
-      const fallback = state.language === 'en' ? 'Staple Foods' : 'Bahan Pokok';
-      catSelect.value = document.getElementById('item-category-input').value || fallback;
-    };
-  }
-
-  // Modal Currency Input Formatter
+  // Price input formatter in item modal
   const modalPriceInput = document.getElementById('item-price-input');
-  modalPriceInput.oninput = (e) => {
-    const parsed = parseRupiahInput(e.target.value);
-    e.target.value = formatRupiah(parsed);
-    updateModalComparatorPreview();
-    updateModalDiscountPreview();
-  };
+  if (modalPriceInput) {
+    modalPriceInput.oninput = (e) => {
+      const parsed = parseRupiahInput(e.target.value);
+      e.target.value = formatRupiah(parsed);
+      updateModalDiscountPreview();
+    };
+  }
 
-  // Quick Price Add Chips in Modal
+  // Quick price chips in modal
   document.querySelectorAll('.btn-price-chip').forEach((chip) => {
     chip.onclick = () => {
       const add = parseInt(chip.getAttribute('data-add'), 10) || 0;
       const cur = parseRupiahInput(modalPriceInput.value);
       modalPriceInput.value = formatRupiah(cur + add);
       sound.playClick();
-      updateModalComparatorPreview();
       updateModalDiscountPreview();
     };
   });
 
-  // Realtime Item Name lookup for price comparator
-  document.getElementById('item-name-input').oninput = () => {
-    updateModalComparatorPreview();
+  // Discount mode toggling in modal
+  let currentDiscountMode = 'none';
+  document.querySelectorAll('.discount-mode-toggle .mode-btn').forEach((btn) => {
+    btn.onclick = () => {
+      currentDiscountMode = btn.getAttribute('data-mode');
+      document.querySelectorAll('.discount-mode-toggle .mode-btn').forEach((b) => b.classList.remove('active'));
+      btn.classList.add('active');
+      document.getElementById('section-discount-single').classList.toggle('hidden', currentDiscountMode !== 'single');
+      document.getElementById('section-discount-tiered').classList.toggle('hidden', currentDiscountMode !== 'tiered');
+      sound.playClick();
+      updateModalDiscountPreview();
+    };
+  });
+
+  function updateModalDiscountPreview() {
+    const rawPrice = parseRupiahInput(modalPriceInput.value);
+    const qty = parseFloat(document.getElementById('item-qty-input').value) || 1;
+    const normalTotal = rawPrice * qty;
+    let finalUnitPrice = rawPrice;
+
+    if (currentDiscountMode === 'single') {
+      const d1 = parseFloat(document.getElementById('input-discount-single').value) || 0;
+      finalUnitPrice = rawPrice * (1 - d1 / 100);
+    } else if (currentDiscountMode === 'tiered') {
+      const d1 = parseFloat(document.getElementById('input-discount-d1').value) || 0;
+      const d2 = parseFloat(document.getElementById('input-discount-d2').value) || 0;
+      finalUnitPrice = rawPrice * (1 - d1 / 100) * (1 - d2 / 100);
+    }
+
+    const finalTotal = Math.round(finalUnitPrice * qty);
+    const saved = normalTotal - finalTotal;
+
+    document.getElementById('preview-normal-total').textContent = `Rp ${formatRupiah(normalTotal)}`;
+    document.getElementById('preview-discount-saved').textContent = `- Rp ${formatRupiah(saved)}`;
+    document.getElementById('preview-final-total').textContent = `Rp ${formatRupiah(finalTotal)}`;
+  }
+
+  document.getElementById('btn-qty-plus').onclick = () => {
+    const el = document.getElementById('item-qty-input');
+    el.value = (parseFloat(el.value) || 1) + 1;
+    updateModalDiscountPreview();
   };
 
-  // Discount Mode Switcher
-  document.querySelectorAll('.mode-btn').forEach((btn) => {
-    btn.onclick = () => {
-      const mode = btn.getAttribute('data-mode');
-      setDiscountMode(mode);
-      sound.playClick();
-    };
-  });
-
-  // Single Discount Presets
-  document.querySelectorAll('.disc-preset').forEach((btn) => {
-    btn.onclick = () => {
-      document.getElementById('input-discount-single').value = btn.getAttribute('data-d1');
-      sound.playClick();
-      updateModalDiscountPreview();
-    };
-  });
-
-  // Tiered Discount Presets
-  document.querySelectorAll('.disc-tiered-preset').forEach((btn) => {
-    btn.onclick = () => {
-      document.getElementById('input-discount-d1').value = btn.getAttribute('data-d1');
-      document.getElementById('input-discount-d2').value = btn.getAttribute('data-d2');
-      sound.playClick();
-      updateModalDiscountPreview();
-    };
-  });
-
-  document.getElementById('input-discount-single').oninput = updateModalDiscountPreview;
-  document.getElementById('input-discount-d1').oninput = updateModalDiscountPreview;
-  document.getElementById('input-discount-d2').oninput = updateModalDiscountPreview;
-
-  // Checkout Actions
-  document.getElementById('btn-checkout-session').onclick = openCheckoutModal;
-  document.getElementById('btn-close-checkout-modal').onclick = closeCheckoutModal;
-  document.getElementById('btn-confirm-save-receipt').onclick = confirmCheckoutAndSave;
-  document.getElementById('btn-close-history-modal').onclick = () => {
-    document.getElementById('history-detail-modal').classList.add('hidden');
+  document.getElementById('btn-qty-minus').onclick = () => {
+    const el = document.getElementById('item-qty-input');
+    const val = (parseFloat(el.value) || 1);
+    if (val > 1) el.value = val - 1;
+    updateModalDiscountPreview();
   };
 
-  // Cloud Sync Firebase Modal Handlers (Admin Only)
-  const cloudModal = document.getElementById('cloud-sync-modal');
-  const cloudTextarea = document.getElementById('firebase-config-textarea');
-  
+  // Save new product from modal
+  const btnSaveItemModal = document.getElementById('btn-save-item-modal');
+  if (btnSaveItemModal) {
+    btnSaveItemModal.onclick = () => {
+      const name = document.getElementById('item-name-input').value.trim();
+      const rawPrice = parseRupiahInput(modalPriceInput.value);
+      if (!name) {
+        alert('Silakan masukkan nama produk!');
+        return;
+      }
+      if (rawPrice <= 0) {
+        alert('Silakan masukkan harga satuan!');
+        return;
+      }
+
+      const category = document.getElementById('item-category-select').value;
+      const unit = document.getElementById('item-unit-input').value;
+      const qty = parseFloat(document.getElementById('item-qty-input').value) || 1;
+      const photo = photoDataUrl.value || 'https://images.unsplash.com/photo-1588964895597-cfccd6e2dbf9?w=300&auto=format&fit=crop&q=80';
+
+      const healthRadio = document.querySelector('input[name="item-health-type"]:checked');
+      const healthType = healthRadio ? healthRadio.value : 'healthy';
+
+      const d1 = currentDiscountMode === 'single' ? parseFloat(document.getElementById('input-discount-single').value) || 0 : (currentDiscountMode === 'tiered' ? parseFloat(document.getElementById('input-discount-d1').value) || 0 : 0);
+      const d2 = currentDiscountMode === 'tiered' ? parseFloat(document.getElementById('input-discount-d2').value) || 0 : 0;
+
+      const newProduct = {
+        id: 'custom_prod_' + Date.now(),
+        name,
+        category,
+        unit,
+        price: rawPrice,
+        normalPrice: rawPrice,
+        image: photo,
+        barcode: '899' + Math.floor(1000000000 + Math.random() * 9000000000),
+        healthType,
+        healthLabel: healthType === 'healthy' ? 'Bahan Segar' : (healthType === 'neutral' ? 'Olahan Seimbang' : 'Tinggi Gula/Garam'),
+        smartTip: 'Periksa selalu tanggal kedaluwarsa dan bandingkan harga per satuan unit.'
+      };
+
+      state.customProducts.push(newProduct);
+      localStorage.setItem(STORAGE_KEYS.CUSTOM_PRODUCTS, JSON.stringify(state.customProducts));
+
+      // Also add to active cart
+      addItemToCart({
+        name,
+        category,
+        unit,
+        qty,
+        unitPrice: rawPrice,
+        discountType: currentDiscountMode,
+        d1,
+        d2,
+        image: photo,
+        healthType
+      });
+
+      sound.playSuccess();
+      fireConfetti();
+      itemModal.classList.add('hidden');
+      document.getElementById('item-form').reset();
+      renderCatalog();
+    };
+  }
+
+  // Cloud sync trigger
   document.getElementById('btn-cloud-sync').onclick = () => {
     if (!isAdmin()) {
-      alert(state.language === 'en' ? 'Firebase sync is restricted to administrator.' : 'Akses sinkronisasi Firebase hanya untuk administrator.');
+      alert('Akses Cloud Firebase hanya untuk Administrator.');
       return;
     }
-    if (window.FirebaseSync && typeof window.FirebaseSync.getConfig === 'function') {
-      const cfg = window.FirebaseSync.getConfig();
-      if (cfg && !cloudTextarea.value.trim()) {
-        const cleanCfg = { ...cfg };
-        delete cleanCfg.source;
-        cloudTextarea.value = JSON.stringify(cleanCfg, null, 2);
-      }
-    }
-    cloudModal.classList.remove('hidden');
-    sound.playClick();
+    document.getElementById('cloud-sync-modal').classList.remove('hidden');
   };
-
   document.getElementById('btn-close-cloud-modal').onclick = () => {
-    cloudModal.classList.add('hidden');
+    document.getElementById('cloud-sync-modal').classList.add('hidden');
   };
 
-  function parseFirebaseConfigInput(text) {
-    if (!text || !text.trim()) return null;
-    const raw = text.trim();
-    try {
-      return JSON.parse(raw);
-    } catch (_) {}
-
-    const extract = (key) => {
-      const match = raw.match(new RegExp(`['"]?${key}['"]?\\s*:\\s*['"\`]([^'"\`]+)['"\`]`));
-      return match ? match[1] : '';
+  // Auth switch account modal
+  const btnSwitchAcc = document.getElementById('btn-switch-account');
+  const authModal = document.getElementById('auth-modal');
+  if (btnSwitchAcc && authModal) {
+    btnSwitchAcc.onclick = () => {
+      authModal.classList.remove('hidden');
     };
-
-    const apiKey = extract('apiKey');
-    const projectId = extract('projectId');
-    if (apiKey && projectId) {
-      return {
-        apiKey,
-        projectId,
-        authDomain: extract('authDomain'),
-        storageBucket: extract('storageBucket'),
-        messagingSenderId: extract('messagingSenderId'),
-        appId: extract('appId')
-      };
-    }
-    return null;
   }
 
-  document.getElementById('btn-save-firebase-config').onclick = async () => {
-    const parsed = parseFirebaseConfigInput(cloudTextarea.value);
-    if (!parsed || !parsed.apiKey || !parsed.projectId) {
-      alert(state.language === 'en' ? 'Invalid configuration format! Must contain apiKey and projectId.' : 'Format konfigurasi tidak valid! Pastikan mengandung apiKey dan projectId dari Firebase Console.');
-      sound.playWarning();
-      return;
-    }
+  // Auth Form tabs
+  const tabLoginBtn = document.getElementById('tab-login-btn');
+  const tabRegBtn = document.getElementById('tab-register-btn');
+  const loginForm = document.getElementById('login-form');
+  const regForm = document.getElementById('register-form');
 
-    try {
-      if (window.FirebaseSync && typeof window.FirebaseSync.saveCustomConfig === 'function') {
-        const ok = await window.FirebaseSync.saveCustomConfig(parsed);
-        if (ok) {
-          alert(state.language === 'en' ? 'Connected to Firebase! Database is now syncing across PC and Mobile.' : 'Berhasil terhubung ke Firebase! Database sekarang tersinkron realtime dengan HP & PC.');
-          sound.playSuccess();
-        } else {
-          alert(state.language === 'en' ? 'Failed to connect. Check your apiKey & Firestore rules.' : 'Gagal menyambung ke Firebase. Periksa kembali apiKey & Security Rules Firestore Anda.');
-          sound.playWarning();
-        }
-      }
-    } catch (err) {
-      alert('Error: ' + err.message);
-      sound.playWarning();
-    }
-  };
-
-  document.getElementById('btn-clear-firebase-config').onclick = () => {
-    const promptClear = state.language === 'en' ? 'Remove saved Firebase config?' : 'Hapus konfigurasi Firebase yang tersimpan?';
-    if (confirm(promptClear)) {
-      if (window.FirebaseSync && typeof window.FirebaseSync.clearCustomConfig === 'function') {
-        window.FirebaseSync.clearCustomConfig();
-      }
-      cloudTextarea.value = '';
-      alert(state.language === 'en' ? 'Firebase configuration cleared.' : 'Konfigurasi Firebase lokal berhasil dihapus.');
-      sound.playClick();
-    }
-  };
-
-  document.getElementById('btn-manual-sync-now').onclick = () => {
-    if (window.FirebaseSync && typeof window.FirebaseSync.pushLocalState === 'function') {
-      window.FirebaseSync.pushLocalState(true);
-      alert(state.language === 'en' ? 'Manual sync request sent to Firestore.' : 'Perintah sinkronisasi manual telah dikirim ke Cloud Firestore.');
-      sound.playSuccess();
-    }
-  };
-
-  // Safety Cap Settings on Tab Budget
-  const capInput = document.getElementById('input-safety-cap-val');
-  capInput.oninput = (e) => {
-    const val = parseRupiahInput(e.target.value);
-    e.target.value = formatRupiah(val);
-  };
-
-  document.querySelectorAll('.btn-budget-pill').forEach((pill) => {
-    pill.onclick = () => {
-      if (pill.hasAttribute('data-add')) {
-        const add = parseInt(pill.getAttribute('data-add'), 10);
-        const cur = parseRupiahInput(capInput.value);
-        capInput.value = formatRupiah(cur + add);
-      } else if (pill.hasAttribute('data-set')) {
-        const setVal = parseInt(pill.getAttribute('data-set'), 10);
-        capInput.value = formatRupiah(setVal);
-      }
+  if (tabLoginBtn && tabRegBtn) {
+    tabLoginBtn.onclick = () => {
+      tabLoginBtn.classList.add('active');
+      tabRegBtn.classList.remove('active');
+      loginForm.classList.remove('hidden');
+      regForm.classList.add('hidden');
       sound.playClick();
     };
-  });
-
-  document.getElementById('btn-save-safety-cap').onclick = () => {
-    const val = parseRupiahInput(capInput.value);
-    if (val < 10000) {
-      alert(state.language === 'en' ? 'Minimum budget limit is Rp 10.000!' : 'Batas minimal dompet adalah Rp 10.000!');
-      return;
-    }
-    state.safetyCap = val;
-    saveState();
-    sound.playSuccess();
-    updateSafetyCapBanner();
-    renderBudgetBreakdown();
-    const saveNotice = state.language === 'en'
-      ? `Budget limit successfully saved: Rp ${formatRupiah(val)}!`
-      : `Batas anggaran dompet berhasil disimpan: Rp ${formatRupiah(val)}!`;
-    alert(saveNotice);
-  };
-
-  // Export Data JSON
-  document.getElementById('btn-export-data').onclick = () => {
-    const backupData = {
-      appName: 'GroceryX',
-      safetyCap: state.safetyCap,
-      cart: state.cart,
-      history: state.history,
-      prevCatalog: state.prevCatalog,
-      customCategories: state.customCategories,
-      exportedAt: new Date().toISOString()
+    tabRegBtn.onclick = () => {
+      tabRegBtn.classList.add('active');
+      tabLoginBtn.classList.remove('active');
+      regForm.classList.remove('hidden');
+      loginForm.classList.add('hidden');
+      sound.playClick();
     };
-    const blob = new Blob([JSON.stringify(backupData, null, 2)], { type: 'application/json' });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = `groceryx_backup_${Date.now()}.json`;
-    a.click();
-    URL.revokeObjectURL(url);
-    sound.playSuccess();
-  };
+  }
 
-  // Clear All Data
-  const clearAllBtn = document.getElementById('btn-clear-all-data');
-  if (clearAllBtn) {
-    clearAllBtn.onclick = () => {
-      const clearConfirm = state.language === 'en'
-        ? 'Are you sure you want to clear all cart items and shopping history? This action cannot be undone.'
-        : 'Apakah Anda yakin ingin mengosongkan seluruh data troli belanja dan riwayat belanja? Tindakan ini tidak dapat dibatalkan.';
-      if (confirm(clearConfirm)) {
-        state.cart = [];
-        state.history = [];
-        saveState();
-        renderCartItems();
-        renderHistorySessions();
-        renderBudgetBreakdown();
-        updateSafetyCapBanner();
+  // Login form handler
+  if (loginForm) {
+    loginForm.onsubmit = (e) => {
+      e.preventDefault();
+      const email = document.getElementById('login-email').value.trim();
+      const pwd = document.getElementById('login-password').value;
+      const user = state.usersList.find((u) => u.email.toLowerCase() === email.toLowerCase());
+
+      if (user && user.password === pwd) {
+        state.currentUser = user;
+        localStorage.setItem(STORAGE_KEYS.CURRENT_USER, JSON.stringify(user));
+        applyUserSessionToUI();
+        authModal.classList.add('hidden');
         sound.playSuccess();
-        alert(state.language === 'en' ? 'All cart items and receipt history have been cleared.' : 'Seluruh data troli dan riwayat belanja berhasil dikosongkan.');
+        alert(`Selamat datang kembali, ${user.username}!`);
+      } else {
+        sound.playWarning();
+        document.getElementById('login-error-msg').textContent = 'Email atau password salah!';
+        document.getElementById('login-error-msg').classList.remove('hidden');
       }
     };
   }
-}
 
-// ==========================================================================
-// APP BOOTSTRAP
-// ==========================================================================
+  // Register form handler
+  if (regForm) {
+    regForm.onsubmit = (e) => {
+      e.preventDefault();
+      const username = document.getElementById('reg-username').value.trim();
+      const email = document.getElementById('reg-email').value.trim();
+      const pwd = document.getElementById('reg-password').value;
 
-function initApp() {
-  loadStateFromStorage();
-  initTheme();
-  initLanguage();
-  initAuth();
-  populateFilterPills();
-  setupEventListeners();
-  setupPWA();
-  renderCartItems();
-  renderHistorySessions();
-  renderBudgetBreakdown();
+      if (state.usersList.some((u) => u.email.toLowerCase() === email.toLowerCase())) {
+        document.getElementById('register-error-msg').textContent = 'Email sudah terdaftar!';
+        document.getElementById('register-error-msg').classList.remove('hidden');
+        return;
+      }
+
+      const newUser = {
+        username,
+        email,
+        password: pwd,
+        role: 'member',
+        provider: 'local'
+      };
+      state.usersList.push(newUser);
+      localStorage.setItem(STORAGE_KEYS.USERS_LIST, JSON.stringify(state.usersList));
+
+      state.currentUser = newUser;
+      localStorage.setItem(STORAGE_KEYS.CURRENT_USER, JSON.stringify(newUser));
+      applyUserSessionToUI();
+      authModal.classList.add('hidden');
+      sound.playSuccess();
+      fireConfetti();
+      alert(`Akun berhasil dibuat! Selamat datang di GroceryX, ${username}!`);
+    };
+  }
+
+  // Logout button
+  const btnLogout = document.getElementById('btn-settings-logout');
+  if (btnLogout) {
+    btnLogout.onclick = () => {
+      if (confirm('Apakah Anda yakin ingin keluar dari akun?')) {
+        state.currentUser = null;
+        localStorage.removeItem(STORAGE_KEYS.CURRENT_USER);
+        sound.playClick();
+        loadUsersAndSession();
+        alert('Anda telah keluar.');
+      }
+    };
+  }
+
+  // Reset database / clear data
+  const btnResetDemo = document.getElementById('btn-reset-demo');
+  if (btnResetDemo) {
+    btnResetDemo.onclick = () => {
+      if (confirm('Kosongkan semua riwayat belanja?')) {
+        state.history = [];
+        localStorage.removeItem(STORAGE_KEYS.HISTORY);
+        sound.playClick();
+        renderHistory();
+      }
+    };
+  }
+
+  // Export JSON data
+  const btnExport = document.getElementById('btn-export-data');
+  if (btnExport) {
+    btnExport.onclick = () => {
+      const dataStr = 'data:text/json;charset=utf-8,' + encodeURIComponent(JSON.stringify({
+        cart: state.cart,
+        history: state.history,
+        safetyCap: state.safetyCap,
+        exportedAt: new Date().toISOString()
+      }, null, 2));
+      const a = document.createElement('a');
+      a.href = dataStr;
+      a.download = `GroceryX_Backup_${Date.now()}.json`;
+      a.click();
+    };
+  }
+
+  // Empty cart go to shop button
+  const btnEmptyGoShop = document.getElementById('btn-empty-go-shop');
+  if (btnEmptyGoShop) {
+    btnEmptyGoShop.onclick = () => {
+      switchTab('view-shop');
+    };
+  }
+
   updateIcons();
-}
-
-window.addEventListener('DOMContentLoaded', initApp);
+});
