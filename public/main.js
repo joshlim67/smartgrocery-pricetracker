@@ -506,6 +506,59 @@ function t(key) {
 }
 
 // ==========================================================================
+// REALTIME FIREBASE SYNC BRIDGE & LOCAL STORAGE PERSISTENCE
+// ==========================================================================
+
+function syncToFirebase(immediate = false) {
+  if (window.FirebaseSync && typeof window.FirebaseSync.pushLocalState === 'function') {
+    window.FirebaseSync.pushLocalState(immediate);
+  }
+}
+
+function saveStateToLocalStorage() {
+  try {
+    localStorage.setItem(STORAGE_KEYS.CART, JSON.stringify(state.cart || []));
+    localStorage.setItem(STORAGE_KEYS.SAFETY_CAP, (state.safetyCap || 500000).toString());
+    localStorage.setItem(STORAGE_KEYS.HISTORY, JSON.stringify(state.history || []));
+    localStorage.setItem(STORAGE_KEYS.PINNED_PRODUCTS, JSON.stringify(state.pinnedProducts || []));
+    localStorage.setItem(STORAGE_KEYS.CUSTOM_PRODUCTS, JSON.stringify(state.customProducts || []));
+    if (state.appliedVoucher) {
+      localStorage.setItem(STORAGE_KEYS.APPLIED_VOUCHER, state.appliedVoucher);
+    } else {
+      localStorage.removeItem(STORAGE_KEYS.APPLIED_VOUCHER);
+    }
+    if (state.currentUser) {
+      localStorage.setItem(STORAGE_KEYS.CURRENT_USER, JSON.stringify(state.currentUser));
+    }
+  } catch (e) {
+    console.warn('Gagal menyimpan state ke localStorage:', e);
+  }
+}
+
+function renderAll() {
+  updateSafetyBanner();
+  renderCatalog();
+  renderComboBundles();
+  renderCart();
+  renderVoucherUI();
+  renderSehatMeter();
+  renderCartSmartTips();
+  renderHistory();
+  renderAccountStats();
+  applyUserSessionToUI();
+  updateIcons();
+}
+
+// Global bridge for multi-device realtime synchronization
+window.SmartGrocery = {
+  state,
+  renderAll,
+  saveStateToLocalStorage,
+  syncToFirebase,
+  sound: null // populated after SoundEngine instantiates
+};
+
+// ==========================================================================
 // 5. AUDIO SYNTHESIZER (WEB AUDIO API HAPTICS & SOUND EFFECTS)
 // ==========================================================================
 
@@ -604,6 +657,7 @@ class SoundEngine {
 }
 
 const sound = new SoundEngine();
+if (window.SmartGrocery) window.SmartGrocery.sound = sound;
 
 // ==========================================================================
 // 6. HELPER FORMATTERS
@@ -770,6 +824,7 @@ function selectGoogleAccount(name, email) {
   localStorage.setItem(STORAGE_KEYS.CURRENT_USER, JSON.stringify(googleUser));
   localStorage.removeItem('sg_user_logged_out');
   applyUserSessionToUI();
+  syncToFirebase(true);
   
   const googleModal = document.getElementById('google-oauth-modal');
   if (googleModal) googleModal.classList.add('hidden');
@@ -901,6 +956,7 @@ function toggleLikeProduct(prodId) {
   localStorage.setItem(STORAGE_KEYS.PINNED_PRODUCTS, JSON.stringify(state.pinnedProducts));
   renderCatalog();
   updateIcons();
+  syncToFirebase();
 }
 
 function renderCategoryPills() {
@@ -1323,6 +1379,7 @@ function saveCart() {
   renderCart();
   renderCatalog();
   renderSehatMeter();
+  syncToFirebase();
 }
 
 function applyVoucherCode(code) {
@@ -1341,6 +1398,7 @@ function applyVoucherCode(code) {
     fireConfetti();
     renderVoucherUI();
     renderCart();
+    syncToFirebase();
   } else {
     sound.playWarning();
     alert(state.language === 'en' ? 'Invalid voucher code!' : 'Kode voucher tidak valid!');
@@ -1353,6 +1411,7 @@ function removeAppliedVoucher() {
   sound.playClick();
   renderVoucherUI();
   renderCart();
+  syncToFirebase();
 }
 
 function renderVoucherUI() {
@@ -1735,6 +1794,7 @@ function confirmCheckoutAndSave() {
   state.appliedVoucher = null;
   localStorage.removeItem(STORAGE_KEYS.CART);
   localStorage.removeItem(STORAGE_KEYS.APPLIED_VOUCHER);
+  syncToFirebase(true);
 
   sound.playSuccess();
   fireConfetti();
@@ -2150,6 +2210,7 @@ document.addEventListener('DOMContentLoaded', () => {
         localStorage.setItem(STORAGE_KEYS.SAFETY_CAP, val.toString());
         sound.playSuccess();
         updateSafetyBanner();
+        syncToFirebase();
         alert(state.language === 'en' ? 'Budget limit updated successfully!' : 'Batas anggaran berhasil diperbarui!');
       }
     };
@@ -2163,6 +2224,7 @@ document.addEventListener('DOMContentLoaded', () => {
       localStorage.setItem(STORAGE_KEYS.SAFETY_CAP, val.toString());
       sound.playClick();
       updateSafetyBanner();
+      syncToFirebase();
     };
   });
 
@@ -2433,6 +2495,7 @@ document.addEventListener('DOMContentLoaded', () => {
       itemModal.classList.add('hidden');
       document.getElementById('item-form').reset();
       renderCatalog();
+      syncToFirebase(true);
     };
   }
 
@@ -2637,6 +2700,7 @@ document.addEventListener('DOMContentLoaded', () => {
         localStorage.removeItem(STORAGE_KEYS.HISTORY);
         sound.playClick();
         renderHistory();
+        syncToFirebase(true);
       }
     };
   }

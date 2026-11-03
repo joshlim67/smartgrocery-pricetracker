@@ -2,7 +2,7 @@
 // FIREBASE REALTIME SYNC (SINGLE SHARED USER / MULTI-DEVICE REALTIME)
 // ==========================================================================
 // Menggunakan Firebase Firestore Modular SDK via Google CDN
-// Tidak memerlukan npm build khusus, bekerja offline-first & realtime.
+// Bekerja offline-first & realtime via onSnapshot.
 // ==========================================================================
 
 import { initializeApp, getApps, getApp } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js';
@@ -19,7 +19,7 @@ const STORAGE_KEY_FIREBASE_CONFIG = 'sg_firebase_config_v1';
 const SHARED_COLLECTION = 'grocery_trackers';
 const SHARED_DOC_ID = 'student_user_01';
 
-// ID unik untuk tab/perangkat saat ini agar tidak terjadi infinite loop saat menerima update dari diri sendiri
+// ID unik untuk tab/perangkat saat ini agar tidak loop balik saat menerima update dari diri sendiri
 const CLIENT_ID = 'device_' + Math.random().toString(36).substring(2, 9) + '_' + Date.now();
 
 let firestoreDb = null;
@@ -35,7 +35,7 @@ let syncStatus = {
   errorMsg: ''
 };
 
-// Ambil konfigurasi: prioritaskan file firebase-config.js, jika kosong gunakan yang disimpan di localStorage
+// Ambil konfigurasi: prioritaskan file firebase-config.js, jika kosong gunakan localStorage
 function getEffectiveConfig() {
   if (fileConfig && fileConfig.apiKey && fileConfig.projectId) {
     return { ...fileConfig, source: 'file' };
@@ -78,6 +78,78 @@ function updateSyncStatusUI() {
   }
 }
 
+// Helper untuk menerapkan data remote ke state lokal secara aman
+function applyRemoteData(remoteData) {
+  if (!window.SmartGrocery || !window.SmartGrocery.state) {
+    // Jika main.js masih loading, tunggu 60ms lalu coba lagi
+    setTimeout(() => applyRemoteData(remoteData), 60);
+    return;
+  }
+
+  isApplyingRemoteChange = true;
+  try {
+    const sg = window.SmartGrocery;
+    const currentState = sg.state;
+
+    // 1. Keranjang Belanja (Cart)
+    if (Array.isArray(remoteData.cart)) {
+      currentState.cart = remoteData.cart;
+    }
+
+    // 2. Batas Anggaran (Safety Cap)
+    if (typeof remoteData.safetyCap === 'number' && remoteData.safetyCap > 0) {
+      currentState.safetyCap = remoteData.safetyCap;
+    }
+
+    // 3. Riwayat Belanja (History)
+    if (Array.isArray(remoteData.history)) {
+      currentState.history = remoteData.history;
+    }
+
+    // 4. Produk Kustom Tambahan (Custom Products)
+    if (Array.isArray(remoteData.customProducts)) {
+      currentState.customProducts = remoteData.customProducts;
+    }
+
+    // 5. Produk Favorit / Pin Disukai (Pinned Products)
+    if (Array.isArray(remoteData.pinnedProducts)) {
+      currentState.pinnedProducts = remoteData.pinnedProducts;
+    }
+
+    // 6. Voucher yang Sedang Aktif
+    if (remoteData.appliedVoucher !== undefined) {
+      currentState.appliedVoucher = remoteData.appliedVoucher;
+    }
+
+    // 7. Single Shared Account (Akun Bersama)
+    if (remoteData.currentUser && typeof remoteData.currentUser === 'object') {
+      currentState.currentUser = remoteData.currentUser;
+      localStorage.removeItem('sg_user_logged_out');
+    }
+
+    // Simpan ke localStorage sebagai cache offline
+    if (typeof sg.saveStateToLocalStorage === 'function') {
+      sg.saveStateToLocalStorage();
+    }
+
+    // Render ulang seluruh UI seketika tanpa reload
+    if (typeof sg.renderAll === 'function') {
+      sg.renderAll();
+    }
+
+    // Efek audio halus tanda sinkronisasi berhasil
+    if (sg.sound && typeof sg.sound.playClick === 'function') {
+      sg.sound.playClick();
+    }
+  } catch (err) {
+    console.error('[Firebase Sync] Gagal menerapkan remote data:', err);
+  } finally {
+    setTimeout(() => {
+      isApplyingRemoteChange = false;
+    }, 150);
+  }
+}
+
 // Inisialisasi Firebase & Firestore Realtime Listener
 export async function initFirebaseSync() {
   const config = getEffectiveConfig();
@@ -117,8 +189,7 @@ export async function initFirebaseSync() {
     // Pasang Realtime Listener (onSnapshot)
     unsubscribeSnapshot = onSnapshot(docRef, { includeMetadataChanges: false }, (docSnap) => {
       if (!docSnap.exists()) {
-        console.log('[Firebase Sync] Dokumen shared_state belum ada di Firestore. Melakukan inisialisasi awal...');
-        // Inisialisasi dokumen baru dengan data lokal yang ada
+        console.log('[Firebase Sync] Dokumen belum ada di Firestore. Melakukan inisialisasi awal...');
         pushLocalStateToFirebase(true);
         return;
       }
@@ -135,45 +206,8 @@ export async function initFirebaseSync() {
         return;
       }
 
-      console.log('[Firebase Sync] Menerima data realtime dari perangkat lain:', remoteData);
-
-      // Terapkan data dari perangkat lain ke state lokal aplikasi
-      if (window.SmartGrocery && window.SmartGrocery.state) {
-        isApplyingRemoteChange = true;
-        try {
-          if (Array.isArray(remoteData.cart)) {
-            window.SmartGrocery.state.cart = remoteData.cart;
-          }
-          if (typeof remoteData.safetyCap === 'number') {
-            window.SmartGrocery.state.safetyCap = remoteData.safetyCap;
-          }
-          if (Array.isArray(remoteData.history)) {
-            window.SmartGrocery.state.history = remoteData.history;
-          }
-          if (remoteData.prevCatalog && typeof remoteData.prevCatalog === 'object') {
-            window.SmartGrocery.state.prevCatalog = remoteData.prevCatalog;
-          }
-
-          // Simpan juga ke localStorage sebagai cache offline
-          if (typeof window.SmartGrocery.saveStateToLocalStorage === 'function') {
-            window.SmartGrocery.saveStateToLocalStorage();
-          }
-
-          // Render ulang tampilan agar sinkron secara visual seketika
-          if (typeof window.SmartGrocery.renderAll === 'function') {
-            window.SmartGrocery.renderAll();
-          }
-
-          // Efek suara lembut (haptic feedback) saat data sinkron dari device lain
-          if (window.SmartGrocery.sound && typeof window.SmartGrocery.sound.playClick === 'function') {
-            window.SmartGrocery.sound.playClick();
-          }
-        } finally {
-          setTimeout(() => {
-            isApplyingRemoteChange = false;
-          }, 100);
-        }
-      }
+      console.log('[Firebase Sync] Menerima data realtime onSnapshot dari perangkat lain:', remoteData);
+      applyRemoteData(remoteData);
 
       syncStatus.connected = true;
       syncStatus.statusText = 'Tersinkron Realtime (1 Database Bersama)';
@@ -211,14 +245,13 @@ export async function initFirebaseSync() {
   }
 }
 
-// Kirim perubahan lokal ke Firestore (Debounced)
+// Kirim perubahan lokal ke Firestore (Debounced & Realtime)
 export function pushLocalStateToFirebase(forceImmediate = false) {
   if (isApplyingRemoteChange) {
-    // Sedang menerapkan perubahan dari remote, jangan kirim balik
     return;
   }
 
-  if (!firestoreDb || !syncStatus.connected) {
+  if (!firestoreDb) {
     return;
   }
 
@@ -232,9 +265,12 @@ export function pushLocalStateToFirebase(forceImmediate = false) {
 
     const payload = {
       cart: currentState.cart || [],
+      customProducts: currentState.customProducts || [],
+      pinnedProducts: currentState.pinnedProducts || [],
       safetyCap: currentState.safetyCap || 500000,
       history: currentState.history || [],
-      prevCatalog: currentState.prevCatalog || {},
+      appliedVoucher: currentState.appliedVoucher || null,
+      currentUser: currentState.currentUser || null,
       updatedAt: Date.now(),
       updatedBy: CLIENT_ID,
       deviceInfo: (navigator.userAgent.includes('Mobi') ? 'Mobile' : 'Desktop')
@@ -253,7 +289,7 @@ export function pushLocalStateToFirebase(forceImmediate = false) {
       syncStatus.state = 'connected';
       syncStatus.lastSync = Date.now();
       updateSyncStatusUI();
-      console.log('[Firebase Sync] Data berhasil dikirim ke Firestore');
+      console.log('[Firebase Sync] Data realtime berhasil disinkronkan ke Firestore');
     } catch (err) {
       console.error('[Firebase Sync] Gagal menyimpan data ke Firestore:', err);
       syncStatus.state = 'error';
@@ -270,7 +306,7 @@ export function pushLocalStateToFirebase(forceImmediate = false) {
   if (forceImmediate) {
     sendData();
   } else {
-    debounceTimer = setTimeout(sendData, 350);
+    debounceTimer = setTimeout(sendData, 200); // Responsif 200ms debounce
   }
 }
 
@@ -310,13 +346,59 @@ window.FirebaseSync = {
   getConfig: getEffectiveConfig
 };
 
+// Wire up UI action buttons for Firebase Cloud Modal
+function setupFirebaseModalActions() {
+  const btnManualSync = document.getElementById('btn-manual-sync-now');
+  if (btnManualSync) {
+    btnManualSync.onclick = () => {
+      pushLocalStateToFirebase(true);
+      if (window.SmartGrocery && window.SmartGrocery.sound) {
+        window.SmartGrocery.sound.playSuccess();
+      }
+      alert('Sinkronisasi cloud paksa berhasil dijalankan!');
+    };
+  }
+
+  const btnSaveConfig = document.getElementById('btn-save-firebase-config');
+  const txtConfig = document.getElementById('firebase-config-textarea');
+  if (btnSaveConfig && txtConfig) {
+    btnSaveConfig.onclick = async () => {
+      try {
+        const val = txtConfig.value.trim();
+        if (!val) {
+          alert('Silakan tempel kode JSON konfigurasi Firebase!');
+          return;
+        }
+        const parsed = JSON.parse(val);
+        await saveCustomConfig(parsed);
+        alert('Konfigurasi Firebase berhasil disimpan dan dihubungkan!');
+      } catch (e) {
+        alert('Format JSON konfigurasi tidak valid: ' + e.message);
+      }
+    };
+  }
+
+  const btnClearConfig = document.getElementById('btn-clear-firebase-config');
+  if (btnClearConfig) {
+    btnClearConfig.onclick = () => {
+      if (confirm('Hapus konfigurasi Firebase lokal?')) {
+        clearCustomConfig();
+        if (txtConfig) txtConfig.value = '';
+        alert('Konfigurasi Firebase lokal berhasil dihapus.');
+      }
+    };
+  }
+}
+
 // Jalankan inisialisasi saat script dimuat
 if (document.readyState === 'loading') {
   document.addEventListener('DOMContentLoaded', () => {
     initFirebaseSync();
     updateSyncStatusUI();
+    setupFirebaseModalActions();
   });
 } else {
   initFirebaseSync();
   updateSyncStatusUI();
+  setupFirebaseModalActions();
 }
