@@ -91,6 +91,19 @@
           <span class="stat-group"><span id="lbl-max-limit">Batas Maks:</span> <strong id="header-limit-budget">Rp
               500.000</strong> (<span id="header-percent-budget">0%</span>)</span>
         </div>
+
+        <!-- Live Store Location Metadata Indicator -->
+        <div class="budget-location-strip" id="budget-location-strip" title="Klik untuk mengubah nama toko / lokasi belanja">
+          <div class="location-strip-left">
+            <i data-lucide="map-pin" class="location-icon"></i>
+            <span class="location-label-sub">Lokasi Toko:</span>
+            <strong class="location-name-val" id="header-store-location">Menentukan Lokasi...</strong>
+          </div>
+          <button type="button" class="btn-change-store-loc" id="btn-change-store-location" title="Ganti Lokasi Toko">
+            <i data-lucide="edit-3"></i>
+            <span>Ganti</span>
+          </button>
+        </div>
       </section>
     </header>
 
@@ -155,17 +168,21 @@
           </div>
         </div>
 
-        <!-- ACTION ROW: TOTAL KATALOG & TOMBOL TAMBAH PRODUK BARU -->
-        <div class="catalog-header-bar">
-          <div class="catalog-info-text">
-            <span id="catalog-count-label">Menampilkan Produk Makanan</span>
-            <span class="pin-hint-tag"><i data-lucide="heart" class="text-crimson fill-crimson"></i> <span
-                id="lbl-pin-hint">Klik ❤️ untuk Pin ke Atas</span></span>
-          </div>
-          <button type="button" id="btn-open-add-product" class="btn-add-product-pill">
-            <i data-lucide="plus"></i>
-            <span id="lbl-btn-add-prod">Tambah Produk Baru</span>
+        <!-- FULL-WIDTH ACTION BAR: + TAMBAH PRODUK BARU (UJUNG KE UJUNG) -->
+        <div class="catalog-add-action-wrap">
+          <button type="button" id="btn-open-add-product" class="btn-add-product-fullbar" aria-label="Tambah Produk Baru">
+            <i data-lucide="plus-circle" class="btn-add-fullbar-icon"></i>
+            <span class="btn-add-fullbar-text" id="lbl-btn-add-prod">+ Tambah Produk Baru ke Katalog</span>
           </button>
+        </div>
+
+        <!-- CATALOG INFO & FAVOURITES HINT (DESKRIPSI DIBAWAH) -->
+        <div class="catalog-sub-info-bar">
+          <span id="catalog-count-label" class="catalog-count-text">Menampilkan Produk Makanan</span>
+          <span class="pin-hint-tag">
+            <i data-lucide="heart" class="text-crimson fill-crimson"></i>
+            <span id="lbl-pin-hint">Klik ❤️ pada produk untuk Pin ke Atas (Favorit)</span>
+          </span>
         </div>
 
         <!-- ETALASE PRODUK GRID (2 KOLOM, GAMBAR MAKANAN, LIKE/PIN, STEPPER) -->
@@ -914,6 +931,15 @@
             </datalist>
           </div>
 
+          <!-- Kode Barcode Produk -->
+          <div class="form-group">
+            <label class="form-label" for="item-barcode-input">Kode Barcode (Hasil Pindai Kamera / Manual)</label>
+            <div class="input-with-icon">
+              <i data-lucide="barcode" class="field-icon"></i>
+              <input type="text" id="item-barcode-input" placeholder="Contoh: 8991234567890">
+            </div>
+          </div>
+
           <!-- Price Comparator Banner -->
           <div id="price-comparator-box" class="comparator-preview-card hidden">
             <div class="comparator-icon-badge" id="comp-icon-badge">
@@ -1304,6 +1330,78 @@
   </div>
 
 
+  <!-- ================= MODAL: LOKASI TOKO & GEOLOCATION (METADATA BELANJA) ================= -->
+  <div id="store-location-modal" class="bottom-sheet-backdrop hidden" role="dialog" aria-modal="true" aria-labelledby="modal-location-title">
+    <div class="bottom-sheet-card location-modal-card glass-card">
+      <div class="sheet-drag-handle"></div>
+
+      <div class="sheet-header">
+        <div class="sheet-header-title">
+          <i data-lucide="map-pin" class="text-primary"></i>
+          <h2 id="modal-location-title">Lokasi Belanja Anda Saat Ini</h2>
+        </div>
+        <button id="btn-close-location-modal" class="btn-sheet-close" aria-label="Tutup Modal Lokasi">
+          <i data-lucide="x"></i>
+        </button>
+      </div>
+
+      <div class="sheet-body-scroll location-modal-body">
+        <p class="location-modal-sub" id="lbl-location-desc">
+          Minta izin lokasi GPS perangkat Anda dan berikan nama toko/cabang tempat Anda berbelanja agar riwayat belanja tersimpan rapi sebagai database pembanding resmi.
+        </p>
+
+        <!-- GPS Detection Box -->
+        <div class="gps-detect-box glass-card-nested">
+          <div class="gps-status-row">
+            <div class="gps-icon-badge" id="gps-status-icon">
+              <i data-lucide="crosshair"></i>
+            </div>
+            <div class="gps-info">
+              <strong id="gps-status-title">Deteksi Otomatis Lokasi GPS</strong>
+              <p id="gps-status-detail">Klik tombol di bawah untuk meminta izin GPS perangkat...</p>
+            </div>
+          </div>
+          <button type="button" id="btn-request-gps" class="btn-outline-glass full-width mt-2">
+            <i data-lucide="navigation"></i> <span id="lbl-btn-gps">Deteksi Lokasi GPS Saya</span>
+          </button>
+        </div>
+
+        <!-- Store Name Input Form -->
+        <form id="form-store-location" class="location-name-form">
+          <div class="form-group">
+            <label class="form-label" for="input-store-name">Nama Toko &amp; Cabang Supermarket</label>
+            <div class="input-with-icon">
+              <i data-lucide="store" class="field-icon"></i>
+              <input type="text" id="input-store-name" class="glass-input location-text-input" placeholder="Contoh: Lotte Mart Grocery - Puri Indah" required>
+            </div>
+          </div>
+
+          <!-- Quick Store Suggestions -->
+          <div class="quick-store-chips-wrap">
+            <span class="chips-label">Pilih Rekomendasi / Riwayat Cepat:</span>
+            <div class="quick-store-chips">
+              <button type="button" class="btn-store-chip" data-store="Lotte Mart Grocery - Puri Indah">Lotte Mart - Puri Indah</button>
+              <button type="button" class="btn-store-chip" data-store="Superindo - Citra Raya">Superindo - Citra Raya</button>
+              <button type="button" class="btn-store-chip" data-store="Grand Lucky - SCBD">Grand Lucky - SCBD</button>
+              <button type="button" class="btn-store-chip" data-store="Hypermart - Lippo Karawaci">Hypermart - Lippo Karawaci</button>
+              <button type="button" class="btn-store-chip" data-store="Pasar Modern BSD">Pasar Modern BSD</button>
+            </div>
+          </div>
+
+          <div class="location-action-buttons">
+            <button type="submit" class="btn-glow-primary full-width" id="btn-save-location-submit">
+              <i data-lucide="check-circle-2"></i> <span>Simpan Lokasi &amp; Terapkan ke Anggaran</span>
+            </button>
+            <button type="button" class="btn-ghost-muted full-width" id="btn-skip-location">
+              <span>Gunakan Lokasi Default</span>
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+
   <!-- ================= MODAL: AUTHENTICATION (LOGIN, SIGN UP & GOOGLE SIGN-IN) ================= -->
   <div id="auth-modal" class="auth-overlay hidden" role="dialog" aria-modal="true" aria-labelledby="auth-modal-title">
     <div class="auth-card glass-card" style="position: relative;">
@@ -1495,10 +1593,12 @@
 
   <!-- Audio elements / Canvas Confetti container -->
   <div id="confetti-container"></div>
+  <div id="toast-container" class="toast-container"></div>
 
   <!-- Vendor Scripts (Offline & GitHub Pages compatible) -->
   <script src="./vendor/lucide.min.js"></script>
   <script src="./vendor/confetti.browser.js"></script>
+  <script src="./vendor/zxing.min.js"></script>
   <!-- Main Application Logic -->
   <script src="./main.js" defer></script>
   <!-- Firebase Realtime Sync Module (Multi-Device) -->

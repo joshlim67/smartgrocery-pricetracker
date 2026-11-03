@@ -402,6 +402,19 @@ const CATALOG_PRODUCTS = [
     healthType: 'neutral',
     healthLabel: 'Minuman Kopi',
     smartTip: 'Hitung harga per sachet saat membandingkan kemasan renceng isi 10 vs kantong isi 30.'
+  },
+  {
+    id: 'prod_roma_sandwich',
+    name: 'Biskuit Cokelat Roma Sandwich 120g',
+    category: 'Camilan & Snack',
+    unit: 'pack',
+    price: 9500,
+    normalPrice: 11000,
+    image: 'https://images.unsplash.com/photo-1558961363-fa8fdf82db35?w=500&auto=format&fit=crop&q=80',
+    barcode: '1234567890',
+    healthType: 'neutral',
+    healthLabel: 'Camilan Halal',
+    smartTip: 'Pilihan hemat untuk teman santai dan teh sore keluarga.'
   }
 ];
 
@@ -479,7 +492,8 @@ const STORAGE_KEYS = {
   USERS_LIST: 'sg_users_list_v1',
   THEME: 'groceryx_theme_v2',
   LANGUAGE: 'groceryx_lang_v2',
-  SOUND: 'groceryx_sound_v2'
+  SOUND: 'groceryx_sound_v2',
+  LOCATION: 'groceryx_location_v2'
 };
 
 const state = {
@@ -496,9 +510,33 @@ const state = {
   language: 'id',
   soundEnabled: true,
   currentUser: null,
+  currentLocation: JSON.parse(localStorage.getItem('groceryx_location_v2') || 'null') || {
+    name: 'Lotte Mart Grocery - Puri Indah',
+    coords: null,
+    updatedAt: Date.now()
+  },
+  detectedCoords: null,
   hasTriggeredOverbudgetModal: false,
-  stream: null
+  stream: null,
+  zxingReader: null
 };
+
+function showToast(message, type = 'success') {
+  const container = document.getElementById('toast-container');
+  if (!container) return;
+  const toast = document.createElement('div');
+  toast.className = `toast-message toast-${type}`;
+  const iconName = type === 'success' ? 'check-circle-2' : (type === 'warning' ? 'alert-triangle' : 'info');
+  toast.innerHTML = `<i data-lucide="${iconName}"></i> <span>${message}</span>`;
+  container.appendChild(toast);
+  if (window.lucide) window.lucide.createIcons();
+  setTimeout(() => {
+    toast.classList.add('toast-fadeout');
+    setTimeout(() => {
+      if (toast.parentNode) toast.parentNode.removeChild(toast);
+    }, 320);
+  }, 2800);
+}
 
 function t(key) {
   const dict = I18N[state.language] || I18N.id;
@@ -529,6 +567,9 @@ function saveStateToLocalStorage() {
     }
     if (state.currentUser) {
       localStorage.setItem(STORAGE_KEYS.CURRENT_USER, JSON.stringify(state.currentUser));
+    }
+    if (state.currentLocation) {
+      localStorage.setItem(STORAGE_KEYS.LOCATION, JSON.stringify(state.currentLocation));
     }
   } catch (e) {
     console.warn('Gagal menyimpan state ke localStorage:', e);
@@ -760,8 +801,8 @@ function applyUserSessionToUI() {
     if (accAvatar) accAvatar.textContent = name.charAt(0).toUpperCase();
 
     if (accProvider) {
-      accProvider.textContent = state.currentUser.provider === 'google' 
-        ? (isEn ? 'Google Account Verified' : 'Akun Google Terverifikasi') 
+      accProvider.textContent = state.currentUser.provider === 'google'
+        ? (isEn ? 'Google Account Verified' : 'Akun Google Terverifikasi')
         : (isEn ? 'Verified Account' : 'Akun Terverifikasi');
     }
 
@@ -825,17 +866,22 @@ function selectGoogleAccount(name, email) {
   localStorage.removeItem('sg_user_logged_out');
   applyUserSessionToUI();
   syncToFirebase(true);
-  
+
   const googleModal = document.getElementById('google-oauth-modal');
   if (googleModal) googleModal.classList.add('hidden');
   const authModal = document.getElementById('auth-modal');
   if (authModal) authModal.classList.add('hidden');
-  
+
   sound.playSuccess();
   fireConfetti();
-  alert(state.language === 'en' 
-    ? `Successfully signed in as ${name} (${email}) with Google Account!` 
-    : `Berhasil masuk dengan Akun Google: ${name} (${email})!`);
+  showToast(state.language === 'en'
+    ? `Signed in as ${name} with Google Account!`
+    : `Berhasil masuk: ${name} (${email})!`, 'success');
+
+  // Selalu tampilkan pop up lokasi real setelah login
+  setTimeout(() => {
+    openStoreLocationModal();
+  }, 450);
 }
 
 // ==========================================================================
@@ -1018,10 +1064,10 @@ function renderCatalog() {
     const qtyInCart = cartItem ? cartItem.qty : 0;
 
     const nutriClass = prod.healthType === 'healthy' ? 'tag-healthy' : (prod.healthType === 'neutral' ? 'tag-neutral' : 'tag-unhealthy');
-    const nutriText = prod.healthType === 'healthy' 
-      ? (isEn ? '🟢 Natural' : '🟢 Alami') 
-      : (prod.healthType === 'neutral' 
-        ? (isEn ? '🟡 Processed' : '🟡 Olahan') 
+    const nutriText = prod.healthType === 'healthy'
+      ? (isEn ? '🟢 Natural' : '🟢 Alami')
+      : (prod.healthType === 'neutral'
+        ? (isEn ? '🟡 Processed' : '🟡 Olahan')
         : (isEn ? '🔴 High Sugar' : '🔴 Tinggi Gula'));
 
     return `
@@ -1169,7 +1215,7 @@ function renderComboBundles() {
         });
         sound.playSuccess();
         fireConfetti();
-        alert(`Paket ${bundle.name} berhasil ditambahkan ke keranjang! Hemat Rp ${formatRupiah(bundle.savedAmount)}`);
+        showToast(`Paket ${bundle.name} berhasil dimasukkan ke anggaran! Hemat Rp ${formatRupiah(bundle.savedAmount)}`, 'success');
       }
     };
   });
@@ -1496,6 +1542,11 @@ function updateSafetyBanner() {
     }
     state.hasTriggeredOverbudgetModal = false;
   }
+
+  const locEl = document.getElementById('header-store-location');
+  if (locEl) {
+    locEl.textContent = (state.currentLocation && state.currentLocation.name) ? state.currentLocation.name : 'Tentukan Lokasi Toko...';
+  }
 }
 
 function showOverbudgetModal(spent, limit, deficit) {
@@ -1562,24 +1613,24 @@ function renderSehatMeter() {
       gradeBadge.textContent = isEn ? 'Grade A (Healthy)' : 'Grade A (Sehat)';
       gradeBadge.className = 'sehat-grade-badge grade-a';
     }
-    if (adviceText) adviceText.textContent = isEn 
-      ? 'Great job! Your basket is predominantly filled with wholesome, fresh, and nutrient-dense ingredients. Keep up this healthy habit.' 
+    if (adviceText) adviceText.textContent = isEn
+      ? 'Great job! Your basket is predominantly filled with wholesome, fresh, and nutrient-dense ingredients. Keep up this healthy habit.'
       : 'Bagus sekali! Belanjaan Anda didominasi bahan segar kaya serat dan protein alami. Pertahankan komposisi ini.';
   } else if (score >= 65) {
     if (gradeBadge) {
       gradeBadge.textContent = isEn ? 'Grade B (Balanced)' : 'Grade B (Seimbang)';
       gradeBadge.className = 'sehat-grade-badge grade-b';
     }
-    if (adviceText) adviceText.textContent = isEn 
-      ? 'Your cart is well balanced between staple foods and processed groceries. Consider adding green vegetables for optimal nutrition.' 
+    if (adviceText) adviceText.textContent = isEn
+      ? 'Your cart is well balanced between staple foods and processed groceries. Consider adding green vegetables for optimal nutrition.'
       : 'Keranjang Anda cukup seimbang antara bahan pokok dan olahan. Tambahkan sayuran hijau untuk nutrisi maksimal.';
   } else {
     if (gradeBadge) {
       gradeBadge.textContent = isEn ? 'Grade C (Evaluation)' : 'Grade C (Evaluasi)';
       gradeBadge.className = 'sehat-grade-badge grade-c';
     }
-    if (adviceText) adviceText.textContent = isEn 
-      ? 'Caution: High amount of instant and sugary snacks. Consider swapping processed items for fresh organic fruits.' 
+    if (adviceText) adviceText.textContent = isEn
+      ? 'Caution: High amount of instant and sugary snacks. Consider swapping processed items for fresh organic fruits.'
       : 'Perhatian: Komposisi belanjaan Anda tinggi makanan instan dan camilan manis. Pertimbangkan mengganti camilan dengan buah segar.';
   }
 }
@@ -1637,10 +1688,36 @@ function openBarcodeScannerModal() {
   if (!modal) return;
   modal.classList.remove('hidden');
 
-  // Attempt WebRTC camera stream
-  const video = document.getElementById('barcode-video');
   const statusEl = document.getElementById('scanner-camera-status');
+  if (statusEl) statusEl.textContent = 'Menghubungkan Kamera Barcode...';
 
+  // Use ZXing BrowserMultiFormatReader for real-time supermarket barcode scanning
+  if (window.ZXing && window.ZXing.BrowserMultiFormatReader) {
+    try {
+      if (!state.zxingReader) {
+        state.zxingReader = new window.ZXing.BrowserMultiFormatReader();
+      }
+      state.zxingReader.decodeFromVideoDevice(null, 'barcode-video', (result, err) => {
+        if (result && result.getText()) {
+          const code = result.getText();
+          handleBarcodeDetected(code);
+        }
+      }).then(() => {
+        if (statusEl) statusEl.textContent = 'Kamera Aktif: Arahkan ke Barcode Kemasan Supermarket...';
+      }).catch((err) => {
+        console.warn('ZXing video start error:', err);
+        fallbackCameraStream(statusEl);
+      });
+    } catch (e) {
+      fallbackCameraStream(statusEl);
+    }
+  } else {
+    fallbackCameraStream(statusEl);
+  }
+}
+
+function fallbackCameraStream(statusEl) {
+  const video = document.getElementById('barcode-video');
   if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
     navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' } })
       .then((stream) => {
@@ -1649,10 +1726,10 @@ function openBarcodeScannerModal() {
           video.srcObject = stream;
           video.play();
         }
-        if (statusEl) statusEl.textContent = 'Kamera Aktif: Mengamati Barcode...';
+        if (statusEl) statusEl.textContent = 'Kamera Aktif: Arahkan barcode ke kotak pemindai...';
       })
       .catch((_) => {
-        if (statusEl) statusEl.textContent = 'Kamera tidak tersedia. Gunakan tombol uji cepat di bawah.';
+        if (statusEl) statusEl.textContent = 'Kamera tidak tersedia. Gunakan tombol uji cepat atau unggah foto di bawah.';
       });
   } else {
     if (statusEl) statusEl.textContent = 'Gunakan tombol barcode instan atau upload foto di bawah.';
@@ -1663,6 +1740,12 @@ function closeBarcodeScannerModal() {
   const modal = document.getElementById('barcode-scanner-modal');
   if (modal) modal.classList.add('hidden');
 
+  if (state.zxingReader) {
+    try {
+      state.zxingReader.reset();
+    } catch (e) { }
+  }
+
   if (state.stream) {
     state.stream.getTracks().forEach((track) => track.stop());
     state.stream = null;
@@ -1670,11 +1753,13 @@ function closeBarcodeScannerModal() {
 }
 
 function handleBarcodeDetected(barcode) {
+  if (!barcode) return;
+  const cleanCode = barcode.toString().trim();
   sound.playScanBeep();
   closeBarcodeScannerModal();
 
   const all = getAllCatalogProducts();
-  const found = all.find((p) => p.barcode === barcode);
+  const found = all.find((p) => p.barcode === cleanCode);
 
   if (found) {
     addItemToCart({
@@ -1690,9 +1775,20 @@ function handleBarcodeDetected(barcode) {
       healthType: found.healthType
     });
     fireConfetti();
-    alert(`Barcode Terdeteksi: ${found.name} (Rp ${formatRupiah(found.price)}) dimasukkan ke keranjang!`);
+    showToast(`Barcode [${cleanCode}] Terdeteksi: ${found.name} (Rp ${formatRupiah(found.price)}) dimasukkan ke keranjang!`, 'success');
   } else {
-    alert(`Barcode ${barcode} berhasil dipindai, namun belum terdaftar di katalog. Silakan gunakan form Tambah Produk Baru.`);
+    sound.playWarning();
+    showToast(`Barcode [${cleanCode}] belum ada di katalog. Membuka form tambah produk...`, 'info');
+
+    // Automatically open "Tambah Produk Baru" modal and pre-fill the scanned barcode
+    openAddItemModal();
+    const barcodeInput = document.getElementById('item-barcode-input');
+    const nameInput = document.getElementById('item-name-input');
+    if (barcodeInput) barcodeInput.value = cleanCode;
+    if (nameInput) {
+      nameInput.value = '';
+      nameInput.focus();
+    }
   }
 }
 
@@ -1770,6 +1866,7 @@ function openCheckoutModal() {
 
 function confirmCheckoutAndSave() {
   const totals = calculateCartTotals();
+  const locName = (state.currentLocation && state.currentLocation.name) ? state.currentLocation.name : 'Lotte Mart Grocery - Puri Indah';
   const session = {
     id: 'hist_' + Date.now(),
     date: new Date().toLocaleDateString(state.language === 'en' ? 'en-US' : 'id-ID', {
@@ -1778,7 +1875,9 @@ function confirmCheckoutAndSave() {
       year: 'numeric'
     }),
     timestamp: Date.now(),
-    note: 'Belanja Supermarket GroceryX',
+    storeLocation: locName,
+    storeCoords: (state.currentLocation && state.currentLocation.coords) ? state.currentLocation.coords : null,
+    note: locName,
     safetyCap: state.safetyCap,
     totalSpent: totals.finalNetTotal,
     totalSaved: totals.totalSavedAll,
@@ -1804,7 +1903,7 @@ function confirmCheckoutAndSave() {
   renderHistory();
   renderAccountStats();
   switchTab('view-history');
-  alert(state.language === 'en' ? 'Grocery trip completed and receipt saved!' : 'Belanja berhasil diselesaikan dan struk tersimpan di Riwayat!');
+  showToast(`Sesi belanja di ${locName} tersimpan rapi ke database riwayat!`, 'success');
 }
 
 function renderHistory() {
@@ -1830,14 +1929,14 @@ function renderHistory() {
     <div class="history-card glass-card" data-hist-idx="${idx}">
       <div class="history-card-header">
         <div>
-          <h4>${h.note}</h4>
+          <h4>📍 ${h.storeLocation || h.note}</h4>
           <span class="history-date">${h.date} • ${h.itemCount} Item</span>
         </div>
         <strong class="history-total text-primary">Rp ${formatRupiah(h.totalSpent)}</strong>
       </div>
       <div class="history-card-actions">
         <button type="button" class="btn-outline-glass btn-sm btn-view-receipt" data-hist-idx="${idx}">
-          <i data-lucide="eye"></i> <span>Lihat Struk</span>
+          <i data-lucide="eye"></i> <span>Lihat Struk &amp; Lokasi</span>
         </button>
       </div>
     </div>
@@ -1866,11 +1965,11 @@ function openHistoryDetailModal(idx) {
     <div class="receipt-header">
       <div class="receipt-brand-logo"><i data-lucide="shopping-cart"></i></div>
       <h2>GROCERYX SUPERMARKET</h2>
-      <p class="receipt-sub-loc">STRUK BELANJA TERSIMPAN</p>
+      <p class="receipt-sub-loc">STRUK &amp; DATABASE PEMBANDING BELANJA</p>
       <div class="receipt-dashed-line"></div>
       <div class="receipt-meta-info">
-        <span>Tanggal: ${h.date}</span>
-        <span>${h.note}</span>
+        <span>Tanggal Transaksi: <strong>${h.date}</strong></span>
+        <span>Lokasi Toko: <strong>📍 ${h.storeLocation || h.note}</strong></span>
       </div>
       <div class="receipt-dashed-line"></div>
     </div>
@@ -1998,6 +2097,155 @@ function switchTab(targetViewId) {
 }
 
 // ==========================================================================
+// 17B. STORE LOCATION & GEOLOCATION METADATA ENGINE
+// ==========================================================================
+
+function openStoreLocationModal() {
+  sound.playClick();
+  const modal = document.getElementById('store-location-modal');
+  if (!modal) return;
+  modal.classList.remove('hidden');
+
+  const inputName = document.getElementById('input-store-name');
+  if (inputName) {
+    inputName.value = (state.currentLocation && state.currentLocation.name) ? state.currentLocation.name : 'Lotte Mart Grocery - Puri Indah';
+    inputName.focus();
+  }
+
+  const statusTitle = document.getElementById('gps-status-title');
+  const statusDetail = document.getElementById('gps-status-detail');
+  if (statusTitle) statusTitle.textContent = 'Deteksi Otomatis Lokasi GPS';
+  if (statusDetail) {
+    if (state.currentLocation && state.currentLocation.coords) {
+      statusDetail.textContent = `Koordinat tersimpan: ${state.currentLocation.coords.lat.toFixed(4)}, ${state.currentLocation.coords.lng.toFixed(4)}`;
+    } else {
+      statusDetail.textContent = 'Klik tombol di bawah untuk meminta izin GPS perangkat...';
+    }
+  }
+}
+
+function closeStoreLocationModal() {
+  const modal = document.getElementById('store-location-modal');
+  if (modal) modal.classList.add('hidden');
+}
+
+function initStoreLocationModule() {
+  const btnCloseLoc = document.getElementById('btn-close-location-modal');
+  if (btnCloseLoc) btnCloseLoc.onclick = closeStoreLocationModal;
+
+  const btnSkipLoc = document.getElementById('btn-skip-location');
+  if (btnSkipLoc) {
+    btnSkipLoc.onclick = () => {
+      closeStoreLocationModal();
+      showToast('Menggunakan lokasi: ' + ((state.currentLocation && state.currentLocation.name) || 'Lotte Mart Grocery - Puri Indah'), 'info');
+    };
+  }
+
+  // Header location strip & change button
+  const locStrip = document.getElementById('budget-location-strip');
+  const btnChangeLoc = document.getElementById('btn-change-store-location');
+  if (locStrip) locStrip.onclick = openStoreLocationModal;
+  if (btnChangeLoc) {
+    btnChangeLoc.onclick = (e) => {
+      e.stopPropagation();
+      openStoreLocationModal();
+    };
+  }
+
+  // GPS Request button
+  const btnRequestGps = document.getElementById('btn-request-gps');
+  if (btnRequestGps) {
+    btnRequestGps.onclick = () => {
+      sound.playClick();
+      const statusTitle = document.getElementById('gps-status-title');
+      const statusDetail = document.getElementById('gps-status-detail');
+      const inputName = document.getElementById('input-store-name');
+
+      if (!navigator.geolocation) {
+        if (statusDetail) statusDetail.textContent = 'Browser ini tidak mendukung Geolocation GPS.';
+        return;
+      }
+
+      if (statusTitle) statusTitle.textContent = 'Meminta Izin Lokasi...';
+      if (statusDetail) statusDetail.textContent = 'Mohon izinkan akses lokasi pada browser/perangkat Anda...';
+
+      navigator.geolocation.getCurrentPosition(
+        async (pos) => {
+          const lat = pos.coords.latitude;
+          const lng = pos.coords.longitude;
+          state.detectedCoords = { lat, lng };
+
+          if (statusTitle) statusTitle.textContent = 'GPS Berhasil Dideteksi!';
+          if (statusDetail) statusDetail.textContent = `Koordinat: ${lat.toFixed(5)}, ${lng.toFixed(5)}`;
+          sound.playSuccess();
+
+          // Attempt reverse geocoding via OpenStreetMap Nominatim
+          try {
+            if (statusDetail) statusDetail.textContent = 'Mencari nama supermarket/wilayah terdekat...';
+            const res = await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}&zoom=18&addressdetails=1`);
+            if (res.ok) {
+              const data = await res.json();
+              const addr = data.address || {};
+              const place = addr.supermarket || addr.shop || addr.mall || addr.commercial || addr.suburb || addr.neighbourhood || addr.city;
+              if (place && inputName) {
+                inputName.value = place + (addr.suburb ? ` - ${addr.suburb}` : '');
+              }
+              if (statusDetail) statusDetail.textContent = `Area: ${data.display_name.split(',').slice(0, 3).join(', ')}`;
+            }
+          } catch (e) {
+            console.log('Reverse geocoding error or offline:', e);
+            if (statusDetail) statusDetail.textContent = `GPS terkunci (${lat.toFixed(4)}, ${lng.toFixed(4)}). Silakan ketik nama toko di bawah.`;
+          }
+        },
+        (err) => {
+          sound.playWarning();
+          if (statusTitle) statusTitle.textContent = 'Izin Akses Lokasi Ditolak';
+          if (statusDetail) statusDetail.textContent = 'Silakan pilih rekomendasi toko atau ketik manual nama supermarket Anda.';
+        },
+        { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 }
+      );
+    };
+  }
+
+  // Quick store chip buttons
+  document.querySelectorAll('.btn-store-chip').forEach((btn) => {
+    btn.onclick = () => {
+      sound.playClick();
+      const storeName = btn.getAttribute('data-store');
+      const inputName = document.getElementById('input-store-name');
+      if (inputName && storeName) {
+        inputName.value = storeName;
+      }
+      document.querySelectorAll('.btn-store-chip').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+    };
+  });
+
+  // Location form submit
+  const formLocation = document.getElementById('form-store-location');
+  if (formLocation) {
+    formLocation.onsubmit = (e) => {
+      e.preventDefault();
+      const inputName = document.getElementById('input-store-name');
+      const name = (inputName && inputName.value.trim()) || 'Lotte Mart Grocery - Puri Indah';
+
+      state.currentLocation = {
+        name,
+        coords: state.detectedCoords || (state.currentLocation ? state.currentLocation.coords : null),
+        updatedAt: Date.now()
+      };
+
+      saveStateToLocalStorage();
+      updateSafetyBanner();
+      closeStoreLocationModal();
+      sound.playSuccess();
+      showToast(`Lokasi belanja aktif: ${name}`, 'success');
+      syncToFirebase(true);
+    };
+  }
+}
+
+// ==========================================================================
 // 18. INITIALIZATION & GLOBAL EVENT HANDLERS
 // ==========================================================================
 
@@ -2056,6 +2304,7 @@ document.addEventListener('DOMContentLoaded', () => {
   renderVoucherUI();
   renderSehatMeter();
   updateSafetyBanner();
+  initStoreLocationModule();
 
   // Bottom Navigation Dock Click Handlers
   document.querySelectorAll('.nav-tab-btn[data-target]').forEach((btn) => {
@@ -2125,16 +2374,56 @@ document.addEventListener('DOMContentLoaded', () => {
     };
   });
 
-  // Barcode photo file input
+  // Barcode photo file input (Real ZXing supermarket barcode decoding)
   const barcodeFileInput = document.getElementById('barcode-file-input');
   if (barcodeFileInput) {
     barcodeFileInput.onchange = (e) => {
       const file = e.target.files && e.target.files[0];
-      if (file) {
-        // Simulated barcode read from image
-        sound.playScanBeep();
-        handleBarcodeDetected('8992388112233');
-      }
+      if (!file) return;
+
+      const statusEl = document.getElementById('scanner-camera-status');
+      if (statusEl) statusEl.textContent = 'Membaca barcode dari foto...';
+
+      const reader = new FileReader();
+      reader.onload = (re) => {
+        const dataUrl = re.target.result;
+        if (window.ZXing && window.ZXing.BrowserMultiFormatReader) {
+          const imgReader = new window.ZXing.BrowserMultiFormatReader();
+          imgReader.decodeFromImageUrl(dataUrl)
+            .then((res) => {
+              if (res && res.getText()) {
+                handleBarcodeDetected(res.getText());
+              }
+            })
+            .catch(() => {
+              // Fallback to HTMLImageElement + BarcodeDetector if available
+              const img = new Image();
+              img.onload = () => {
+                if ('BarcodeDetector' in window) {
+                  const detector = new window.BarcodeDetector();
+                  detector.detect(img)
+                    .then(barcodes => {
+                      if (barcodes.length > 0) {
+                        handleBarcodeDetected(barcodes[0].rawValue);
+                      } else {
+                        sound.playWarning();
+                        alert('Barcode tidak terbaca pada foto. Pastikan gambar barcode tegak, tidak buram, dan kontras.');
+                      }
+                    })
+                    .catch(() => {
+                      sound.playWarning();
+                      alert('Barcode tidak terbaca pada foto.');
+                    });
+                } else {
+                  sound.playWarning();
+                  alert('Barcode tidak terbaca pada foto. Pastikan gambar barcode jelas dan tidak berbayang.');
+                }
+              };
+              img.src = dataUrl;
+            });
+        }
+      };
+      reader.readAsDataURL(file);
     };
   }
 
@@ -2309,11 +2598,13 @@ document.addEventListener('DOMContentLoaded', () => {
   const photoDataUrl = document.getElementById('item-photo-data-url');
   const btnRemovePhoto = document.getElementById('btn-remove-photo');
 
+  function openAddItemModal() {
+    sound.playClick();
+    if (itemModal) itemModal.classList.remove('hidden');
+  }
+
   if (btnOpenAddProduct) {
-    btnOpenAddProduct.onclick = () => {
-      sound.playClick();
-      itemModal.classList.remove('hidden');
-    };
+    btnOpenAddProduct.onclick = openAddItemModal;
   }
 
   if (btnCloseItemModal) {
@@ -2467,7 +2758,7 @@ document.addEventListener('DOMContentLoaded', () => {
         price: rawPrice,
         normalPrice: rawPrice,
         image: photo,
-        barcode: '899' + Math.floor(1000000000 + Math.random() * 9000000000),
+        barcode: (document.getElementById('item-barcode-input') && document.getElementById('item-barcode-input').value.trim()) || ('899' + Math.floor(1000000000 + Math.random() * 9000000000)),
         healthType,
         healthLabel: healthType === 'healthy' ? 'Bahan Segar' : (healthType === 'neutral' ? 'Olahan Seimbang' : 'Tinggi Gula/Garam'),
         smartTip: 'Periksa selalu tanggal kedaluwarsa dan bandingkan harga per satuan unit.'
@@ -2558,7 +2849,10 @@ document.addEventListener('DOMContentLoaded', () => {
         applyUserSessionToUI();
         authModal.classList.add('hidden');
         sound.playSuccess();
-        alert(`Selamat datang kembali, ${user.username}!`);
+        showToast(`Selamat datang kembali, ${user.username}!`, 'success');
+        setTimeout(() => {
+          openStoreLocationModal();
+        }, 450);
       } else {
         sound.playWarning();
         document.getElementById('login-error-msg').textContent = 'Email atau password salah!';
@@ -2598,7 +2892,10 @@ document.addEventListener('DOMContentLoaded', () => {
       authModal.classList.add('hidden');
       sound.playSuccess();
       fireConfetti();
-      alert(`Akun berhasil dibuat! Selamat datang di GroceryX, ${username}!`);
+      showToast(`Akun berhasil dibuat! Selamat datang di GroceryX, ${username}!`, 'success');
+      setTimeout(() => {
+        openStoreLocationModal();
+      }, 450);
     };
   }
 
@@ -2674,8 +2971,8 @@ document.addEventListener('DOMContentLoaded', () => {
   const btnLogout = document.getElementById('btn-settings-logout');
   if (btnLogout) {
     btnLogout.onclick = () => {
-      const confirmMsg = state.language === 'en' 
-        ? 'Are you sure you want to log out of your account?' 
+      const confirmMsg = state.language === 'en'
+        ? 'Are you sure you want to log out of your account?'
         : 'Apakah Anda yakin ingin keluar dari akun?';
       if (confirm(confirmMsg)) {
         state.currentUser = null;
