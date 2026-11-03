@@ -24,7 +24,10 @@
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap"
     rel="stylesheet">
 
-  <link rel="stylesheet" href="./style.css?v=2.3">
+  <!-- Google Identity Services (OAuth 2.0) -->
+  <script src="https://accounts.google.com/gsi/client" async defer></script>
+
+  <link rel="stylesheet" href="./style.css?v=2.6">
 </head>
 
 <body>
@@ -36,7 +39,7 @@
       <div class="header-inner">
         <div class="user-profile-badge" id="btn-header-profile" title="Buka Profil Akun">
           <div class="app-logo-icon" id="header-avatar-container">
-            <i data-lucide="shopping-bag" id="header-logo-icon"></i>
+            <img src="./icon.svg" alt="GroceryX Logo" class="app-header-logo-img" id="header-logo-img">
           </div>
           <div>
             <h1 class="app-title">GroceryX</h1>
@@ -48,11 +51,6 @@
         </div>
 
         <div class="header-actions">
-          <!-- Quick Barcode Scanner Button -->
-          <button id="btn-header-barcode" class="icon-btn-glass" title="Pindai Barcode Produk"
-            aria-label="Scan Barcode">
-            <i data-lucide="scan-barcode"></i>
-          </button>
           <!-- Firebase Sync ONLY visible for Admin (joshualim@mutiarabangsa.sch.id) -->
           <button id="btn-cloud-sync" class="icon-btn-glass cloud-sync-btn hidden"
             title="Status Sinkronisasi Firebase (Administrator)" aria-label="Status Cloud">
@@ -102,7 +100,7 @@
       <!-- ================= TAB 1: ETALASE PRODUK MAKANAN (ASTRO & SHOPEE STYLE) ================= -->
       <section id="view-shop" class="app-view active" aria-label="Tab Etalase Produk Makanan">
 
-        <!-- Search Bar with Instant Barcode Scanner & Quick Add -->
+        <!-- Search Bar -->
         <div class="shop-search-bar glass-card">
           <div class="search-input-wrapper">
             <i data-lucide="search" class="search-icon"></i>
@@ -110,10 +108,6 @@
               autocomplete="off">
             <button id="shop-search-clear" class="btn-clear hidden" aria-label="Clear Search">
               <i data-lucide="x"></i>
-            </button>
-            <button type="button" id="btn-search-barcode-trigger" class="btn-search-scanner"
-              title="Scan Barcode Kamera">
-              <i data-lucide="scan-barcode"></i>
             </button>
           </div>
         </div>
@@ -651,21 +645,31 @@
           </button>
         </div>
 
-        <!-- ADMIN ONLY: FIREBASE SYNC CONFIG -->
-        <div id="settings-admin-firebase-section" class="settings-section glass-card hidden">
+        <!-- HELP CENTER (PUSAT BANTUAN) -->
+        <div class="settings-section glass-card" id="account-help-center-section">
           <div class="settings-section-header">
-            <i data-lucide="cloud-lightning" class="text-primary"></i>
+            <i data-lucide="headphones" class="text-primary"></i>
             <div>
-              <h3 id="lbl-admin-firebase-title">Sinkronisasi Cloud Firebase</h3>
-              <p id="lbl-admin-firebase-sub">Kelola koneksi multi-device realtime database</p>
+              <h3 id="lbl-help-title">Pusat Bantuan (Help Center)</h3>
+              <p id="lbl-help-sub">Hubungi Customer Service kami jika membutuhkan bantuan</p>
             </div>
           </div>
-          <p class="admin-cloud-desc" id="lbl-admin-cloud-desc">
-            Fitur sinkronisasi cloud ini hanya tampil khusus untuk administrator (joshualim@mutiarabangsa.sch.id).
-          </p>
-          <button type="button" id="btn-open-cloud-config-from-settings" class="btn-glow-primary full-width mt-2">
-            <i data-lucide="sliders"></i> <span id="lbl-open-cloud-btn">Buka Konfigurasi Cloud Firebase</span>
-          </button>
+          <div class="help-center-card-content">
+            <div class="help-cs-card glass-card-nested">
+              <div class="help-cs-details">
+                <span class="help-cs-badge"><i data-lucide="clock" class="help-badge-icon"></i> CS Siap Membantu</span>
+                <div class="help-phone-row">
+                  <i data-lucide="phone-call" class="text-primary"></i>
+                  <strong class="help-cs-phone" id="lbl-cs-phone">+62 123456777</strong>
+                </div>
+                <p class="help-cs-note" id="lbl-cs-note">Hubungi kami jika mengalami kendala atau membutuhkan informasi produk.</p>
+              </div>
+              <a href="tel:+62123456777" class="btn-glow-primary btn-call-cs-action" id="btn-call-cs">
+                <i data-lucide="phone"></i>
+                <span id="lbl-btn-call-cs">Hubungi CS</span>
+              </a>
+            </div>
+          </div>
         </div>
 
       </section>
@@ -679,6 +683,7 @@
         <div class="nav-icon-container">
           <i data-lucide="store"></i>
         </div>
+        <span class="nav-label" id="lbl-nav-shop">Etalase</span>
       </button>
 
       <!-- 2. Keranjang (Dedicated Cart Page) -->
@@ -687,20 +692,31 @@
           <i data-lucide="shopping-cart"></i>
           <span class="nav-badge" id="nav-cart-badge">0</span>
         </div>
+        <span class="nav-label" id="lbl-nav-cart">Keranjang</span>
       </button>
 
-      <!-- 3. Riwayat (History) -->
+      <!-- 3. Scan Barcode (Center Highlighted Button) -->
+      <button class="nav-tab-btn nav-btn-scan-center" id="nav-btn-scan" title="Scan Barcode" aria-label="Scan Barcode">
+        <div class="nav-icon-container">
+          <i data-lucide="scan-barcode"></i>
+        </div>
+        <span class="nav-label" id="lbl-nav-scan">Scan</span>
+      </button>
+
+      <!-- 4. Riwayat (History) -->
       <button class="nav-tab-btn" data-target="view-history" id="nav-btn-history" title="Riwayat" aria-label="Riwayat">
         <div class="nav-icon-container">
           <i data-lucide="receipt"></i>
         </div>
+        <span class="nav-label" id="lbl-nav-history">Riwayat</span>
       </button>
 
-      <!-- 4. Akun & Sehat Meter (Account & Health) -->
+      <!-- 5. Akun & Sehat Meter (Account & Health) -->
       <button class="nav-tab-btn" data-target="view-account" id="nav-btn-account" title="Akun" aria-label="Akun">
         <div class="nav-icon-container">
           <i data-lucide="user"></i>
         </div>
+        <span class="nav-label" id="lbl-nav-account">Akun</span>
       </button>
     </nav>
 
@@ -1290,14 +1306,17 @@
 
   <!-- ================= MODAL: AUTHENTICATION (LOGIN, SIGN UP & GOOGLE SIGN-IN) ================= -->
   <div id="auth-modal" class="auth-overlay hidden" role="dialog" aria-modal="true" aria-labelledby="auth-modal-title">
-    <div class="auth-card glass-card">
-      <div class="auth-header">
-        <div class="auth-brand-icon">
-          <i data-lucide="shopping-bag"></i>
+    <div class="auth-card glass-card" style="position: relative;">
+      <button type="button" id="btn-close-auth-modal" class="btn-sheet-close auth-close-btn" aria-label="Tutup Modal" style="position: absolute; top: 14px; right: 14px; z-index: 10;">
+        <i data-lucide="x"></i>
+      </button>
+      <div class="auth-header" style="display: flex; flex-direction: column; align-items: center; text-align: center; padding-top: 6px;">
+        <div class="auth-brand-icon" style="width: 52px; height: 52px; max-width: 52px; max-height: 52px; border-radius: 14px; overflow: hidden; margin: 0 auto 8px auto; box-shadow: 0 4px 14px rgba(0,0,0,0.18); flex-shrink: 0;">
+          <img src="./icon.svg" alt="GroceryX Logo" class="auth-header-logo-img" style="width: 52px; height: 52px; max-width: 52px; max-height: 52px; object-fit: contain; display: block; border-radius: 14px;">
         </div>
-        <div>
-          <h2 id="auth-modal-title" class="auth-brand-title">GroceryX</h2>
-          <p class="auth-brand-sub" id="lbl-auth-brand-sub">Modern Food E-Commerce & Budget Safety Tracker</p>
+        <div class="auth-header-title-wrap">
+          <h2 id="auth-modal-title" class="auth-brand-title" style="font-size: 1.3rem; margin: 0 0 2px 0;">GroceryX</h2>
+          <p class="auth-brand-sub" id="lbl-auth-brand-sub" style="margin: 0; font-size: 0.72rem;">Modern Food E-Commerce & Budget Safety Tracker</p>
         </div>
       </div>
 
@@ -1396,6 +1415,80 @@
           <span id="lbl-auth-reg-submit">Buat Akun Sekarang</span>
         </button>
       </form>
+    </div>
+  </div>
+
+
+  <!-- ================= MODAL: GOOGLE OAUTH 2.0 ACCOUNT CHOOSER (select_account) ================= -->
+  <div id="google-oauth-modal" class="auth-overlay hidden" role="dialog" aria-modal="true" aria-labelledby="google-oauth-title">
+    <div class="google-oauth-card">
+      <!-- Google Close Button -->
+      <button type="button" id="btn-close-google-oauth" class="google-oauth-close" aria-label="Tutup">
+        <i data-lucide="x"></i>
+      </button>
+
+      <!-- Google Brand Header -->
+      <div class="google-oauth-header">
+        <svg class="google-oauth-glogo" viewBox="0 0 24 24" width="36" height="36">
+          <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" />
+          <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" />
+          <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.63z" />
+          <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z" />
+        </svg>
+        <h2 id="google-oauth-title" class="google-oauth-title">Pilih akun</h2>
+        <p class="google-oauth-sub">untuk melanjutkan ke <strong class="text-primary-brand">GroceryX</strong></p>
+      </div>
+
+      <!-- Account List (OAuth 2.0 prompt=select_account) -->
+      <div class="google-accounts-list" id="google-accounts-list">
+        <button type="button" class="google-account-item" data-email="joshualim.google@gmail.com" data-name="Josh Lim">
+          <div class="google-avatar-circle bg-blue">J</div>
+          <div class="google-account-details">
+            <span class="google-account-name">Josh Lim</span>
+            <span class="google-account-email">joshualim.google@gmail.com</span>
+          </div>
+        </button>
+
+        <button type="button" class="google-account-item" data-email="student.grocery@gmail.com" data-name="Student Developer">
+          <div class="google-avatar-circle bg-emerald">S</div>
+          <div class="google-account-details">
+            <span class="google-account-name">Student Developer</span>
+            <span class="google-account-email">student.grocery@gmail.com</span>
+          </div>
+        </button>
+
+        <button type="button" class="google-account-item google-add-account-btn" id="btn-google-add-account">
+          <div class="google-avatar-circle bg-ghost">
+            <i data-lucide="user-plus"></i>
+          </div>
+          <div class="google-account-details">
+            <span class="google-account-name">Gunakan akun lain</span>
+          </div>
+        </button>
+      </div>
+
+      <!-- Custom Account Form (hidden by default) -->
+      <form id="google-custom-account-form" class="google-custom-form hidden">
+        <div class="form-group mb-2">
+          <label class="form-label text-xs">Nama Lengkap</label>
+          <input type="text" id="google-custom-name" placeholder="Nama Akun Google Anda" class="glass-input text-xs" required>
+        </div>
+        <div class="form-group mb-3">
+          <label class="form-label text-xs">Alamat Email (@gmail.com)</label>
+          <input type="email" id="google-custom-email" placeholder="nama@gmail.com" class="glass-input text-xs" required>
+        </div>
+        <div class="google-custom-actions">
+          <button type="button" id="btn-cancel-custom-google" class="btn-ghost-muted btn-sm">Batal</button>
+          <button type="submit" class="btn-google-continue btn-sm">Pilih &amp; Lanjutkan</button>
+        </div>
+      </form>
+
+      <!-- Google Privacy & Terms Disclaimer -->
+      <div class="google-oauth-footer">
+        <p>
+          Untuk melanjutkan, Google akan membagikan nama, alamat email, dan preferensi bahasa Anda kepada <strong>GroceryX</strong>. Lihat <a href="https://policies.google.com/privacy" target="_blank" rel="noopener">Kebijakan Privasi</a> dan <a href="https://policies.google.com/terms" target="_blank" rel="noopener">Persyaratan Layanan</a> Google.
+        </p>
+      </div>
     </div>
   </div>
 

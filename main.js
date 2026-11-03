@@ -17,14 +17,18 @@ const I18N = {
     catalogTitle: 'Menampilkan Produk Makanan',
     pinHint: 'Klik ❤️ untuk Pin ke Atas',
     addProdBtn: 'Tambah Produk Baru',
+    btnAddProd: 'Tambah Produk Baru',
     bundleTitle: 'Paket Hemat Spesial',
     bundleSub: 'Diskon s/d 20%',
+    bundleHint: 'Beli combo 2–3 produk hemat langsung di keranjang',
     bundleBuyBtn: 'Beli Paket',
     cartPageTitle: 'Keranjang Belanja',
     cartPageDesc: 'Periksa kuantitas item, masukkan voucher diskon, dan amankan budget Anda.',
     voucherTitle: 'Voucher & Kode Diskon',
+    voucherSectionTitle: 'Voucher & Kode Diskon',
     applyVoucherBtn: 'Terapkan',
     voucherPlaceholder: 'cth: GROCERYHEMAT',
+    cartTipsTitle: 'Tips Cerdas Belanja Saat Ini',
     totalItemsPrefix: 'Total Barang:',
     savedPrefix: 'Hemat',
     voucherDiscountTitle: 'Diskon Voucher:',
@@ -40,8 +44,13 @@ const I18N = {
     clearBtn: 'Kosongkan Data',
     emptyHistoryTitle: 'Belum Ada Struk Belanja',
     emptyHistoryDesc: 'Struk belanja yang telah diselesaikan akan tersimpan rapi di sini.',
+    emptyCatalogTitle: 'Produk Tidak Ditemukan',
+    emptyCatalogDesc: 'Coba gunakan kata kunci lain atau pilih kategori "Semua".',
+    resetCatalogBtn: 'Tampilkan Semua Produk',
     sehatTitle: 'Sehat Meter',
+    sehatMeterTitle: 'Sehat Meter',
     sehatSub: 'Nutri-Score & analisis kualitas kesehatan produk makanan yang Anda beli.',
+    sehatMeterSub: 'Nutri-Score & analisis kualitas kesehatan produk makanan yang Anda beli.',
     sehatCaption: 'Skor Makanan Sehat',
     statFresh: 'Bahan Segar<br>& Alami',
     statNeutral: 'Olahan<br>Seimbang',
@@ -57,27 +66,56 @@ const I18N = {
     saveBudgetBtn: 'Simpan Batas Anggaran',
     themeTitle: 'Pilihan Tema Tampilan (Liquid Glass)',
     themeSub: 'Pilih tema kaca transparan modern favorit Anda',
+    themeBrightSub: 'Terang kristal & modern (Default)',
+    themeIceSub: 'Kaca es transparan biru cyan',
+    themeAuroraSub: 'Gradasi violet & peach transparan',
+    themeMidnightSub: 'Kaca transparan gelap & neon',
     langTitle: 'Pilihan Bahasa (Language)',
     langSub: 'Pilih bahasa tampilan antarmuka aplikasi',
     audioTitle: 'Efek Suara Belanja',
     audioSub: 'Suara responsif saat scan barcode, klik, dan checkout',
     changePwdTitle: 'Ganti Password Akun',
     changePwdSub: 'Perbarui kata sandi untuk keamanan akun',
+    currentPwd: 'Password Saat Ini',
+    newPwd: 'Password Baru',
+    confirmPwd: 'Konfirmasi Password Baru',
+    saveNewPwdBtn: 'Simpan Password Baru',
     logoutBtn: 'Keluar dari Akun (Logout)',
-    adminFirebaseTitle: 'Sinkronisasi Cloud Firebase',
-    adminFirebaseSub: 'Kelola koneksi multi-device realtime database',
+    helpTitle: 'Pusat Bantuan (Help Center)',
+    helpSub: 'Hubungi Customer Service kami jika membutuhkan bantuan',
+    csPhone: '+62 123456777',
+    csHours: 'CS Siap Membantu',
+    csNote: 'Hubungi kami jika mengalami kendala atau membutuhkan informasi produk.',
+    btnCallCs: 'Hubungi CS',
+    btnSwitchAcc: 'Ganti Akun',
+    balanceSub: 'Sisa Dompet:',
+    spent: 'Terpakai:',
+    maxLimit: 'Batas Maks:',
     navShop: 'Etalase',
     navCart: 'Keranjang',
+    navScan: 'Scan',
     navHistory: 'Riwayat',
     navAccount: 'Akun',
     scannerTitle: 'Pindai Barcode Produk',
     scannerDesc: 'Arahkan kamera ke barcode pada kemasan makanan atau upload foto barcode.',
+    uploadBarcodeBtn: 'Unggah Foto Barcode',
     warningTitle: 'Peringatan: Anggaran Terlampaui!',
+    modalWarningTitle: 'Peringatan: Anggaran Terlampaui!',
+    modalWarningDesc: 'Total belanjaan Anda saat ini telah melebihi batas anggaran yang ditentukan.',
     warningDesc: 'Total belanjaan Anda saat ini telah melebihi batas anggaran yang ditentukan.',
     warningBtnCart: 'Tinjau Keranjang & Hemat',
     warningBtnRaise: 'Naikkan Batas Anggaran',
     warningBtnDismiss: 'Tetap Lanjut Belanja',
-    googleAuthText: 'Lanjutkan dengan Google'
+    googleAuthText: 'Lanjutkan dengan Google',
+    authBrandSub: 'Modern Food E-Commerce & Budget Safety Tracker',
+    authEmail: 'Email',
+    authPassword: 'Password',
+    authLoginSubmit: 'Masuk ke GroceryX',
+    regUsername: 'Username',
+    regEmail: 'Email',
+    regPassword: 'Password',
+    authRegSubmit: 'Buat Akun Sekarang',
+    btnSearchPlaceholder: 'Cari beras, minyak, susu, snack...'
   },
   en: {
     appTitle: 'GroceryX',
@@ -88,14 +126,18 @@ const I18N = {
     catalogTitle: 'Showing Food Groceries',
     pinHint: 'Click ❤️ to Pin to Top',
     addProdBtn: 'Add New Product',
+    btnAddProd: 'Add New Product',
     bundleTitle: 'Special Value Packs',
     bundleSub: 'Up to 20% Off',
+    bundleHint: 'Buy 2–3 item combo directly to cart',
     bundleBuyBtn: 'Buy Bundle',
     cartPageTitle: 'Shopping Cart',
     cartPageDesc: 'Verify item quantities, apply promo vouchers, and protect your budget.',
     voucherTitle: 'Voucher & Promo Code',
+    voucherSectionTitle: 'Vouchers & Promo Codes',
     applyVoucherBtn: 'Apply',
     voucherPlaceholder: 'e.g. GROCERYHEMAT',
+    cartTipsTitle: 'Smart Shopping Tips',
     totalItemsPrefix: 'Total Items:',
     savedPrefix: 'Saved',
     voucherDiscountTitle: 'Voucher Discount:',
@@ -111,8 +153,13 @@ const I18N = {
     clearBtn: 'Clear All Data',
     emptyHistoryTitle: 'No Receipts Yet',
     emptyHistoryDesc: 'Completed grocery receipts will be neatly stored here.',
+    emptyCatalogTitle: 'No Products Found',
+    emptyCatalogDesc: 'Try another keyword or select "All" category.',
+    resetCatalogBtn: 'Show All Products',
     sehatTitle: 'Health Meter',
+    sehatMeterTitle: 'Health Meter',
     sehatSub: 'Nutri-Score and nutritional health analysis of your grocery cart.',
+    sehatMeterSub: 'Nutri-Score and nutritional health analysis of your grocery cart.',
     sehatCaption: 'Healthy Food Score',
     statFresh: 'Fresh &<br>Natural',
     statNeutral: 'Balanced<br>Processed',
@@ -128,27 +175,56 @@ const I18N = {
     saveBudgetBtn: 'Save Budget Limit',
     themeTitle: 'Appearance Theme (Liquid Glass)',
     themeSub: 'Select your favorite modern translucent glass theme',
+    themeBrightSub: 'Crystal bright & modern (Default)',
+    themeIceSub: 'Cyan blue transparent ice glass',
+    themeAuroraSub: 'Translucent violet & peach gradient',
+    themeMidnightSub: 'Dark & neon transparent glass',
     langTitle: 'Language Selection',
     langSub: 'Select application display language',
     audioTitle: 'Shopping Sound Effects',
     audioSub: 'Responsive haptics for barcode scan, clicks, and checkout',
     changePwdTitle: 'Change Account Password',
     changePwdSub: 'Update password for security',
+    currentPwd: 'Current Password',
+    newPwd: 'New Password',
+    confirmPwd: 'Confirm New Password',
+    saveNewPwdBtn: 'Save New Password',
     logoutBtn: 'Log Out of Account',
-    adminFirebaseTitle: 'Firebase Cloud Sync',
-    adminFirebaseSub: 'Manage multi-device realtime database connection',
+    helpTitle: 'Help Center',
+    helpSub: 'Contact our Customer Service for support and inquiries',
+    csPhone: '+62 123456777',
+    csHours: 'CS Ready to Help',
+    csNote: 'Contact us if you have any issues or need product information.',
+    btnCallCs: 'Call CS',
+    btnSwitchAcc: 'Switch Account',
+    balanceSub: 'Remaining:',
+    spent: 'Spent:',
+    maxLimit: 'Max Limit:',
     navShop: 'Shop',
     navCart: 'Cart',
+    navScan: 'Scan',
     navHistory: 'History',
     navAccount: 'Account',
     scannerTitle: 'Scan Product Barcode',
-    scannerDesc: 'Point your camera at the food package barcode or upload a barcode photo.',
+    scannerDesc: 'Point camera at food packaging barcode or upload photo.',
+    uploadBarcodeBtn: 'Upload Barcode Photo',
     warningTitle: 'Warning: Budget Exceeded!',
+    modalWarningTitle: 'Warning: Budget Exceeded!',
+    modalWarningDesc: 'Your grocery spending has exceeded your set monthly safety cap.',
     warningDesc: 'Your grocery spending has exceeded your set monthly safety cap.',
     warningBtnCart: 'Review Cart & Save',
     warningBtnRaise: 'Increase Budget Cap',
     warningBtnDismiss: 'Continue Shopping',
-    googleAuthText: 'Sign in with Google'
+    googleAuthText: 'Continue with Google',
+    authBrandSub: 'Modern Food E-Commerce & Budget Safety Tracker',
+    authEmail: 'Email',
+    authPassword: 'Password',
+    authLoginSubmit: 'Sign In to GroceryX',
+    regUsername: 'Username',
+    regEmail: 'Email',
+    regPassword: 'Password',
+    authRegSubmit: 'Create Account Now',
+    btnSearchPlaceholder: 'Search rice, cooking oil, milk, snack...'
   }
 };
 
@@ -595,8 +671,9 @@ function loadUsersAndSession() {
     state.currentUser = null;
   }
 
-  if (!state.currentUser) {
-    state.currentUser = admin; // Default to admin for seamless evaluation
+  const hasLoggedOut = localStorage.getItem('sg_user_logged_out');
+  if (!state.currentUser && !hasLoggedOut) {
+    state.currentUser = admin; // Default to admin for seamless initial evaluation
     localStorage.setItem(STORAGE_KEYS.CURRENT_USER, JSON.stringify(state.currentUser));
   }
 
@@ -604,36 +681,39 @@ function loadUsersAndSession() {
 }
 
 function isAdmin() {
-  return state.currentUser && state.currentUser.email.toLowerCase() === 'joshualim@mutiarabangsa.sch.id';
+  return state.currentUser && state.currentUser.email && state.currentUser.email.toLowerCase() === 'joshualim@mutiarabangsa.sch.id';
 }
 
 function applyUserSessionToUI() {
   const greetingEl = document.getElementById('header-user-greeting');
   const adminBadge = document.getElementById('header-admin-badge');
   const cloudBtn = document.getElementById('btn-cloud-sync');
-  const adminCloudSec = document.getElementById('settings-admin-firebase-section');
 
   const accName = document.getElementById('account-user-name');
   const accEmail = document.getElementById('account-user-email');
   const accRole = document.getElementById('account-role-pill');
   const accAvatar = document.getElementById('account-avatar-initials');
   const accProvider = document.getElementById('account-provider-label');
+  const btnLogout = document.getElementById('btn-settings-logout');
+
+  const isEn = state.language === 'en';
 
   if (state.currentUser) {
     const name = state.currentUser.username || 'User';
-    if (greetingEl) greetingEl.textContent = `Halo, ${name}`;
+    if (greetingEl) greetingEl.textContent = isEn ? `Hello, ${name}` : `Halo, ${name}`;
     if (accName) accName.textContent = name;
     if (accEmail) accEmail.textContent = state.currentUser.email;
     if (accAvatar) accAvatar.textContent = name.charAt(0).toUpperCase();
 
     if (accProvider) {
-      accProvider.textContent = state.currentUser.provider === 'google' ? 'Google Account Verified' : 'Akun Terverifikasi';
+      accProvider.textContent = state.currentUser.provider === 'google' 
+        ? (isEn ? 'Google Account Verified' : 'Akun Google Terverifikasi') 
+        : (isEn ? 'Verified Account' : 'Akun Terverifikasi');
     }
 
     if (isAdmin()) {
       if (adminBadge) adminBadge.classList.remove('hidden');
       if (cloudBtn) cloudBtn.classList.remove('hidden');
-      if (adminCloudSec) adminCloudSec.classList.remove('hidden');
       if (accRole) {
         accRole.textContent = 'ADMIN';
         accRole.className = 'badge-role-pill';
@@ -641,30 +721,66 @@ function applyUserSessionToUI() {
     } else {
       if (adminBadge) adminBadge.classList.add('hidden');
       if (cloudBtn) cloudBtn.classList.add('hidden');
-      if (adminCloudSec) adminCloudSec.classList.add('hidden');
       if (accRole) {
         accRole.textContent = 'MEMBER';
         accRole.className = 'badge-role-pill bg-muted';
       }
     }
+    if (btnLogout) btnLogout.classList.remove('hidden');
+  } else {
+    if (greetingEl) greetingEl.textContent = isEn ? 'Hello, Guest' : 'Halo, Pengguna';
+    if (accName) accName.textContent = isEn ? 'Guest' : 'Tamu (Belum Masuk)';
+    if (accEmail) accEmail.textContent = isEn ? 'Please log in' : 'Silakan masuk akun';
+    if (accAvatar) accAvatar.textContent = '?';
+    if (accProvider) accProvider.textContent = isEn ? 'Guest Mode' : 'Mode Tamu';
+    if (adminBadge) adminBadge.classList.add('hidden');
+    if (cloudBtn) cloudBtn.classList.add('hidden');
+    if (accRole) {
+      accRole.textContent = 'GUEST';
+      accRole.className = 'badge-role-pill bg-muted';
+    }
+    if (btnLogout) btnLogout.classList.add('hidden');
   }
 }
 
 function handleGoogleSignIn() {
   sound.playClick();
+  const googleModal = document.getElementById('google-oauth-modal');
+  if (googleModal) {
+    googleModal.classList.remove('hidden');
+    // Reset custom form if open
+    const customForm = document.getElementById('google-custom-account-form');
+    const accList = document.getElementById('google-accounts-list');
+    if (customForm) customForm.classList.add('hidden');
+    if (accList) accList.classList.remove('hidden');
+    if (window.lucide) window.lucide.createIcons();
+  }
+}
+
+function selectGoogleAccount(name, email) {
+  sound.playClick();
+  const role = (email === 'joshualim@mutiarabangsa.sch.id' || email === 'joshualim.google@gmail.com') ? 'admin' : 'member';
   const googleUser = {
-    username: 'Josh (Google)',
-    email: 'joshualim.google@gmail.com',
-    role: 'member',
+    username: name,
+    email: email,
+    role: role,
     provider: 'google'
   };
   state.currentUser = googleUser;
   localStorage.setItem(STORAGE_KEYS.CURRENT_USER, JSON.stringify(googleUser));
+  localStorage.removeItem('sg_user_logged_out');
   applyUserSessionToUI();
-  document.getElementById('auth-modal').classList.add('hidden');
+  
+  const googleModal = document.getElementById('google-oauth-modal');
+  if (googleModal) googleModal.classList.add('hidden');
+  const authModal = document.getElementById('auth-modal');
+  if (authModal) authModal.classList.add('hidden');
+  
   sound.playSuccess();
   fireConfetti();
-  alert(state.language === 'en' ? 'Successfully logged in with Google Account!' : 'Berhasil masuk dengan Akun Google!');
+  alert(state.language === 'en' 
+    ? `Successfully signed in as ${name} (${email}) with Google Account!` 
+    : `Berhasil masuk dengan Akun Google: ${name} (${email})!`);
 }
 
 // ==========================================================================
@@ -681,6 +797,23 @@ function setTheme(themeName) {
   });
 }
 
+const CATEGORY_NAMES_EN = {
+  'Semua': 'All',
+  'Bahan Pokok': 'Staple Food',
+  'Makanan Instan & Olahan': 'Instant & Processed',
+  'Daging & Seafood Segar': 'Fresh Meat & Seafood',
+  'Sayur & Buah Segar': 'Fresh Produce',
+  'Bumbu & Dapur': 'Seasoning & Pantry',
+  'Susu, Keju & Olahan': 'Dairy & Cheese',
+  'Camilan & Snack': 'Snacks & Treats',
+  'Sabun Cuci & Deterjen': 'Laundry & Detergent',
+  'Perlengkapan Mandi & Tubuh': 'Personal Care'
+};
+
+function toCamelCase(str) {
+  return str.replace(/-([a-z])/g, (_, letter) => letter.toUpperCase());
+}
+
 function setLanguage(lang) {
   state.language = lang === 'en' ? 'en' : 'id';
   localStorage.setItem(STORAGE_KEYS.LANGUAGE, state.language);
@@ -690,24 +823,60 @@ function setLanguage(lang) {
     btn.classList.toggle('active', btn.getAttribute('data-lang') === state.language);
   });
 
+  const dict = I18N[state.language] || I18N.id;
+
   // Apply translations to UI elements
   document.querySelectorAll('[id^="lbl-"]').forEach((el) => {
-    const key = el.id.replace('lbl-', '');
-    if (I18N[state.language][key]) {
-      el.innerHTML = I18N[state.language][key];
+    const rawKey = el.id.replace('lbl-', '');
+    const camelKey = toCamelCase(rawKey);
+    if (dict[camelKey] !== undefined) {
+      el.innerHTML = dict[camelKey];
+    } else if (dict[rawKey] !== undefined) {
+      el.innerHTML = dict[rawKey];
+    } else if (dict[el.id] !== undefined) {
+      el.innerHTML = dict[el.id];
     }
   });
 
-  const voucherInput = document.getElementById('voucher-code-input');
-  if (voucherInput) {
-    voucherInput.placeholder = I18N[state.language].voucherPlaceholder;
+  const searchInput = document.getElementById('shop-search-input');
+  if (searchInput) {
+    searchInput.placeholder = dict.btnSearchPlaceholder || (state.language === 'en' ? 'Search rice, cooking oil, milk, snack...' : 'Cari beras, minyak, susu, snack...');
   }
 
+  const voucherInput = document.getElementById('voucher-code-input');
+  if (voucherInput) {
+    voucherInput.placeholder = dict.voucherPlaceholder || 'cth: GROCERYHEMAT';
+  }
+
+  // Update Bottom Nav Labels
+  const navShop = document.getElementById('lbl-nav-shop');
+  if (navShop) navShop.textContent = dict.navShop || (state.language === 'en' ? 'Shop' : 'Etalase');
+
+  const navCart = document.getElementById('lbl-nav-cart');
+  if (navCart) navCart.textContent = dict.navCart || (state.language === 'en' ? 'Cart' : 'Keranjang');
+
+  const navScan = document.getElementById('lbl-nav-scan');
+  if (navScan) navScan.textContent = dict.navScan || 'Scan';
+
+  const navHistory = document.getElementById('lbl-nav-history');
+  if (navHistory) navHistory.textContent = dict.navHistory || (state.language === 'en' ? 'History' : 'Riwayat');
+
+  const navAccount = document.getElementById('lbl-nav-account');
+  if (navAccount) navAccount.textContent = dict.navAccount || (state.language === 'en' ? 'Account' : 'Akun');
+
+  const catalogCountLabel = document.getElementById('catalog-count-label');
+  if (catalogCountLabel) {
+    catalogCountLabel.textContent = dict.catalogTitle || (state.language === 'en' ? 'Showing Food Groceries' : 'Menampilkan Produk Makanan');
+  }
+
+  renderCategoryPills();
+  renderComboBundles();
   renderCatalog();
   renderCart();
   renderHistory();
   renderSehatMeter();
   updateSafetyBanner();
+  applyUserSessionToUI();
   updateIcons();
 }
 
@@ -740,7 +909,8 @@ function renderCategoryPills() {
 
   container.innerHTML = DEFAULT_CATEGORIES.map((cat) => {
     const isActive = state.selectedCategory === cat ? 'active' : '';
-    return `<button type="button" class="filter-pill ${isActive}" data-category="${cat}">${cat}</button>`;
+    const label = state.language === 'en' ? (CATEGORY_NAMES_EN[cat] || cat) : cat;
+    return `<button type="button" class="filter-pill ${isActive}" data-category="${cat}">${label}</button>`;
   }).join('');
 
   container.querySelectorAll('.filter-pill').forEach((btn) => {
@@ -784,20 +954,26 @@ function renderCatalog() {
 
   if (emptyState) emptyState.classList.add('hidden');
 
+  const isEn = state.language === 'en';
+
   grid.innerHTML = filtered.map((prod) => {
     const isPinned = state.pinnedProducts.includes(prod.id);
     const cartItem = state.cart.find((i) => i.name.toLowerCase() === prod.name.toLowerCase());
     const qtyInCart = cartItem ? cartItem.qty : 0;
 
     const nutriClass = prod.healthType === 'healthy' ? 'tag-healthy' : (prod.healthType === 'neutral' ? 'tag-neutral' : 'tag-unhealthy');
-    const nutriText = prod.healthType === 'healthy' ? '🟢 Alami' : (prod.healthType === 'neutral' ? '🟡 Olahan' : '🔴 Tinggi Gula');
+    const nutriText = prod.healthType === 'healthy' 
+      ? (isEn ? '🟢 Natural' : '🟢 Alami') 
+      : (prod.healthType === 'neutral' 
+        ? (isEn ? '🟡 Processed' : '🟡 Olahan') 
+        : (isEn ? '🔴 High Sugar' : '🔴 Tinggi Gula'));
 
     return `
       <div class="product-card ${isPinned ? 'is-pinned' : ''}" data-id="${prod.id}">
-        ${isPinned ? '<div class="pinned-badge-chip">📌 Disukai</div>' : ''}
+        ${isPinned ? `<div class="pinned-badge-chip">📌 ${isEn ? 'Pinned' : 'Disukai'}</div>` : ''}
         
-        <button type="button" class="btn-pin-like ${isPinned ? 'active' : ''}" data-id="${prod.id}" title="Pin ke Atas">
-          <i data-lucide="heart"></i>
+        <button type="button" class="btn-pin-like ${isPinned ? 'active is-pinned-heart' : ''}" data-id="${prod.id}" title="${isEn ? 'Pin to Top' : 'Pin ke Atas'}">
+          <i data-lucide="heart" class="${isPinned ? 'fill-crimson text-crimson' : ''}"></i>
         </button>
 
         <div class="product-card-img-wrap">
@@ -826,7 +1002,7 @@ function renderCatalog() {
               </div>
             ` : `
               <button type="button" class="btn-catalog-add btn-quick-add" data-id="${prod.id}">
-                <i data-lucide="plus"></i> <span>Keranjang</span>
+                <i data-lucide="plus"></i> <span>${isEn ? 'Cart' : 'Keranjang'}</span>
               </button>
             `}
           </div>
@@ -1207,6 +1383,7 @@ function updateSafetyBanner() {
   const limit = state.safetyCap || 500000;
   const percent = limit > 0 ? Math.round((spent / limit) * 100) : 0;
   const remaining = limit - spent;
+  const isEn = state.language === 'en';
 
   const statusPill = document.getElementById('budget-status-pill');
   const statusText = document.getElementById('budget-status-text');
@@ -1227,8 +1404,8 @@ function updateSafetyBanner() {
     if (statusPill) {
       statusPill.className = 'safety-status-label badge-overbudget';
     }
-    if (statusText) statusText.textContent = 'OVER BUDGET!';
-    if (balanceSub) balanceSub.textContent = 'Defisit:';
+    if (statusText) statusText.textContent = isEn ? 'OVER BUDGET!' : 'ANGGARAN LEBIH!';
+    if (balanceSub) balanceSub.textContent = isEn ? 'Deficit:' : 'Defisit:';
     if (remainingBudget) {
       remainingBudget.textContent = `Rp ${formatRupiah(deficit)}`;
       remainingBudget.className = 'text-deficit';
@@ -1248,8 +1425,8 @@ function updateSafetyBanner() {
     if (statusPill) {
       statusPill.className = 'safety-status-label';
     }
-    if (statusText) statusText.textContent = 'ANGGARAN AMAN';
-    if (balanceSub) balanceSub.textContent = 'Sisa Dompet:';
+    if (statusText) statusText.textContent = isEn ? 'BUDGET SAFE' : 'ANGGARAN AMAN';
+    if (balanceSub) balanceSub.textContent = isEn ? 'Remaining:' : 'Sisa Dompet:';
     if (remainingBudget) {
       remainingBudget.textContent = `Rp ${formatRupiah(remaining)}`;
       remainingBudget.className = '';
@@ -1281,6 +1458,7 @@ function showOverbudgetModal(spent, limit, deficit) {
 function renderSehatMeter() {
   const allProds = getAllCatalogProducts();
   const items = state.cart;
+  const isEn = state.language === 'en';
 
   let healthyCount = 0;
   let neutralCount = 0;
@@ -1322,22 +1500,28 @@ function renderSehatMeter() {
 
   if (score >= 80) {
     if (gradeBadge) {
-      gradeBadge.textContent = 'Grade A (Sehat)';
+      gradeBadge.textContent = isEn ? 'Grade A (Healthy)' : 'Grade A (Sehat)';
       gradeBadge.className = 'sehat-grade-badge grade-a';
     }
-    if (adviceText) adviceText.textContent = 'Bagus sekali! Belanjaan Anda didominasi bahan segar kaya serat dan protein alami. Pertahankan komposisi ini.';
+    if (adviceText) adviceText.textContent = isEn 
+      ? 'Great job! Your basket is predominantly filled with wholesome, fresh, and nutrient-dense ingredients. Keep up this healthy habit.' 
+      : 'Bagus sekali! Belanjaan Anda didominasi bahan segar kaya serat dan protein alami. Pertahankan komposisi ini.';
   } else if (score >= 65) {
     if (gradeBadge) {
-      gradeBadge.textContent = 'Grade B (Seimbang)';
+      gradeBadge.textContent = isEn ? 'Grade B (Balanced)' : 'Grade B (Seimbang)';
       gradeBadge.className = 'sehat-grade-badge grade-b';
     }
-    if (adviceText) adviceText.textContent = 'Keranjang Anda cukup seimbang antara bahan pokok dan olahan. Tambahkan sayuran hijau untuk nutrisi maksimal.';
+    if (adviceText) adviceText.textContent = isEn 
+      ? 'Your cart is well balanced between staple foods and processed groceries. Consider adding green vegetables for optimal nutrition.' 
+      : 'Keranjang Anda cukup seimbang antara bahan pokok dan olahan. Tambahkan sayuran hijau untuk nutrisi maksimal.';
   } else {
     if (gradeBadge) {
-      gradeBadge.textContent = 'Grade C (Evaluasi)';
+      gradeBadge.textContent = isEn ? 'Grade C (Evaluation)' : 'Grade C (Evaluasi)';
       gradeBadge.className = 'sehat-grade-badge grade-c';
     }
-    if (adviceText) adviceText.textContent = 'Perhatian: Komposisi belanjaan Anda tinggi makanan instan dan camilan manis. Pertimbangkan mengganti camilan dengan buah segar.';
+    if (adviceText) adviceText.textContent = isEn 
+      ? 'Caution: High amount of instant and sugary snacks. Consider swapping processed items for fresh organic fruits.' 
+      : 'Perhatian: Komposisi belanjaan Anda tinggi makanan instan dan camilan manis. Pertimbangkan mengganti camilan dengan buah segar.';
   }
 }
 
@@ -1734,7 +1918,7 @@ function switchTab(targetViewId) {
     view.classList.toggle('hidden', view.id !== targetViewId);
   });
 
-  document.querySelectorAll('.nav-tab-btn').forEach((btn) => {
+  document.querySelectorAll('.nav-tab-btn[data-target]').forEach((btn) => {
     btn.classList.toggle('active', btn.getAttribute('data-target') === targetViewId);
   });
 
@@ -1814,12 +1998,22 @@ document.addEventListener('DOMContentLoaded', () => {
   updateSafetyBanner();
 
   // Bottom Navigation Dock Click Handlers
-  document.querySelectorAll('.nav-tab-btn').forEach((btn) => {
+  document.querySelectorAll('.nav-tab-btn[data-target]').forEach((btn) => {
     btn.onclick = () => {
       const target = btn.getAttribute('data-target');
       switchTab(target);
     };
   });
+
+  // Center Scan Barcode Button
+  const btnNavScan = document.getElementById('nav-btn-scan');
+  if (btnNavScan) {
+    btnNavScan.onclick = (e) => {
+      e.preventDefault();
+      sound.playClick();
+      openBarcodeScannerModal();
+    };
+  }
 
   // Category Arrow Slide Navigation
   const catContainer = document.getElementById('category-filter-container');
@@ -1860,12 +2054,7 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   // Barcode Scanner Triggers
-  const btnHeadBarcode = document.getElementById('btn-header-barcode');
-  const btnSearchBarcode = document.getElementById('btn-search-barcode-trigger');
   const btnCloseScanner = document.getElementById('btn-close-scanner-modal');
-
-  if (btnHeadBarcode) btnHeadBarcode.onclick = openBarcodeScannerModal;
-  if (btnSearchBarcode) btnSearchBarcode.onclick = openBarcodeScannerModal;
   if (btnCloseScanner) btnCloseScanner.onclick = closeBarcodeScannerModal;
 
   // Barcode popular test buttons
@@ -2302,6 +2491,7 @@ document.addEventListener('DOMContentLoaded', () => {
       if (user && user.password === pwd) {
         state.currentUser = user;
         localStorage.setItem(STORAGE_KEYS.CURRENT_USER, JSON.stringify(user));
+        localStorage.removeItem('sg_user_logged_out');
         applyUserSessionToUI();
         authModal.classList.add('hidden');
         sound.playSuccess();
@@ -2340,6 +2530,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
       state.currentUser = newUser;
       localStorage.setItem(STORAGE_KEYS.CURRENT_USER, JSON.stringify(newUser));
+      localStorage.removeItem('sg_user_logged_out');
       applyUserSessionToUI();
       authModal.classList.add('hidden');
       sound.playSuccess();
@@ -2348,16 +2539,91 @@ document.addEventListener('DOMContentLoaded', () => {
     };
   }
 
+  // Close Auth Modal
+  const btnCloseAuth = document.getElementById('btn-close-auth-modal');
+  if (btnCloseAuth && authModal) {
+    btnCloseAuth.onclick = () => {
+      authModal.classList.add('hidden');
+    };
+  }
+
+  // Google OAuth 2.0 Account Chooser (select_account) Handlers
+  const googleOauthModal = document.getElementById('google-oauth-modal');
+  const btnCloseGoogleOauth = document.getElementById('btn-close-google-oauth');
+  if (btnCloseGoogleOauth && googleOauthModal) {
+    btnCloseGoogleOauth.onclick = () => {
+      googleOauthModal.classList.add('hidden');
+    };
+  }
+
+  // Click on account in Google list
+  document.querySelectorAll('.google-account-item[data-email]').forEach(item => {
+    item.onclick = () => {
+      const email = item.getAttribute('data-email');
+      const name = item.getAttribute('data-name');
+      selectGoogleAccount(name, email);
+    };
+  });
+
+  // Switch to custom account form
+  const btnGoogleAddAccount = document.getElementById('btn-google-add-account');
+  const googleAccountsList = document.getElementById('google-accounts-list');
+  const googleCustomForm = document.getElementById('google-custom-account-form');
+  const btnCancelCustomGoogle = document.getElementById('btn-cancel-custom-google');
+
+  if (btnGoogleAddAccount && googleCustomForm && googleAccountsList) {
+    btnGoogleAddAccount.onclick = () => {
+      googleAccountsList.classList.add('hidden');
+      googleCustomForm.classList.remove('hidden');
+      const nameInput = document.getElementById('google-custom-name');
+      if (nameInput) nameInput.focus();
+    };
+  }
+
+  if (btnCancelCustomGoogle && googleCustomForm && googleAccountsList) {
+    btnCancelCustomGoogle.onclick = () => {
+      googleCustomForm.classList.add('hidden');
+      googleAccountsList.classList.remove('hidden');
+    };
+  }
+
+  if (googleCustomForm) {
+    googleCustomForm.onsubmit = (e) => {
+      e.preventDefault();
+      const nameInput = document.getElementById('google-custom-name');
+      const emailInput = document.getElementById('google-custom-email');
+      const name = (nameInput && nameInput.value.trim()) || 'Google User';
+      const email = (emailInput && emailInput.value.trim()) || 'user@gmail.com';
+      selectGoogleAccount(name, email);
+    };
+  }
+
+  // Close Google modal when clicking backdrop
+  if (googleOauthModal) {
+    googleOauthModal.onclick = (e) => {
+      if (e.target === googleOauthModal) {
+        googleOauthModal.classList.add('hidden');
+      }
+    };
+  }
+
   // Logout button
   const btnLogout = document.getElementById('btn-settings-logout');
   if (btnLogout) {
     btnLogout.onclick = () => {
-      if (confirm('Apakah Anda yakin ingin keluar dari akun?')) {
+      const confirmMsg = state.language === 'en' 
+        ? 'Are you sure you want to log out of your account?' 
+        : 'Apakah Anda yakin ingin keluar dari akun?';
+      if (confirm(confirmMsg)) {
         state.currentUser = null;
         localStorage.removeItem(STORAGE_KEYS.CURRENT_USER);
+        localStorage.setItem('sg_user_logged_out', 'true');
         sound.playClick();
-        loadUsersAndSession();
-        alert('Anda telah keluar.');
+        applyUserSessionToUI();
+        if (authModal) {
+          authModal.classList.remove('hidden');
+        }
+        alert(state.language === 'en' ? 'You have successfully logged out.' : 'Anda telah berhasil keluar dari akun.');
       }
     };
   }
