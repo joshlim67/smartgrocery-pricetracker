@@ -26,6 +26,7 @@
 
   <!-- Google Identity Services (OAuth 2.0) -->
   <script src="https://accounts.google.com/gsi/client" async defer></script>
+  <script src="./google-auth-config.js" type="module"></script>
 
   <link rel="stylesheet" href="./style.css?v=2.6">
 </head>
@@ -93,7 +94,8 @@
         </div>
 
         <!-- Live Store Location Metadata Indicator -->
-        <div class="budget-location-strip" id="budget-location-strip" title="Klik untuk mengubah nama toko / lokasi belanja">
+        <div class="budget-location-strip" id="budget-location-strip"
+          title="Klik untuk mengubah nama toko / lokasi belanja">
           <div class="location-strip-left">
             <i data-lucide="map-pin" class="location-icon"></i>
             <span class="location-label-sub">Lokasi Toko:</span>
@@ -170,7 +172,8 @@
 
         <!-- FULL-WIDTH ACTION BAR: + TAMBAH PRODUK BARU (UJUNG KE UJUNG) -->
         <div class="catalog-add-action-wrap">
-          <button type="button" id="btn-open-add-product" class="btn-add-product-fullbar" aria-label="Tambah Produk Baru">
+          <button type="button" id="btn-open-add-product" class="btn-add-product-fullbar"
+            aria-label="Tambah Produk Baru">
             <i data-lucide="plus-circle" class="btn-add-fullbar-icon"></i>
             <span class="btn-add-fullbar-text" id="lbl-btn-add-prod">+ Tambah Produk Baru ke Katalog</span>
           </button>
@@ -246,8 +249,7 @@
 
           <div class="voucher-input-row">
             <div class="voucher-input-wrapper">
-              <input type="text" id="voucher-code-input" placeholder="cth: GROCERYHEMAT" uppercase
-                autocomplete="off">
+              <input type="text" id="voucher-code-input" placeholder="cth: GROCERYHEMAT" uppercase autocomplete="off">
               <button type="button" id="btn-clear-voucher" class="btn-clear hidden" aria-label="Hapus Kode">
                 <i data-lucide="x"></i>
               </button>
@@ -257,7 +259,8 @@
             </button>
           </div>
           <div class="voucher-input-hint-row">
-            <span class="voucher-hint-text">💡 Contoh kode diskon: <strong>GROCERYHEMAT</strong> (15%) • <strong>SEHATSEGAR</strong> (-20rb)</span>
+            <span class="voucher-hint-text">💡 Contoh kode diskon: <strong>GROCERYHEMAT</strong> (15%) •
+              <strong>SEHATSEGAR</strong> (-20rb)</span>
           </div>
 
           <!-- Applied Voucher Notification Pill -->
@@ -679,7 +682,8 @@
                   <i data-lucide="phone-call" class="text-primary"></i>
                   <strong class="help-cs-phone" id="lbl-cs-phone">+62 123456777</strong>
                 </div>
-                <p class="help-cs-note" id="lbl-cs-note">Hubungi kami jika mengalami kendala atau membutuhkan informasi produk.</p>
+                <p class="help-cs-note" id="lbl-cs-note">Hubungi kami jika mengalami kendala atau membutuhkan informasi
+                  produk.</p>
               </div>
               <a href="tel:+62123456777" class="btn-glow-primary btn-call-cs-action" id="btn-call-cs">
                 <i data-lucide="phone"></i>
@@ -1331,7 +1335,8 @@
 
 
   <!-- ================= MODAL: LOKASI TOKO & GEOLOCATION (METADATA BELANJA) ================= -->
-  <div id="store-location-modal" class="bottom-sheet-backdrop hidden" role="dialog" aria-modal="true" aria-labelledby="modal-location-title">
+  <div id="store-location-modal" class="bottom-sheet-backdrop hidden" role="dialog" aria-modal="true"
+    aria-labelledby="modal-location-title">
     <div class="bottom-sheet-card location-modal-card glass-card">
       <div class="sheet-drag-handle"></div>
 
@@ -1347,7 +1352,8 @@
 
       <div class="sheet-body-scroll location-modal-body">
         <p class="location-modal-sub" id="lbl-location-desc">
-          Minta izin lokasi GPS perangkat Anda dan berikan nama toko/cabang tempat Anda berbelanja agar riwayat belanja tersimpan rapi sebagai database pembanding resmi.
+          Minta izin lokasi GPS perangkat Anda dan berikan nama toko/cabang tempat Anda berbelanja agar riwayat belanja
+          tersimpan rapi sebagai database pembanding resmi.
         </p>
 
         <!-- GPS Detection Box -->
@@ -1372,7 +1378,8 @@
             <label class="form-label" for="input-store-name">Nama Toko &amp; Cabang Supermarket</label>
             <div class="input-with-icon">
               <i data-lucide="store" class="field-icon"></i>
-              <input type="text" id="input-store-name" class="glass-input location-text-input" placeholder="Contoh: Lotte Mart Grocery - Puri Indah" required>
+              <input type="text" id="input-store-name" class="glass-input location-text-input"
+                placeholder="Contoh: Lotte Mart Grocery - Puri Indah" required>
             </div>
           </div>
 
@@ -1380,10 +1387,13 @@
           <div class="quick-store-chips-wrap">
             <span class="chips-label">Pilih Rekomendasi / Riwayat Cepat:</span>
             <div class="quick-store-chips">
-              <button type="button" class="btn-store-chip" data-store="Lotte Mart Grocery - Puri Indah">Lotte Mart - Puri Indah</button>
-              <button type="button" class="btn-store-chip" data-store="Superindo - Citra Raya">Superindo - Citra Raya</button>
+              <button type="button" class="btn-store-chip" data-store="Lotte Mart Grocery - Puri Indah">Lotte Mart -
+                Puri Indah</button>
+              <button type="button" class="btn-store-chip" data-store="Superindo - Citra Raya">Superindo - Citra
+                Raya</button>
               <button type="button" class="btn-store-chip" data-store="Grand Lucky - SCBD">Grand Lucky - SCBD</button>
-              <button type="button" class="btn-store-chip" data-store="Hypermart - Lippo Karawaci">Hypermart - Lippo Karawaci</button>
+              <button type="button" class="btn-store-chip" data-store="Hypermart - Lippo Karawaci">Hypermart - Lippo
+                Karawaci</button>
               <button type="button" class="btn-store-chip" data-store="Pasar Modern BSD">Pasar Modern BSD</button>
             </div>
           </div>
@@ -1405,16 +1415,21 @@
   <!-- ================= MODAL: AUTHENTICATION (LOGIN, SIGN UP & GOOGLE SIGN-IN) ================= -->
   <div id="auth-modal" class="auth-overlay hidden" role="dialog" aria-modal="true" aria-labelledby="auth-modal-title">
     <div class="auth-card glass-card" style="position: relative;">
-      <button type="button" id="btn-close-auth-modal" class="btn-sheet-close auth-close-btn" aria-label="Tutup Modal" style="position: absolute; top: 14px; right: 14px; z-index: 10;">
+      <button type="button" id="btn-close-auth-modal" class="btn-sheet-close auth-close-btn" aria-label="Tutup Modal"
+        style="position: absolute; top: 14px; right: 14px; z-index: 10;">
         <i data-lucide="x"></i>
       </button>
-      <div class="auth-header" style="display: flex; flex-direction: column; align-items: center; text-align: center; padding-top: 6px;">
-        <div class="auth-brand-icon" style="width: 52px; height: 52px; max-width: 52px; max-height: 52px; border-radius: 14px; overflow: hidden; margin: 0 auto 8px auto; box-shadow: 0 4px 14px rgba(0,0,0,0.18); flex-shrink: 0;">
-          <img src="./icon.svg" alt="GroceryX Logo" class="auth-header-logo-img" style="width: 52px; height: 52px; max-width: 52px; max-height: 52px; object-fit: contain; display: block; border-radius: 14px;">
+      <div class="auth-header"
+        style="display: flex; flex-direction: column; align-items: center; text-align: center; padding-top: 6px;">
+        <div class="auth-brand-icon"
+          style="width: 52px; height: 52px; max-width: 52px; max-height: 52px; border-radius: 14px; overflow: hidden; margin: 0 auto 8px auto; box-shadow: 0 4px 14px rgba(0,0,0,0.18); flex-shrink: 0;">
+          <img src="./icon.svg" alt="GroceryX Logo" class="auth-header-logo-img"
+            style="width: 52px; height: 52px; max-width: 52px; max-height: 52px; object-fit: contain; display: block; border-radius: 14px;">
         </div>
         <div class="auth-header-title-wrap">
           <h2 id="auth-modal-title" class="auth-brand-title" style="font-size: 1.3rem; margin: 0 0 2px 0;">GroceryX</h2>
-          <p class="auth-brand-sub" id="lbl-auth-brand-sub" style="margin: 0; font-size: 0.72rem;">Modern Food E-Commerce & Budget Safety Tracker</p>
+          <p class="auth-brand-sub" id="lbl-auth-brand-sub" style="margin: 0; font-size: 0.72rem;">Modern Food
+            E-Commerce & Budget Safety Tracker</p>
         </div>
       </div>
 
@@ -1433,6 +1448,8 @@
           </svg>
           <span id="lbl-google-auth-text">Lanjutkan dengan Google</span>
         </button>
+        <!-- Google Official GSI Button Render Target -->
+        <div id="g_id_signin_render" style="margin-top: 8px; display: flex; justify-content: center; width: 100%;"></div>
       </div>
 
       <div class="auth-divider">
@@ -1517,76 +1534,47 @@
   </div>
 
 
-  <!-- ================= MODAL: GOOGLE OAUTH 2.0 ACCOUNT CHOOSER (select_account) ================= -->
-  <div id="google-oauth-modal" class="auth-overlay hidden" role="dialog" aria-modal="true" aria-labelledby="google-oauth-title">
-    <div class="google-oauth-card">
-      <!-- Google Close Button -->
-      <button type="button" id="btn-close-google-oauth" class="google-oauth-close" aria-label="Tutup">
+  <!-- ================= MODAL: KONFIGURASI GOOGLE OAUTH 2.0 CLIENT ID ================= -->
+  <div id="google-client-id-modal" class="auth-overlay hidden" role="dialog" aria-modal="true" aria-labelledby="google-config-title">
+    <div class="auth-card glass-card" style="max-width: 420px; padding: 24px; position: relative;">
+      <button type="button" id="btn-close-google-config" class="btn-sheet-close" aria-label="Tutup" style="position: absolute; top: 16px; right: 16px;">
         <i data-lucide="x"></i>
       </button>
 
-      <!-- Google Brand Header -->
-      <div class="google-oauth-header">
-        <svg class="google-oauth-glogo" viewBox="0 0 24 24" width="36" height="36">
-          <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" />
-          <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" />
-          <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.63z" />
-          <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z" />
-        </svg>
-        <h2 id="google-oauth-title" class="google-oauth-title">Pilih akun</h2>
-        <p class="google-oauth-sub">untuk melanjutkan ke <strong class="text-primary-brand">GroceryX</strong></p>
-      </div>
-
-      <!-- Account List (OAuth 2.0 prompt=select_account) -->
-      <div class="google-accounts-list" id="google-accounts-list">
-        <button type="button" class="google-account-item" data-email="joshualim.google@gmail.com" data-name="Josh Lim">
-          <div class="google-avatar-circle bg-blue">J</div>
-          <div class="google-account-details">
-            <span class="google-account-name">Josh Lim</span>
-            <span class="google-account-email">joshualim.google@gmail.com</span>
-          </div>
-        </button>
-
-        <button type="button" class="google-account-item" data-email="student.grocery@gmail.com" data-name="Student Developer">
-          <div class="google-avatar-circle bg-emerald">S</div>
-          <div class="google-account-details">
-            <span class="google-account-name">Student Developer</span>
-            <span class="google-account-email">student.grocery@gmail.com</span>
-          </div>
-        </button>
-
-        <button type="button" class="google-account-item google-add-account-btn" id="btn-google-add-account">
-          <div class="google-avatar-circle bg-ghost">
-            <i data-lucide="user-plus"></i>
-          </div>
-          <div class="google-account-details">
-            <span class="google-account-name">Gunakan akun lain</span>
-          </div>
-        </button>
-      </div>
-
-      <!-- Custom Account Form (hidden by default) -->
-      <form id="google-custom-account-form" class="google-custom-form hidden">
-        <div class="form-group mb-2">
-          <label class="form-label text-xs">Nama Lengkap</label>
-          <input type="text" id="google-custom-name" placeholder="Nama Akun Google Anda" class="glass-input text-xs" required>
+      <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 8px;">
+        <div style="width: 38px; height: 38px; border-radius: 12px; background: rgba(66, 133, 244, 0.15); display: flex; align-items: center; justify-content: center; color: #4285F4; flex-shrink: 0;">
+          <i data-lucide="key-round"></i>
         </div>
+        <div>
+          <h3 id="google-config-title" style="margin: 0; font-size: 1.05rem; font-weight: 800;">Google OAuth 2.0 Client ID</h3>
+          <p style="margin: 0; font-size: 0.72rem; color: var(--text-muted);">Autentikasi Akun Google Resmi</p>
+        </div>
+      </div>
+
+      <p style="font-size: 0.78rem; color: var(--text-muted); line-height: 1.5; margin: 12px 0 16px;">
+        Untuk mengaktifkan autentikasi akun Google asli, masukkan <strong>OAuth 2.0 Web Client ID</strong> dari Google Cloud Console Anda.
+      </p>
+
+      <form id="form-google-client-id">
         <div class="form-group mb-3">
-          <label class="form-label text-xs">Alamat Email (@gmail.com)</label>
-          <input type="email" id="google-custom-email" placeholder="nama@gmail.com" class="glass-input text-xs" required>
+          <label class="form-label text-xs">Google OAuth Client ID</label>
+          <div class="input-with-icon">
+            <i data-lucide="shield-check" class="field-icon"></i>
+            <input type="text" id="input-google-client-id" placeholder="Contoh: 79307342744-xxxx.apps.googleusercontent.com" class="glass-input text-xs" required style="font-family: monospace; font-size: 0.75rem;">
+          </div>
         </div>
-        <div class="google-custom-actions">
-          <button type="button" id="btn-cancel-custom-google" class="btn-ghost-muted btn-sm">Batal</button>
-          <button type="submit" class="btn-google-continue btn-sm">Pilih &amp; Lanjutkan</button>
+
+        <div style="background: rgba(37, 99, 235, 0.08); border: 1px solid rgba(37, 99, 235, 0.2); border-radius: 12px; padding: 10px 12px; margin-bottom: 16px; font-size: 0.72rem; color: var(--text-body); line-height: 1.45;">
+          📌 <strong>Panduan Setup:</strong> Langkah pembuatan Client ID di Google Cloud Console dan penambahan Authorized Origins (<code style="background: rgba(0,0,0,0.1); padding: 1px 4px; border-radius: 4px;">http://localhost:5173</code> &amp; <code style="background: rgba(0,0,0,0.1); padding: 1px 4px; border-radius: 4px;">https://joshlim67.github.io</code>) telah tertulis di panduan <strong>GOOGLE_AUTH_SETUP.md</strong>.
+        </div>
+
+        <div style="display: flex; gap: 8px;">
+          <button type="button" id="btn-cancel-google-config" class="btn-ghost-muted full-width">Batal</button>
+          <button type="submit" class="btn-glow-primary full-width">
+            <i data-lucide="check"></i> <span>Simpan &amp; Hubungkan</span>
+          </button>
         </div>
       </form>
-
-      <!-- Google Privacy & Terms Disclaimer -->
-      <div class="google-oauth-footer">
-        <p>
-          Untuk melanjutkan, Google akan membagikan nama, alamat email, dan preferensi bahasa Anda kepada <strong>GroceryX</strong>. Lihat <a href="https://policies.google.com/privacy" target="_blank" rel="noopener">Kebijakan Privasi</a> dan <a href="https://policies.google.com/terms" target="_blank" rel="noopener">Persyaratan Layanan</a> Google.
-        </p>
-      </div>
     </div>
   </div>
 
