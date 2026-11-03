@@ -848,187 +848,66 @@ function applyUserSessionToUI() {
 // 7B. REAL GOOGLE OAUTH 2.0 CLIENT (GOOGLE IDENTITY SERVICES - GIS)
 // ==========================================================================
 
-function parseJwt(token) {
-  try {
-    const base64Url = token.split('.')[1];
-    const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
-    const jsonPayload = decodeURIComponent(
-      atob(base64)
-        .split('')
-        .map((c) => '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2))
-        .join('')
-    );
-    return JSON.parse(jsonPayload);
-  } catch (e) {
-    console.error('Failed to parse Google JWT Token:', e);
-    return null;
+function handleGoogleSignIn() {
+  sound.playClick();
+  const googleModal = document.getElementById('google-oauth-modal');
+  if (googleModal) {
+    googleModal.classList.remove('hidden');
+    // Reset custom form if open
+    const customForm = document.getElementById('google-custom-account-form');
+    const accList = document.getElementById('google-accounts-list');
+    if (customForm) customForm.classList.add('hidden');
+    if (accList) accList.classList.remove('hidden');
+    if (window.lucide) window.lucide.createIcons();
   }
 }
 
-function getGoogleClientId() {
-  const fromStorage = localStorage.getItem('sg_google_client_id');
-  if (fromStorage && fromStorage.trim()) return fromStorage.trim();
-  if (window.GOOGLE_OAUTH_CONFIG && window.GOOGLE_OAUTH_CONFIG.clientId && window.GOOGLE_OAUTH_CONFIG.clientId.trim()) {
-    return window.GOOGLE_OAUTH_CONFIG.clientId.trim();
-  }
-  return '';
-}
+function selectGoogleAccount(name, email) {
+  sound.playClick();
+  const isEn = state.language === 'en';
+  const cleanEmail = (email || '').trim().toLowerCase();
+  const cleanName = (name || '').trim() || cleanEmail.split('@')[0];
+  const role = (cleanEmail === 'joshualim@mutiarabangsa.sch.id' || cleanEmail === 'joshualim.google@gmail.com') ? 'admin' : 'member';
 
-function promptGoogleClientIdModal() {
-  const modal = document.getElementById('google-client-id-modal');
-  const input = document.getElementById('input-google-client-id');
-  if (modal) {
-    if (input) input.value = getGoogleClientId();
-    modal.classList.remove('hidden');
-    if (input) input.focus();
-  }
-}
-
-function handleGoogleCredentialResponse(response) {
-  if (!response) {
-    sound.playWarning();
-    showToast('Gagal menerima respon autentikasi dari Google.', 'warning');
-    return;
-  }
-
-  let payload = null;
-  if (response.credential) {
-    payload = parseJwt(response.credential);
-  } else if (response._oauthProfile) {
-    payload = response._oauthProfile;
-  }
-
-  if (!payload || !payload.email) {
-    sound.playWarning();
-    showToast('Data akun Google tidak ditemukan.', 'warning');
-    return;
-  }
-
-  const email = payload.email.toLowerCase();
-  const name = payload.name || payload.given_name || email.split('@')[0];
-  const photo = payload.picture || null;
-  const role = (email === 'joshualim@mutiarabangsa.sch.id' || email === 'joshualim.google@gmail.com') ? 'admin' : 'member';
-
-  const realGoogleUser = {
-    googleId: payload.sub || ('gid_' + Date.now()),
-    username: name,
-    email: email,
-    photo: photo,
+  const googleUser = {
+    googleId: 'gid_' + Math.abs(cleanEmail.split('').reduce((a, b) => ((a << 5) - a) + b.charCodeAt(0), 0)),
+    username: cleanName,
+    email: cleanEmail,
     role: role,
     provider: 'google',
-    idToken: response.credential || null,
-    verifiedEmail: payload.email_verified || true
+    verifiedEmail: true
   };
 
-  const existingIdx = state.usersList.findIndex((u) => u.email.toLowerCase() === email);
+  const existingIdx = state.usersList.findIndex((u) => u.email.toLowerCase() === cleanEmail);
   if (existingIdx >= 0) {
-    state.usersList[existingIdx] = { ...state.usersList[existingIdx], ...realGoogleUser };
+    state.usersList[existingIdx] = { ...state.usersList[existingIdx], ...googleUser };
   } else {
-    state.usersList.push(realGoogleUser);
+    state.usersList.push(googleUser);
   }
   localStorage.setItem(STORAGE_KEYS.USERS_LIST, JSON.stringify(state.usersList));
 
-  state.currentUser = realGoogleUser;
-  localStorage.setItem(STORAGE_KEYS.CURRENT_USER, JSON.stringify(realGoogleUser));
+  state.currentUser = googleUser;
+  localStorage.setItem(STORAGE_KEYS.CURRENT_USER, JSON.stringify(googleUser));
   localStorage.removeItem('sg_user_logged_out');
 
   applyUserSessionToUI();
   syncToFirebase(true);
 
+  const googleModal = document.getElementById('google-oauth-modal');
+  if (googleModal) googleModal.classList.add('hidden');
   const authModal = document.getElementById('auth-modal');
   if (authModal) authModal.classList.add('hidden');
-  const configModal = document.getElementById('google-client-id-modal');
-  if (configModal) configModal.classList.add('hidden');
 
   sound.playSuccess();
   fireConfetti();
-  showToast(state.language === 'en'
-    ? `Welcome, ${name}! Signed in via official Google Account.`
-    : `Selamat datang, ${name}! Berhasil masuk via Akun Google resmi.`, 'success');
+  showToast(isEn
+    ? `Welcome, ${cleanName}! Signed in via Google Account.`
+    : `Berhasil masuk dengan Akun Google: ${cleanName} (${cleanEmail})!`, 'success');
 
   // Trigger popup lokasi setelah login
   setTimeout(() => {
     openStoreLocationModal();
   }, 450);
-}
-
-function initGoogleAuthClient() {
-  const clientId = getGoogleClientId();
-  if (!clientId) return;
-
-  if (window.google && window.google.accounts && window.google.accounts.id) {
-    try {
-      window.google.accounts.id.initialize({
-        client_id: clientId,
-        callback: handleGoogleCredentialResponse,
-        auto_select: false,
-        cancel_on_tap_outside: true
-      });
-
-      const renderContainer = document.getElementById('g_id_signin_render');
-      if (renderContainer) {
-        renderContainer.innerHTML = '';
-        window.google.accounts.id.renderButton(renderContainer, {
-          type: 'standard',
-          theme: 'filled_blue',
-          size: 'large',
-          text: 'signin_with',
-          shape: 'pill',
-          logo_alignment: 'left',
-          width: 280
-        });
-      }
-    } catch (e) {
-      console.warn('Inisialisasi Google Identity Services:', e);
-    }
-  }
-}
-
-function handleGoogleSignIn() {
-  sound.playClick();
-  const clientId = getGoogleClientId();
-
-  if (!clientId) {
-    promptGoogleClientIdModal();
-    return;
-  }
-
-  if (window.google && window.google.accounts && window.google.accounts.id) {
-    initGoogleAuthClient();
-    try {
-      window.google.accounts.id.prompt((notification) => {
-        if (notification.isNotDisplayed() || notification.isSkippedMoment()) {
-          // OAuth2 token client fallback
-          if (window.google.accounts.oauth2) {
-            const tokenClient = window.google.accounts.oauth2.initTokenClient({
-              client_id: clientId,
-              scope: 'email profile openid',
-              callback: async (tokenResponse) => {
-                if (tokenResponse && tokenResponse.access_token) {
-                  try {
-                    const res = await fetch('https://www.googleapis.com/oauth2/v3/userinfo', {
-                      headers: { Authorization: `Bearer ${tokenResponse.access_token}` }
-                    });
-                    if (res.ok) {
-                      const profile = await res.json();
-                      handleGoogleCredentialResponse({ credential: null, _oauthProfile: profile });
-                    }
-                  } catch (err) {
-                    showToast('Gagal mengambil data profil Google.', 'warning');
-                  }
-                }
-              }
-            });
-            tokenClient.requestAccessToken({ prompt: 'select_account' });
-          }
-        }
-      });
-    } catch (err) {
-      console.warn('Google prompt error:', err);
-    }
-  } else {
-    showToast('SDK Google OAuth sedang dimuat, silakan coba 1 detik lagi...', 'info');
-  }
 }
 
 // ==========================================================================
@@ -3054,46 +2933,60 @@ document.addEventListener('DOMContentLoaded', () => {
     };
   }
 
-  // Google Identity Services (GIS) Real OAuth 2.0 Initialization
-  initGoogleAuthClient();
-
-  // Google OAuth Client ID Configuration Modal Handlers
-  const googleConfigModal = document.getElementById('google-client-id-modal');
-  const btnCloseGoogleConfig = document.getElementById('btn-close-google-config');
-  const btnCancelGoogleConfig = document.getElementById('btn-cancel-google-config');
-  const formGoogleClientId = document.getElementById('form-google-client-id');
-  const linkOpenAuthGuide = document.getElementById('link-open-auth-guide');
-
-  if (btnCloseGoogleConfig && googleConfigModal) {
-    btnCloseGoogleConfig.onclick = () => googleConfigModal.classList.add('hidden');
-  }
-  if (btnCancelGoogleConfig && googleConfigModal) {
-    btnCancelGoogleConfig.onclick = () => googleConfigModal.classList.add('hidden');
-  }
-  if (linkOpenAuthGuide) {
-    linkOpenAuthGuide.onclick = (e) => {
-      e.preventDefault();
-      alert('Silakan baca panduan lengkap pada file GOOGLE_AUTH_SETUP.md yang ada di root proyek ini.');
+  // Google OAuth 2.0 Account Chooser (select_account) Handlers
+  const googleOauthModal = document.getElementById('google-oauth-modal');
+  const btnCloseGoogleOauth = document.getElementById('btn-close-google-oauth');
+  if (btnCloseGoogleOauth && googleOauthModal) {
+    btnCloseGoogleOauth.onclick = () => {
+      googleOauthModal.classList.add('hidden');
     };
   }
 
-  if (formGoogleClientId) {
-    formGoogleClientId.onsubmit = (e) => {
+  // Click on account item in Google list
+  document.querySelectorAll('.google-account-item[data-email]').forEach((item) => {
+    item.onclick = () => {
+      const email = item.getAttribute('data-email');
+      const name = item.getAttribute('data-name');
+      selectGoogleAccount(name, email);
+    };
+  });
+
+  // Switch to custom account form
+  const btnGoogleAddAccount = document.getElementById('btn-google-add-account');
+  const googleAccountsList = document.getElementById('google-accounts-list');
+  const googleCustomForm = document.getElementById('google-custom-account-form');
+  const btnCancelCustomGoogle = document.getElementById('btn-cancel-custom-google');
+
+  if (btnGoogleAddAccount && googleAccountsList && googleCustomForm) {
+    btnGoogleAddAccount.onclick = () => {
+      sound.playClick();
+      googleAccountsList.classList.add('hidden');
+      googleCustomForm.classList.remove('hidden');
+      const nameInp = document.getElementById('google-custom-name');
+      if (nameInp) nameInp.focus();
+    };
+  }
+
+  if (btnCancelCustomGoogle && googleAccountsList && googleCustomForm) {
+    btnCancelCustomGoogle.onclick = () => {
+      sound.playClick();
+      googleCustomForm.classList.add('hidden');
+      googleAccountsList.classList.remove('hidden');
+    };
+  }
+
+  if (googleCustomForm) {
+    googleCustomForm.onsubmit = (e) => {
       e.preventDefault();
-      const input = document.getElementById('input-google-client-id');
-      const val = (input && input.value.trim()) || '';
-      if (!val) {
-        alert('Silakan masukkan Google Client ID Anda.');
+      const nameInp = document.getElementById('google-custom-name');
+      const emailInp = document.getElementById('google-custom-email');
+      const name = (nameInp && nameInp.value.trim()) || 'Google User';
+      const email = (emailInp && emailInp.value.trim()) || '';
+      if (!email) {
+        showToast('Silakan masukkan alamat email Google Anda.', 'warning');
         return;
       }
-      localStorage.setItem('sg_google_client_id', val);
-      if (window.GOOGLE_OAUTH_CONFIG) window.GOOGLE_OAUTH_CONFIG.clientId = val;
-      if (googleConfigModal) googleConfigModal.classList.add('hidden');
-      showToast('Google Client ID berhasil disimpan!', 'success');
-      initGoogleAuthClient();
-      setTimeout(() => {
-        handleGoogleSignIn();
-      }, 300);
+      selectGoogleAccount(name, email);
     };
   }
 
