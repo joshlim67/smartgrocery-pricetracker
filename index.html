@@ -805,10 +805,10 @@
   <div id="barcode-scanner-modal" class="bottom-sheet-backdrop hidden" role="dialog" aria-modal="true"
     aria-labelledby="modal-scanner-title">
     <div class="bottom-sheet-card scanner-modal-card glass-card">
-      <div class="sheet-handle-bar"></div>
+      <div class="sheet-drag-handle"></div>
 
       <div class="sheet-header">
-        <div class="title-with-icon">
+        <div class="sheet-header-title">
           <i data-lucide="scan-barcode" class="text-primary"></i>
           <h2 id="modal-scanner-title">Pindai Barcode Produk</h2>
         </div>
@@ -817,42 +817,44 @@
         </button>
       </div>
 
-      <p class="scanner-sub-text" id="lbl-scanner-desc">Arahkan kamera ke barcode pada kemasan makanan atau upload foto
-        barcode.</p>
+      <div class="scanner-modal-body sheet-body-scroll">
+        <p class="scanner-sub-text" id="lbl-scanner-desc">Arahkan kamera ke barcode pada kemasan makanan atau upload foto
+          barcode.</p>
 
-      <!-- Viewfinder Kamera Video Area -->
-      <div class="scanner-viewfinder-container">
-        <video id="barcode-video" class="scanner-video" autoplay playsinline muted></video>
-        <div class="scanner-overlay-box">
-          <div class="scanner-corner corner-tl"></div>
-          <div class="scanner-corner corner-tr"></div>
-          <div class="scanner-corner corner-bl"></div>
-          <div class="scanner-corner corner-br"></div>
-          <div class="scanner-laser-line"></div>
+        <!-- Viewfinder Kamera Video Area -->
+        <div class="scanner-viewfinder-container">
+          <video id="barcode-video" class="scanner-video" autoplay playsinline muted></video>
+          <div class="scanner-overlay-box">
+            <div class="scanner-corner corner-tl"></div>
+            <div class="scanner-corner corner-tr"></div>
+            <div class="scanner-corner corner-bl"></div>
+            <div class="scanner-corner corner-br"></div>
+            <div class="scanner-laser-line"></div>
+          </div>
+          <div class="scanner-camera-status" id="scanner-camera-status">Kamera Siap Memindai...</div>
         </div>
-        <div class="scanner-camera-status" id="scanner-camera-status">Kamera Siap Memindai...</div>
-      </div>
 
-      <!-- Upload Foto Barcode -->
-      <div class="scanner-upload-row">
-        <label for="barcode-file-input" class="btn-outline-glass full-width">
-          <i data-lucide="image"></i> <span id="lbl-upload-barcode-btn">Unggah Foto Barcode</span>
-        </label>
-        <input type="file" id="barcode-file-input" accept="image/*" class="hidden">
-      </div>
+        <!-- Upload Foto Barcode -->
+        <div class="scanner-upload-row">
+          <label for="barcode-file-input" class="btn-outline-glass full-width">
+            <i data-lucide="image"></i> <span id="lbl-upload-barcode-btn">Unggah Foto Barcode</span>
+          </label>
+          <input type="file" id="barcode-file-input" accept="image/*" class="hidden">
+        </div>
 
-      <!-- Quick Test Barcode Simulator Pills -->
-      <div class="popular-barcode-test-section">
-        <span class="test-barcode-label">Uji Coba Cepat Barcode Populer:</span>
-        <div class="barcode-pills-grid">
-          <button type="button" class="btn-test-barcode" data-code="8992388112233"
-            data-name="Indomie Goreng (Dus)">Indomie (8992388...)</button>
-          <button type="button" class="btn-test-barcode" data-code="8999999123456" data-name="Minyak Goreng 2L">Minyak
-            2L (8999999...)</button>
-          <button type="button" class="btn-test-barcode" data-code="8992753123456"
-            data-name="Susu UHT Full Cream 1L">Ultra Milk (8992753...)</button>
-          <button type="button" class="btn-test-barcode" data-code="8996001301234"
-            data-name="Biskuit Roma Kelapa 300g">Roma Kelapa (8996001...)</button>
+        <!-- Quick Test Barcode Simulator Pills -->
+        <div class="popular-barcode-test-section">
+          <span class="test-barcode-label">Uji Coba Cepat Barcode Populer:</span>
+          <div class="barcode-pills-grid">
+            <button type="button" class="btn-test-barcode" data-code="8992388112233"
+              data-name="Indomie Goreng (Dus)">Indomie (8992388...)</button>
+            <button type="button" class="btn-test-barcode" data-code="8999999123456" data-name="Minyak Goreng 2L">Minyak
+              2L (8999999...)</button>
+            <button type="button" class="btn-test-barcode" data-code="8992753123456"
+              data-name="Susu UHT Full Cream 1L">Ultra Milk (8992753...)</button>
+            <button type="button" class="btn-test-barcode" data-code="8996001301234"
+              data-name="Biskuit Roma Kelapa 300g">Roma Kelapa (8996001...)</button>
+          </div>
         </div>
       </div>
     </div>

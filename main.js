@@ -768,10 +768,9 @@ function loadUsersAndSession() {
     state.currentUser = null;
   }
 
-  const hasLoggedOut = localStorage.getItem('sg_user_logged_out');
-  if (!state.currentUser && !hasLoggedOut) {
-    state.currentUser = admin; // Default to admin for seamless initial evaluation
-    localStorage.setItem(STORAGE_KEYS.CURRENT_USER, JSON.stringify(state.currentUser));
+  // Guest by default when not logged in
+  if (!state.currentUser) {
+    state.currentUser = null;
   }
 
   applyUserSessionToUI();
@@ -801,8 +800,9 @@ function applyUserSessionToUI() {
     if (accName) accName.textContent = name;
     if (accEmail) accEmail.textContent = state.currentUser.email;
     if (accAvatar) {
-      if (state.currentUser.photo) {
-        accAvatar.innerHTML = `<img src="${state.currentUser.photo}" alt="${name}" style="width: 100%; height: 100%; border-radius: 50%; object-fit: cover;">`;
+      const userPhoto = state.currentUser.photo || state.currentUser.avatarUrl;
+      if (userPhoto) {
+        accAvatar.innerHTML = `<img src="${userPhoto}" alt="${name}" referrerpolicy="no-referrer" style="width: 100%; height: 100%; border-radius: 50%; object-fit: cover;">`;
       } else {
         accAvatar.textContent = name.charAt(0).toUpperCase();
       }
@@ -996,13 +996,15 @@ function applyGoogleUserSession({ name, email, avatarUrl, googleId }) {
   const cleanName = (name || '').trim() || cleanEmail.split('@')[0] || 'Google User';
   const role = (cleanEmail === 'joshualim@mutiarabangsa.sch.id' || cleanEmail === 'joshualim.google@gmail.com') ? 'admin' : 'member';
 
+  const finalAvatar = avatarUrl || `https://ui-avatars.com/api/?name=${encodeURIComponent(cleanName)}&background=2563eb&color=fff&bold=true`;
   const googleUser = {
     googleId: googleId || ('gid_' + Math.abs(cleanEmail.split('').reduce((a, b) => ((a << 5) - a) + b.charCodeAt(0), 0))),
     username: cleanName,
     email: cleanEmail,
     role: role,
     provider: 'google',
-    avatarUrl: avatarUrl || `https://ui-avatars.com/api/?name=${encodeURIComponent(cleanName)}&background=2563eb&color=fff&bold=true`,
+    avatarUrl: finalAvatar,
+    photo: finalAvatar,
     verifiedEmail: true
   };
 
@@ -2252,8 +2254,18 @@ function renderAccountStats() {
 // ==========================================================================
 
 function switchTab(targetViewId) {
-  state.activeTab = targetViewId;
   sound.playClick();
+
+  // ROUTE PROTECTION: Require login for private tabs (Account & History)
+  const protectedTabs = ['view-account', 'view-history'];
+  if (protectedTabs.includes(targetViewId) && (!state.currentUser || localStorage.getItem('sg_user_logged_out') === 'true')) {
+    const authModal = document.getElementById('auth-modal');
+    if (authModal) authModal.classList.remove('hidden');
+    showToast(state.language === 'en' ? 'Please sign in to access this page.' : 'Silakan login dengan Google terlebih dahulu untuk mengakses menu ini.', 'warning');
+    return;
+  }
+
+  state.activeTab = targetViewId;
 
   document.querySelectorAll('.app-view').forEach((view) => {
     view.classList.toggle('active', view.id === targetViewId);
@@ -3215,6 +3227,10 @@ document.addEventListener('DOMContentLoaded', () => {
         localStorage.setItem(STORAGE_KEYS.CURRENT_USER, JSON.stringify(user));
         localStorage.removeItem('sg_user_logged_out');
         applyUserSessionToUI();
+        syncToFirebase(true);
+        if (window.FirebaseSync && typeof window.FirebaseSync.init === 'function') {
+          window.FirebaseSync.init();
+        }
         authModal.classList.add('hidden');
         sound.playSuccess();
         showToast(`Selamat datang kembali, ${user.username}!`, 'success');
@@ -3259,6 +3275,10 @@ document.addEventListener('DOMContentLoaded', () => {
       localStorage.setItem(STORAGE_KEYS.CURRENT_USER, JSON.stringify(newUser));
       localStorage.removeItem('sg_user_logged_out');
       applyUserSessionToUI();
+      syncToFirebase(true);
+      if (window.FirebaseSync && typeof window.FirebaseSync.init === 'function') {
+        window.FirebaseSync.init();
+      }
       authModal.classList.add('hidden');
       sound.playSuccess();
       fireConfetti();
@@ -3390,6 +3410,9 @@ document.addEventListener('DOMContentLoaded', () => {
         state.currentUser = null;
         localStorage.removeItem(STORAGE_KEYS.CURRENT_USER);
         localStorage.setItem('sg_user_logged_out', 'true');
+        if (window.FirebaseSync && typeof window.FirebaseSync.detachListener === 'function') {
+          window.FirebaseSync.detachListener();
+        }
         sound.playClick();
         applyUserSessionToUI();
         if (authModal) {

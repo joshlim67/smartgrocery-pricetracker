@@ -1,0 +1,15 @@
+# Environment variables and secrets
+.env
+.env.local
+.env.*.local
+*.secret
+
+# Local dev server scratch
+serve.ps1
+
+# Dependencies
+node_modules/
+.npm/
+
+# Logs
+*.log

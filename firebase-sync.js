@@ -1,8 +1,10 @@
 // ==========================================================================
-// FIREBASE REALTIME SYNC (SINGLE SHARED USER / MULTI-DEVICE REALTIME)
+// FIREBASE REALTIME MULTI-USER ISOLATED SYNC (ONSNAPSHOT PER ACCOUNT)
 // ==========================================================================
-// Menggunakan Firebase Firestore Modular SDK via Google CDN
-// Bekerja offline-first & realtime via onSnapshot.
+// - Guest Mode (belum login): TIDAK ADA data yang disimpan ke Firebase Cloud.
+// - Authenticated User (sudah login): Setiap akun memiliki dokumen Firestore sendiri
+//   berdasarkan User ID / Email unik ('users_data/{userId}').
+// - Realtime Snapshot: Perubahan tersinkronisasi instan multi-perangkat via onSnapshot.
 // ==========================================================================
 
 import { initializeApp, getApps, getApp } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js';
@@ -10,27 +12,28 @@ import {
   getFirestore, 
   doc, 
   onSnapshot, 
-  setDoc 
+  setDoc,
+  getDoc
 } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js';
 
 import { firebaseConfig as fileConfig } from './firebase-config.js';
 
 const STORAGE_KEY_FIREBASE_CONFIG = 'sg_firebase_config_v1';
-const SHARED_COLLECTION = 'grocery_trackers';
-const SHARED_DOC_ID = 'student_user_01';
+const USERS_COLLECTION = 'users_grocery_data';
 
-// ID unik untuk tab/perangkat saat ini agar tidak loop balik saat menerima update dari diri sendiri
+// ID unik tab/perangkat saat ini agar tidak terjadi infinite loop saat menerima update dari diri sendiri
 const CLIENT_ID = 'device_' + Math.random().toString(36).substring(2, 9) + '_' + Date.now();
 
 let firestoreDb = null;
 let unsubscribeSnapshot = null;
+let currentSubscribedUserId = null;
 let isApplyingRemoteChange = false;
 let debounceTimer = null;
 
 let syncStatus = {
   connected: false,
-  statusText: 'Memeriksa konfigurasi...',
-  state: 'idle', // 'connected' | 'disconnected' | 'syncing' | 'error'
+  statusText: 'Mode Tamu (Belum Login - Cloud Nonaktif)',
+  state: 'disconnected', // 'connected' | 'disconnected' | 'syncing' | 'error'
   lastSync: null,
   errorMsg: ''
 };
@@ -54,6 +57,20 @@ function getEffectiveConfig() {
   return null;
 }
 
+// Generate doc ID unik yang aman untuk Firestore berdasarkan User
+function getUserDocId() {
+  if (!window.SmartGrocery || !window.SmartGrocery.state) return null;
+  const user = window.SmartGrocery.state.currentUser;
+  if (!user) return null;
+
+  // Gunakan Google ID, UID, atau sanitized email
+  if (user.googleId) return 'gid_' + String(user.googleId).replace(/[^a-zA-Z0-9_-]/g, '_');
+  if (user.uid) return 'uid_' + String(user.uid).replace(/[^a-zA-Z0-9_-]/g, '_');
+  if (user.email) return 'email_' + String(user.email).toLowerCase().replace(/[^a-zA-Z0-9_-]/g, '_');
+  if (user.username) return 'usr_' + String(user.username).toLowerCase().replace(/[^a-zA-Z0-9_-]/g, '_');
+  return null;
+}
+
 // Perbarui status badge di UI
 function updateSyncStatusUI() {
   const dot = document.getElementById('cloud-status-dot');
@@ -65,7 +82,7 @@ function updateSyncStatusUI() {
     dot.className = 'cloud-status-dot ' + syncStatus.state;
   }
   if (btn) {
-    btn.setAttribute('title', `Cloud Sync: ${syncStatus.statusText}`);
+    btn.setAttribute('title', Cloud Sync:  + syncStatus.statusText);
   }
   if (statusEl) {
     statusEl.textContent = syncStatus.statusText;
@@ -78,10 +95,9 @@ function updateSyncStatusUI() {
   }
 }
 
-// Helper untuk menerapkan data remote ke state lokal secara aman
+// Helper untuk menerapkan data remote dari dokumen akun ke state lokal
 function applyRemoteData(remoteData) {
   if (!window.SmartGrocery || !window.SmartGrocery.state) {
-    // Jika main.js masih loading, tunggu 60ms lalu coba lagi
     setTimeout(() => applyRemoteData(remoteData), 60);
     return;
   }
@@ -121,12 +137,6 @@ function applyRemoteData(remoteData) {
       currentState.appliedVoucher = remoteData.appliedVoucher;
     }
 
-    // 7. Single Shared Account (Akun Bersama)
-    if (remoteData.currentUser && typeof remoteData.currentUser === 'object') {
-      currentState.currentUser = remoteData.currentUser;
-      localStorage.removeItem('sg_user_logged_out');
-    }
-
     // Simpan ke localStorage sebagai cache offline
     if (typeof sg.saveStateToLocalStorage === 'function') {
       sg.saveStateToLocalStorage();
@@ -142,7 +152,7 @@ function applyRemoteData(remoteData) {
       sg.sound.playClick();
     }
   } catch (err) {
-    console.error('[Firebase Sync] Gagal menerapkan remote data:', err);
+    console.error('[Firebase Sync] Gagal menerapkan data remote akun:', err);
   } finally {
     setTimeout(() => {
       isApplyingRemoteChange = false;
@@ -150,7 +160,24 @@ function applyRemoteData(remoteData) {
   }
 }
 
-// Inisialisasi Firebase & Firestore Realtime Listener
+// Detach / Hentikan listener snapshot saat logout
+export function detachListener() {
+  if (unsubscribeSnapshot) {
+    unsubscribeSnapshot();
+    unsubscribeSnapshot = null;
+  }
+  currentSubscribedUserId = null;
+  syncStatus = {
+    connected: false,
+    statusText: 'Mode Tamu (Belum Login - Cloud Nonaktif)',
+    state: 'disconnected',
+    lastSync: null,
+    errorMsg: ''
+  };
+  updateSyncStatusUI();
+}
+
+// Inisialisasi atau Pasang Listener Realtime untuk Akun Tertentu
 export async function initFirebaseSync() {
   const config = getEffectiveConfig();
 
@@ -160,17 +187,26 @@ export async function initFirebaseSync() {
       statusText: 'Belum Terhubung (Konfigurasi Belum Diisi)',
       state: 'disconnected',
       lastSync: null,
-      errorMsg: 'Kunci apiKey atau projectId belum diisi di firebase-config.js atau modal pengaturan.'
+      errorMsg: 'Kunci apiKey atau projectId belum diisi di firebase-config.js.'
     };
     updateSyncStatusUI();
     return false;
   }
 
-  try {
-    syncStatus.statusText = 'Menghubungkan ke Firebase...';
-    syncStatus.state = 'syncing';
-    updateSyncStatusUI();
+  // Cek apakah user sudah login atau masih Guest
+  const docId = getUserDocId();
+  if (!docId) {
+    // GUEST MODE: Jangan simpan atau sync apa pun ke Firebase
+    detachListener();
+    return false;
+  }
 
+  // Jika sudah listening pada user yang sama, tidak perlu attach ulang
+  if (unsubscribeSnapshot && currentSubscribedUserId === docId) {
+    return true;
+  }
+
+  try {
     let app;
     if (getApps().length === 0) {
       app = initializeApp(config);
@@ -179,38 +215,48 @@ export async function initFirebaseSync() {
     }
 
     firestoreDb = getFirestore(app);
-    const docRef = doc(firestoreDb, SHARED_COLLECTION, SHARED_DOC_ID);
+    const userDocRef = doc(firestoreDb, USERS_COLLECTION, docId);
 
-    // Stop listener lama jika ada
+    // Stop listener lama jika user berganti
     if (unsubscribeSnapshot) {
       unsubscribeSnapshot();
+      unsubscribeSnapshot = null;
     }
 
-    // Pasang Realtime Listener (onSnapshot)
-    unsubscribeSnapshot = onSnapshot(docRef, { includeMetadataChanges: false }, (docSnap) => {
+    syncStatus.statusText = 'Menyambungkan Realtime Cloud Akun...';
+    syncStatus.state = 'syncing';
+    updateSyncStatusUI();
+
+    currentSubscribedUserId = docId;
+
+    // Pasang Realtime Listener (onSnapshot) TERPISAH KHUSUS USER INI
+    unsubscribeSnapshot = onSnapshot(userDocRef, { includeMetadataChanges: false }, (docSnap) => {
+      const user = window.SmartGrocery?.state?.currentUser;
+      const userName = user ? (user.username || user.email) : 'Akun';
+
       if (!docSnap.exists()) {
-        console.log('[Firebase Sync] Dokumen belum ada di Firestore. Melakukan inisialisasi awal...');
+        console.log([Firebase Sync] Dokumen baru untuk user \. Melakukan inisialisasi cloud...);
         pushLocalStateToFirebase(true);
         return;
       }
 
       const remoteData = docSnap.data();
 
-      // Cek apakah update ini berasal dari aksi lokal sendiri
+      // Abaikan jika update ini berasal dari perangkat/tab ini sendiri
       if (remoteData.updatedBy === CLIENT_ID) {
         syncStatus.connected = true;
-        syncStatus.statusText = 'Tersinkron Realtime (1 Database Bersama)';
+        syncStatus.statusText = Realtime Aktif: \;
         syncStatus.state = 'connected';
         syncStatus.lastSync = remoteData.updatedAt || Date.now();
         updateSyncStatusUI();
         return;
       }
 
-      console.log('[Firebase Sync] Menerima data realtime onSnapshot dari perangkat lain:', remoteData);
+      console.log([Firebase Sync] Data snapshot diterima untuk user \:, remoteData);
       applyRemoteData(remoteData);
 
       syncStatus.connected = true;
-      syncStatus.statusText = 'Tersinkron Realtime (1 Database Bersama)';
+      syncStatus.statusText = Realtime Aktif: \;
       syncStatus.state = 'connected';
       syncStatus.lastSync = remoteData.updatedAt || Date.now();
       updateSyncStatusUI();
@@ -221,7 +267,7 @@ export async function initFirebaseSync() {
       syncStatus.errorMsg = error.message;
 
       if (error.code === 'permission-denied') {
-        syncStatus.statusText = 'Izin Ditolak (Periksa Security Rules Firestore)';
+        syncStatus.statusText = 'Izin Firestore Ditolak (Security Rules)';
       } else {
         syncStatus.statusText = 'Koneksi Terputus: ' + (error.message || 'Error');
       }
@@ -229,30 +275,37 @@ export async function initFirebaseSync() {
     });
 
     syncStatus.connected = true;
-    syncStatus.statusText = 'Tersinkron Realtime (1 Database Bersama)';
+    syncStatus.statusText = 'Tersambung ke Cloud Akun';
     syncStatus.state = 'connected';
     updateSyncStatusUI();
     return true;
 
   } catch (err) {
-    console.error('[Firebase Sync] Gagal inisialisasi Firebase:', err);
+    console.error('[Firebase Sync] Gagal menghubungkan Firestore:', err);
     syncStatus.connected = false;
     syncStatus.state = 'error';
-    syncStatus.statusText = 'Gagal Terhubung: ' + err.message;
+    syncStatus.statusText = 'Gagal: ' + err.message;
     syncStatus.errorMsg = err.message;
     updateSyncStatusUI();
     return false;
   }
 }
 
-// Kirim perubahan lokal ke Firestore (Debounced & Realtime)
+// Kirim perubahan lokal ke dokumen akun di Firestore (HANYA JIKA SUDAH LOGIN)
 export function pushLocalStateToFirebase(forceImmediate = false) {
-  if (isApplyingRemoteChange) {
+  if (isApplyingRemoteChange) return;
+  if (!firestoreDb) return;
+
+  // STRICT GUEST CHECK: Jika belum login, jangan simpan data ke Firebase!
+  const docId = getUserDocId();
+  if (!docId) {
+    // Mode tamu: Tidak ada data yang dikirim ke cloud
     return;
   }
 
-  if (!firestoreDb) {
-    return;
+  // Jika listener belum aktif untuk akun ini, aktifkan
+  if (!unsubscribeSnapshot || currentSubscribedUserId !== docId) {
+    initFirebaseSync();
   }
 
   if (debounceTimer) {
@@ -263,39 +316,45 @@ export function pushLocalStateToFirebase(forceImmediate = false) {
     if (!window.SmartGrocery || !window.SmartGrocery.state) return;
     const currentState = window.SmartGrocery.state;
 
+    // Pastikan user masih login saat timer debounce dieksekusi
+    const activeDocId = getUserDocId();
+    if (!activeDocId) return;
+
     const payload = {
+      userEmail: currentState.currentUser?.email || '',
+      userName: currentState.currentUser?.username || '',
+      userId: activeDocId,
       cart: currentState.cart || [],
       customProducts: currentState.customProducts || [],
       pinnedProducts: currentState.pinnedProducts || [],
       safetyCap: currentState.safetyCap || 500000,
       history: currentState.history || [],
       appliedVoucher: currentState.appliedVoucher || null,
-      currentUser: currentState.currentUser || null,
       updatedAt: Date.now(),
       updatedBy: CLIENT_ID,
       deviceInfo: (navigator.userAgent.includes('Mobi') ? 'Mobile' : 'Desktop')
     };
 
     try {
-      syncStatus.statusText = 'Menyinkronkan ke Cloud...';
+      syncStatus.statusText = 'Menyinkronkan ke Cloud Akun...';
       syncStatus.state = 'syncing';
       updateSyncStatusUI();
 
-      const docRef = doc(firestoreDb, SHARED_COLLECTION, SHARED_DOC_ID);
-      await setDoc(docRef, payload, { merge: true });
+      const userDocRef = doc(firestoreDb, USERS_COLLECTION, activeDocId);
+      await setDoc(userDocRef, payload, { merge: true });
 
+      const userName = currentState.currentUser?.username || 'Akun';
       syncStatus.connected = true;
-      syncStatus.statusText = 'Tersinkron Realtime (1 Database Bersama)';
+      syncStatus.statusText = Realtime Aktif: \;
       syncStatus.state = 'connected';
       syncStatus.lastSync = Date.now();
       updateSyncStatusUI();
-      console.log('[Firebase Sync] Data realtime berhasil disinkronkan ke Firestore');
     } catch (err) {
       console.error('[Firebase Sync] Gagal menyimpan data ke Firestore:', err);
       syncStatus.state = 'error';
       syncStatus.errorMsg = err.message;
       if (err.code === 'permission-denied') {
-        syncStatus.statusText = 'Izin Firestore Ditolak (Rules belum diset allow read, write)';
+        syncStatus.statusText = 'Izin Firestore Ditolak (Periksa Security Rules)';
       } else {
         syncStatus.statusText = 'Gagal Simpan: ' + err.message;
       }
@@ -306,7 +365,7 @@ export function pushLocalStateToFirebase(forceImmediate = false) {
   if (forceImmediate) {
     sendData();
   } else {
-    debounceTimer = setTimeout(sendData, 200); // Responsif 200ms debounce
+    debounceTimer = setTimeout(sendData, 200); // 200ms debounce
   }
 }
 
@@ -322,40 +381,37 @@ export async function saveCustomConfig(configObj) {
 // Hapus custom config dari localStorage
 export function clearCustomConfig() {
   localStorage.removeItem(STORAGE_KEY_FIREBASE_CONFIG);
-  if (unsubscribeSnapshot) {
-    unsubscribeSnapshot();
-  }
+  detachListener();
   firestoreDb = null;
-  syncStatus = {
-    connected: false,
-    statusText: 'Belum Terhubung (Konfigurasi Dihapus)',
-    state: 'disconnected',
-    lastSync: null,
-    errorMsg: ''
-  };
-  updateSyncStatusUI();
 }
 
-// Pasang bridge global agar dapat dipanggil dari main.js / modal UI
+// Bridge global window
 window.FirebaseSync = {
   init: initFirebaseSync,
+  detachListener,
   pushLocalState: pushLocalStateToFirebase,
   saveCustomConfig,
   clearCustomConfig,
   getStatus: () => ({ ...syncStatus }),
-  getConfig: getEffectiveConfig
+  getConfig: getEffectiveConfig,
+  getUserDocId
 };
 
-// Wire up UI action buttons for Firebase Cloud Modal
+// Pasang event listener tombol modal cloud
 function setupFirebaseModalActions() {
   const btnManualSync = document.getElementById('btn-manual-sync-now');
   if (btnManualSync) {
     btnManualSync.onclick = () => {
+      const docId = getUserDocId();
+      if (!docId) {
+        alert('Anda sedang dalam Mode Tamu. Silakan login terlebih dahulu untuk menyinkronkan data ke Cloud.');
+        return;
+      }
       pushLocalStateToFirebase(true);
       if (window.SmartGrocery && window.SmartGrocery.sound) {
         window.SmartGrocery.sound.playSuccess();
       }
-      alert('Sinkronisasi cloud paksa berhasil dijalankan!');
+      alert('Sinkronisasi cloud akun berhasil dijalankan!');
     };
   }
 
@@ -371,7 +427,7 @@ function setupFirebaseModalActions() {
         }
         const parsed = JSON.parse(val);
         await saveCustomConfig(parsed);
-        alert('Konfigurasi Firebase berhasil disimpan dan dihubungkan!');
+        alert('Konfigurasi Firebase berhasil disimpan!');
       } catch (e) {
         alert('Format JSON konfigurasi tidak valid: ' + e.message);
       }
@@ -390,7 +446,7 @@ function setupFirebaseModalActions() {
   }
 }
 
-// Jalankan inisialisasi saat script dimuat
+// Inisialisasi saat document ready
 if (document.readyState === 'loading') {
   document.addEventListener('DOMContentLoaded', () => {
     initFirebaseSync();
