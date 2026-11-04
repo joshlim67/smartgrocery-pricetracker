@@ -1,4 +1,4 @@
-/* ==========================================================================
+﻿/* ==========================================================================
    GROCERYX • SMART GROCERY & BUDGET SAFETY TRACKER
    Theme: Liquid Glass Translucent Design System (Mobile-First 430px Chassis)
    ========================================================================== */
@@ -6246,7 +6246,7 @@ body::after {
 .receipt-sheet-card {
   max-width: 440px !important;
   border-radius: 28px 28px 0 0 !important;
-  max-height: 90dvh !important;
+  max-height: 92dvh !important;
   background: var(--bg-sheet) !important;
   overflow: hidden;
   display: flex;
@@ -6255,22 +6255,22 @@ body::after {
 
 .receipt-thermal-paper {
   background: #ffffff !important;
-  color: #1e293b !important;
-  padding: 24px 20px 28px !important;
-  margin: 12px 16px !important;
-  border-radius: 18px !important;
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.12), 0 2px 8px rgba(0, 0, 0, 0.06) !important;
-  border: 1px solid rgba(226, 232, 240, 0.8) !important;
-  font-family: -apple-system, BlinkMacSystemFont, "Plus Jakarta Sans", "SF Pro Text", "Segoe UI", Roboto, sans-serif !important;
+  color: #0f172a !important;
+  padding: 24px 22px 28px !important;
+  margin: 12px 16px 8px !important;
+  border-radius: 20px !important;
+  box-shadow: 0 12px 36px rgba(0, 0, 0, 0.12), 0 2px 8px rgba(0, 0, 0, 0.06) !important;
+  border: 1px solid rgba(226, 232, 240, 0.9) !important;
+  position: relative;
   overflow-y: auto;
   max-height: calc(85dvh - 120px);
   -webkit-overflow-scrolling: touch;
 }
 
 [data-theme="midnight-glass"] .receipt-thermal-paper {
-  background: #0f172a !important;
-  color: #f1f5f9 !important;
-  border-color: rgba(255, 255, 255, 0.12) !important;
+  background: #111827 !important;
+  color: #f8fafc !important;
+  border-color: rgba(255, 255, 255, 0.14) !important;
 }
 
 .receipt-header {
@@ -6278,13 +6278,13 @@ body::after {
   flex-direction: column;
   align-items: center;
   text-align: center;
-  margin-bottom: 14px;
+  margin-bottom: 12px;
 }
 
 .receipt-brand-logo {
-  width: 46px;
-  height: 46px;
-  border-radius: 14px;
+  width: 44px;
+  height: 44px;
+  border-radius: 12px;
   background: rgba(37, 99, 235, 0.1);
   color: #2563eb;
   display: flex;
@@ -6296,41 +6296,59 @@ body::after {
 .receipt-header h2 {
   font-size: 1.15rem !important;
   font-weight: 800 !important;
-  letter-spacing: 0.03em !important;
+  letter-spacing: 0.04em !important;
   color: inherit !important;
   margin: 0 !important;
+  text-transform: uppercase;
 }
 
 .receipt-sub-loc {
-  font-size: 0.72rem !important;
+  font-size: 0.68rem !important;
   font-weight: 700 !important;
   text-transform: uppercase !important;
-  letter-spacing: 0.05em !important;
+  letter-spacing: 0.06em !important;
   color: #64748b !important;
   margin: 4px 0 10px !important;
 }
 
+[data-theme="midnight-glass"] .receipt-sub-loc {
+  color: #94a3b8 !important;
+}
+
 .receipt-dashed-line {
   width: 100%;
-  border-bottom: 1.5px dashed #cbd5e1 !important;
+  border-bottom: 2px dashed #cbd5e1 !important;
   margin: 10px 0 !important;
 }
 
 [data-theme="midnight-glass"] .receipt-dashed-line {
-  border-bottom-color: rgba(255, 255, 255, 0.18) !important;
+  border-bottom-color: rgba(255, 255, 255, 0.2) !important;
 }
 
 .receipt-meta-info {
   width: 100%;
   display: flex;
   flex-direction: column;
-  gap: 4px;
-  font-size: 0.75rem !important;
+  gap: 5px;
+  font-size: 0.74rem !important;
   color: #475569 !important;
 }
 
 [data-theme="midnight-glass"] .receipt-meta-info {
-  color: #94a3b8 !important;
+  color: #cbd5e1 !important;
+}
+
+.receipt-meta-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 8px;
+}
+
+.receipt-meta-row strong {
+  font-weight: 700;
+  color: inherit;
+  text-align: right;
 }
 
 /* Tabel Item Struk */
@@ -6347,23 +6365,48 @@ body::after {
   justify-content: space-between;
   gap: 12px;
   font-size: 0.82rem;
+  padding: 4px 0;
 }
 
 .receipt-item-info {
   display: flex;
   flex-direction: column;
-  gap: 2px;
+  gap: 3px;
+  flex: 1;
 }
 
 .receipt-item-info strong {
-  font-size: 0.84rem;
+  font-size: 0.86rem;
   font-weight: 700;
   color: inherit;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+.receipt-item-disc-tag {
+  display: inline-flex;
+  align-items: center;
+  font-size: 0.66rem;
+  font-weight: 800;
+  padding: 1px 6px;
+  border-radius: 4px;
+  background: #ecfdf5;
+  color: #059669;
+  border: 1px solid #a7f3d0;
+}
+
+[data-theme="midnight-glass"] .receipt-item-disc-tag {
+  background: rgba(16, 185, 129, 0.2);
+  color: #34d399;
+  border-color: rgba(16, 185, 129, 0.4);
 }
 
 .receipt-item-info span {
-  font-size: 0.72rem;
+  font-size: 0.74rem;
   color: #64748b;
+  font-family: inherit;
 }
 
 [data-theme="midnight-glass"] .receipt-item-info span {
@@ -6371,18 +6414,20 @@ body::after {
 }
 
 .receipt-item-subtotal {
-  font-size: 0.86rem;
+  font-size: 0.90rem;
   font-weight: 800;
   white-space: nowrap;
   color: inherit;
+  text-align: right;
+  font-variant-numeric: tabular-nums;
 }
 
 /* Rincian Total Struk */
 .receipt-totals-section {
   display: flex;
   flex-direction: column;
-  gap: 7px;
-  margin: 12px 0 16px;
+  gap: 8px;
+  margin: 12px 0 14px;
 }
 
 .receipt-row {
@@ -6398,17 +6443,24 @@ body::after {
 }
 
 .receipt-row.grand-total {
-  font-size: 0.95rem !important;
+  font-size: 1.02rem !important;
   font-weight: 800 !important;
   color: #0f172a !important;
-  padding-top: 8px;
+  padding-top: 10px;
   margin-top: 4px;
-  border-top: 1px solid #e2e8f0;
+  border-top: 2px solid #e2e8f0;
 }
 
 [data-theme="midnight-glass"] .receipt-row.grand-total {
   color: #38bdf8 !important;
-  border-top-color: rgba(255, 255, 255, 0.15) !important;
+  border-top-color: rgba(255, 255, 255, 0.18) !important;
+}
+
+.receipt-grand-amount {
+  font-size: 1.25rem !important;
+  font-weight: 900 !important;
+  color: var(--primary) !important;
+  font-variant-numeric: tabular-nums;
 }
 
 /* Kotak Status Evaluasi Anggaran */
@@ -6455,6 +6507,80 @@ body::after {
   line-height: 1.35;
 }
 
+/* Authentic Thermal Barcode */
+.receipt-barcode-wrap {
+  margin-top: 18px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: 6px;
+}
+
+.receipt-barcode-bars {
+  width: 70%;
+  height: 36px;
+  background: repeating-linear-gradient(
+    90deg,
+    #1e293b 0px,
+    #1e293b 2px,
+    transparent 2px,
+    transparent 4px,
+    #1e293b 4px,
+    #1e293b 8px,
+    transparent 8px,
+    transparent 11px,
+    #1e293b 11px,
+    #1e293b 13px,
+    transparent 13px,
+    transparent 15px,
+    #1e293b 15px,
+    #1e293b 18px
+  );
+  opacity: 0.85;
+}
+
+[data-theme="midnight-glass"] .receipt-barcode-bars {
+  background: repeating-linear-gradient(
+    90deg,
+    #f8fafc 0px,
+    #f8fafc 2px,
+    transparent 2px,
+    transparent 4px,
+    #f8fafc 4px,
+    #f8fafc 8px,
+    transparent 8px,
+    transparent 11px,
+    #f8fafc 11px,
+    #f8fafc 13px,
+    transparent 13px,
+    transparent 15px,
+    #f8fafc 15px,
+    #f8fafc 18px
+  );
+}
+
+.receipt-barcode-num {
+  font-size: 0.70rem;
+  font-family: monospace;
+  letter-spacing: 2.5px;
+  color: #64748b;
+  font-weight: 600;
+}
+
+[data-theme="midnight-glass"] .receipt-barcode-num {
+  color: #94a3b8;
+}
+
+.receipt-thank-you {
+  font-size: 0.66rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  color: #94a3b8;
+  margin: 4px 0 0 0;
+  text-transform: uppercase;
+}
+
 .receipt-modal-actions {
   padding: 10px 18px 20px;
   background: var(--bg-sheet);
@@ -6468,7 +6594,7 @@ body::after {
    2. POLISHED HISTORY CARDS & PADDING FIX
    ========================================================================== */
 .history-card {
-  padding: 18px 18px !important;
+  padding: 16px 18px !important;
   border-radius: 20px !important;
   background: var(--bg-card) !important;
   border: 1px solid var(--glass-border) !important;
@@ -6477,50 +6603,114 @@ body::after {
   display: flex;
   flex-direction: column;
   gap: 12px;
+  overflow: hidden;
 }
 
 .history-card-header {
   display: flex;
-  align-items: flex-start;
+  align-items: center;
   justify-content: space-between;
   gap: 12px;
 }
 
-.history-card-header h4 {
+.history-card-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.history-store-title {
   font-size: 0.92rem !important;
   font-weight: 800 !important;
   color: var(--text-title) !important;
   margin: 0 0 4px 0 !important;
   line-height: 1.35;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
-.history-date {
+.history-meta-sub {
+  display: flex;
+  align-items: center;
+  gap: 6px;
   font-size: 0.74rem !important;
   font-weight: 600 !important;
   color: var(--text-muted) !important;
 }
 
-.history-total {
-  font-size: 1.05rem !important;
-  font-weight: 800 !important;
-  white-space: nowrap !important;
-  color: var(--primary) !important;
+.meta-dot {
+  opacity: 0.4;
 }
 
-.history-card-actions {
+.history-price-badge {
+  background: rgba(37, 99, 235, 0.08);
+  border: 1px solid rgba(37, 99, 235, 0.2);
+  color: var(--primary);
+  padding: 6px 12px;
+  border-radius: 12px;
+  display: inline-flex;
+  align-items: baseline;
+  gap: 3px;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.history-badge-curr {
+  font-size: 0.74rem;
+  font-weight: 700;
+  color: inherit;
+}
+
+.history-badge-val {
+  font-size: 1.05rem;
+  font-weight: 800;
+  color: inherit;
+  font-variant-numeric: tabular-nums;
+}
+
+.history-card-footer {
   display: flex;
-  justify-content: flex-start;
-  padding-top: 6px;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  padding-top: 10px;
   border-top: 1px dashed var(--glass-border-subtle);
 }
 
-.history-card-actions .btn-outline-glass {
+.btn-history-view {
   height: 36px;
   padding: 0 14px;
   border-radius: 10px;
   font-size: 0.78rem;
   font-weight: 700;
+  display: inline-flex;
+  align-items: center;
   gap: 6px;
+  background: var(--bg-card);
+  border: 1px solid var(--glass-border);
+  color: var(--text-title);
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.btn-history-view:hover {
+  background: var(--bg-card-hover);
+  border-color: var(--primary);
+  color: var(--primary);
+}
+
+.history-saved-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: #10b981;
+  background: rgba(16, 185, 129, 0.1);
+  border: 1px solid rgba(16, 185, 129, 0.25);
+  padding: 4px 10px;
+  border-radius: 8px;
+  white-space: nowrap;
 }
 
 /* 3. Preset Cepat Grid Rapi Sejajar */
@@ -6547,4 +6737,159 @@ body::after {
   background: var(--bg-card-hover);
   border-color: var(--primary);
   color: var(--primary);
+}
+
+/* ==========================================================================
+   POLISHED CART SUMMARY & CHECKOUT DOCK UI
+   ========================================================================== */
+
+.cart-summary-card {
+  padding: 16px 18px !important;
+  border-radius: 24px !important;
+  background: var(--bg-card) !important;
+  border: 1px solid var(--glass-border) !important;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08) !important;
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 12px !important;
+  margin-top: 14px !important;
+}
+
+/* Top Row: Total Barang & Badge Hemat */
+.cart-summary-top-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.summary-qty-box {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.8rem;
+  color: var(--text-muted);
+}
+
+.summary-qty-box strong {
+  font-size: 0.84rem;
+  font-weight: 700;
+  color: var(--text-title);
+}
+
+.summary-savings-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 4px 10px;
+  border-radius: 9999px;
+  background: rgba(16, 185, 129, 0.12);
+  border: 1px solid rgba(16, 185, 129, 0.3);
+  color: #10b981;
+  font-size: 0.74rem;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.summary-savings-pill strong {
+  font-weight: 800;
+  color: #10b981;
+}
+
+/* Banner Voucher Diskon */
+.cart-voucher-discount-banner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 8px 12px;
+  background: rgba(16, 185, 129, 0.08);
+  border-radius: 12px;
+  border: 1px dashed rgba(16, 185, 129, 0.35);
+  font-size: 0.78rem;
+  color: #10b981;
+  font-weight: 600;
+}
+
+.cart-voucher-discount-banner strong {
+  font-size: 0.84rem;
+  font-weight: 800;
+}
+
+/* Baris Utama Total Belanja */
+.cart-main-total-row {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 12px;
+  padding-top: 8px;
+  border-top: 1px solid var(--glass-border-subtle);
+}
+
+.price-title-wrap {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.price-title-wrap .price-title {
+  font-size: 0.74rem;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+  color: var(--text-muted);
+  text-transform: uppercase;
+}
+
+.price-title-wrap .price-subtitle-hint {
+  font-size: 0.68rem;
+  color: var(--text-muted);
+  opacity: 0.8;
+}
+
+.cart-main-total-row .price-display {
+  display: flex;
+  align-items: baseline;
+  gap: 4px;
+}
+
+.cart-main-total-row .price-display .currency {
+  font-size: 1.05rem;
+  font-weight: 800;
+  color: var(--primary);
+}
+
+.cart-main-total-row .price-display .amount {
+  font-size: 1.65rem;
+  font-weight: 900;
+  color: var(--primary);
+  line-height: 1;
+}
+
+/* Tombol Selesaikan Struk */
+.btn-checkout-glow {
+  width: 100% !important;
+  height: 48px !important;
+  border-radius: 16px !important;
+  font-size: 0.92rem !important;
+  font-weight: 800 !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 8px !important;
+  background: #10b981 !important;
+  color: #ffffff !important;
+  border: none !important;
+  box-shadow: 0 6px 20px rgba(16, 185, 129, 0.35) !important;
+  cursor: pointer !important;
+  transition: all 0.2s var(--spring-bounce) !important;
+}
+
+.btn-checkout-glow:hover {
+  background: #059669 !important;
+  transform: translateY(-1px) !important;
+  box-shadow: 0 8px 24px rgba(16, 185, 129, 0.45) !important;
+}
+
+.btn-checkout-glow:active {
+  transform: scale(0.98) !important;
 }

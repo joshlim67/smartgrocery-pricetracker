@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="id" data-theme="liquid-bright">
 
 <head>
@@ -311,29 +311,44 @@
         </div>
 
         <!-- Sticky Cart Summary & Checkout Footer -->
+        <!-- Sticky Cart Summary & Checkout Footer (Redesigned Clean Layout) -->
         <div class="cart-summary-card glass-card" id="cart-summary-dock">
-          <div class="summary-details">
-            <div class="summary-line">
-              <span><span id="lbl-total-items-prefix">Total Barang:</span> <strong id="summary-total-qty">0
-                  item</strong></span>
-              <span class="discount-saved-pill" id="summary-discount-pill">
-                <i data-lucide="tag"></i> <span id="lbl-saved-prefix">Hemat</span> <strong id="summary-saved-amount">Rp
-                  0</strong>
-              </span>
+          <!-- Top Row: Total Items & Total Savings Badge -->
+          <div class="cart-summary-top-row">
+            <div class="summary-qty-box">
+              <span id="lbl-total-items-prefix">Total Barang:</span>
+              <strong id="summary-total-qty">0 item</strong>
             </div>
-            <div class="summary-price-breakdown-row" id="summary-voucher-row">
-              <span class="voucher-discount-label"><span id="lbl-voucher-discount-title">Diskon Voucher:</span></span>
-              <strong class="text-emerald" id="summary-voucher-amount">- Rp 0</strong>
-            </div>
-            <div class="summary-main-price">
-              <span class="price-title" id="lbl-total-price-title">Total Belanja:</span>
-              <div class="price-display">
-                <span class="currency">Rp</span>
-                <span class="amount" id="summary-total-price">0</span>
-              </div>
+
+            <div class="summary-savings-pill" id="summary-discount-pill">
+              <i data-lucide="tag"></i>
+              <span>Total Hemat:</span>
+              <strong id="summary-saved-amount">Rp 0</strong>
             </div>
           </div>
 
+          <!-- Middle Row: Voucher Discount Notice (If applied) -->
+          <div class="cart-voucher-discount-banner hidden" id="summary-voucher-row">
+            <div class="d-flex align-items-center gap-1">
+              <i data-lucide="ticket-percent" class="text-emerald"></i>
+              <span id="lbl-voucher-discount-title">Diskon Voucher Aktif:</span>
+            </div>
+            <strong class="text-emerald" id="summary-voucher-amount">- Rp 0</strong>
+          </div>
+
+          <!-- Bottom Row: Clean Total Net Price Display -->
+          <div class="cart-main-total-row">
+            <div class="price-title-wrap">
+              <span class="price-title" id="lbl-total-price-title">TOTAL BERSIH DIBAYAR</span>
+              <span class="price-subtitle-hint">Termasuk seluruh promo & voucher</span>
+            </div>
+            <div class="price-display">
+              <span class="currency">Rp</span>
+              <span class="amount" id="summary-total-price">0</span>
+            </div>
+          </div>
+
+          <!-- Checkout Button -->
           <button id="btn-checkout-session" class="btn-checkout-glow">
             <i data-lucide="receipt"></i>
             <span id="lbl-checkout-btn">Selesaikan & Simpan Struk</span>
@@ -1183,11 +1198,21 @@
             <i data-lucide="shopping-cart"></i>
           </div>
           <h2 id="receipt-modal-title">GROCERYX SUPERMARKET</h2>
-          <p class="receipt-sub-loc">STRUK BELANJA BULANAN & PENGHEMATAN</p>
+          <p class="receipt-sub-loc" id="receipt-modal-subtitle">STRUK BELANJA BULANAN & PENGHEMATAN</p>
           <div class="receipt-dashed-line"></div>
           <div class="receipt-meta-info">
-            <span id="receipt-date-time">Tanggal: 1 November 2026</span>
-            <span id="receipt-session-user">Kasir: Josh (Mandiri)</span>
+            <div class="receipt-meta-row">
+              <span id="lbl-receipt-meta-store">Toko:</span>
+              <strong id="receipt-modal-store">Lotte Mart Grocery - Puri Indah</strong>
+            </div>
+            <div class="receipt-meta-row">
+              <span id="lbl-receipt-meta-date">Waktu:</span>
+              <strong id="receipt-date-time">4 November 2026</strong>
+            </div>
+            <div class="receipt-meta-row">
+              <span id="lbl-receipt-meta-user">Kasir:</span>
+              <strong id="receipt-session-user">Josh (Mandiri)</strong>
+            </div>
           </div>
           <div class="receipt-dashed-line"></div>
         </div>

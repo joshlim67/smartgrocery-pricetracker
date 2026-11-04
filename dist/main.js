@@ -1,4 +1,4 @@
-/**
+﻿/**
  * GROCERYX 2.0 • Modern Food E-Commerce & Smart Budget Safety Tracker
  * Architecture: Vanilla ES Modules, Liquid Glass UI, Mobile-First 430px Chassis
  */
@@ -2006,13 +2006,33 @@ function openCheckoutModal() {
   if (!modal) return;
 
   const totals = calculateCartTotals();
-  const dateStr = new Date().toLocaleDateString(state.language === 'en' ? 'en-US' : 'id-ID', {
-    day: 'numeric',
-    month: 'long',
-    year: 'numeric'
-  });
+  const dateStr = (state.currentLocation && state.currentLocation.shoppingDate)
+    ? state.currentLocation.shoppingDate
+    : new Date().toLocaleDateString(state.language === 'en' ? 'en-US' : 'id-ID', {
+        day: 'numeric',
+        month: 'long',
+        year: 'numeric'
+      });
 
-  document.getElementById('receipt-date-time').textContent = `Tanggal: ${dateStr}`;
+  const locName = (state.currentLocation && state.currentLocation.name)
+    ? state.currentLocation.name
+    : 'Lotte Mart Grocery - Puri Indah';
+
+  const modalTitle = document.getElementById('receipt-modal-title');
+  if (modalTitle) modalTitle.textContent = locName.toUpperCase();
+
+  const storeEl = document.getElementById('receipt-modal-store');
+  if (storeEl) storeEl.textContent = locName;
+
+  const dateEl = document.getElementById('receipt-date-time');
+  if (dateEl) dateEl.textContent = dateStr;
+
+  const userEl = document.getElementById('receipt-session-user');
+  if (userEl) userEl.textContent = (state.user && state.user.displayName) ? state.user.displayName : 'Josh (Mandiri)';
+
+  const barcodeEl = document.getElementById('receipt-barcode-code');
+  if (barcodeEl) barcodeEl.textContent = `GROCERYX-TRX-${Date.now().toString().slice(-8)}`;
+
   document.getElementById('receipt-val-limit').textContent = `Rp ${formatRupiah(state.safetyCap)}`;
   document.getElementById('receipt-val-normal').textContent = `Rp ${formatRupiah(totals.subtotalNormal)}`;
   document.getElementById('receipt-val-saved').textContent = `- Rp ${formatRupiah(totals.totalSavedAll)}`;
@@ -2035,25 +2055,28 @@ function openCheckoutModal() {
     if (verdictIcon) verdictIcon.setAttribute('data-lucide', 'check-circle');
   }
 
-  // Render receipt items
+  // Render receipt items with discount tags
   const table = document.getElementById('receipt-items-table');
   table.innerHTML = state.cart.map((item) => {
     const qty = Number(item.qty) || 1;
     const unitP = Number(item.unitPrice) || 0;
     let finalUnitP = unitP;
+    let discBadge = '';
     if (item.discountType === 'single') {
       finalUnitP = unitP * (1 - (Number(item.d1) || 0) / 100);
+      discBadge = ` <span class="receipt-item-disc-tag">-${item.d1}%</span>`;
     } else if (item.discountType === 'tiered') {
       const step1 = unitP * (1 - (Number(item.d1) || 0) / 100);
       finalUnitP = step1 * (1 - (Number(item.d2) || 0) / 100);
+      discBadge = ` <span class="receipt-item-disc-tag">-${item.d1}%+${item.d2}%</span>`;
     }
     const finalRow = qty * finalUnitP;
 
     return `
       <div class="receipt-table-row">
         <div class="receipt-item-info">
-          <strong>${item.name}</strong>
-          <span>${qty} ${item.unit} x Rp ${formatRupiah(unitP)}</span>
+          <strong>${item.name}${discBadge}</strong>
+          <span>${qty} ${item.unit || 'pcs'} x Rp ${formatRupiah(unitP)}</span>
         </div>
         <strong class="receipt-item-subtotal">Rp ${formatRupiah(finalRow)}</strong>
       </div>
@@ -2131,22 +2154,28 @@ function renderHistory() {
   container.innerHTML = state.history.map((h, idx) => `
     <div class="history-card glass-card" data-hist-idx="${idx}">
       <div class="history-card-header">
-        <div style="flex: 1; padding-right: 12px;">
-          <h4>📍 ${h.storeLocation || h.storeName || h.note || 'Lotte Mart Grocery'}</h4>
-          <div class="history-date mt-1">
-            <span>📅 ${h.formattedDate || h.date}</span>
-            <span style="opacity: 0.5;">•</span>
-            <span>🛍️ ${h.itemCount || (h.items ? h.items.length : 1)} Item</span>
+        <div class="history-card-info">
+          <h4 class="history-store-title">ðŸ“ ${h.storeLocation || h.storeName || h.note || 'Lotte Mart Grocery'}</h4>
+          <div class="history-meta-sub">
+            <span>ðŸ“… ${h.formattedDate || h.date}</span>
+            <span class="meta-dot">â€¢</span>
+            <span>ðŸ›ï¸ ${h.itemCount || (h.items ? h.items.length : 1)} Item</span>
           </div>
         </div>
-        <div style="text-align: right;">
-          <strong class="history-total">Rp ${formatRupiah(h.totalSpent)}</strong>
+        <div class="history-price-badge">
+          <span class="history-badge-curr">Rp</span>
+          <strong class="history-badge-val">${formatRupiah(h.totalSpent)}</strong>
         </div>
       </div>
-      <div class="history-card-actions">
-        <button type="button" class="btn-outline-glass btn-sm btn-view-receipt" data-hist-idx="${idx}">
+      <div class="history-card-footer">
+        <button type="button" class="btn-history-view btn-view-receipt" data-hist-idx="${idx}">
           <i data-lucide="receipt"></i> <span>Lihat Rincian Struk</span>
         </button>
+        ${h.totalSaved > 0 ? `
+          <span class="history-saved-badge">
+            <i data-lucide="tag"></i> Hemat Rp ${formatRupiah(h.totalSaved)}
+          </span>
+        ` : ''}
       </div>
     </div>
   `).join('');
@@ -2173,36 +2202,72 @@ function openHistoryDetailModal(idx) {
   content.innerHTML = `
     <div class="receipt-header">
       <div class="receipt-brand-logo"><i data-lucide="shopping-cart"></i></div>
-      <h2>GROCERYX SUPERMARKET</h2>
-      <p class="receipt-sub-loc">STRUK &amp; DATABASE PEMBANDING BELANJA</p>
+      <h2>${(h.storeLocation || h.storeName || 'GROCERYX SUPERMARKET').toUpperCase()}</h2>
+      <p class="receipt-sub-loc">STRUK &amp; DATABASE PEMBANDING RESMI</p>
       <div class="receipt-dashed-line"></div>
       <div class="receipt-meta-info">
-        <span>Tanggal Transaksi: <strong>${h.date}</strong></span>
-        <span>Lokasi Toko: <strong>📍 ${h.storeLocation || h.note}</strong></span>
+        <div class="receipt-meta-row">
+          <span>Tanggal:</span>
+          <strong>${h.formattedDate || h.date}</strong>
+        </div>
+        <div class="receipt-meta-row">
+          <span>Lokasi:</span>
+          <strong>ðŸ“ ${h.storeLocation || h.storeName || h.note || 'Supermarket'}</strong>
+        </div>
+        <div class="receipt-meta-row">
+          <span>Status Sesi:</span>
+          <strong class="text-emerald">Tersimpan di Database</strong>
+        </div>
       </div>
       <div class="receipt-dashed-line"></div>
     </div>
     <div class="receipt-items-table">
-      ${(h.items || []).map((it) => `
-        <div class="receipt-table-row">
-          <div>
-            <strong>${it.name}</strong>
-            <span>${it.qty} ${it.unit} x Rp ${formatRupiah(it.unitPrice)}</span>
+      ${(h.items || []).map((it) => {
+        const qty = Number(it.qty) || 1;
+        const unitP = Number(it.unitPrice) || 0;
+        let finalUnitP = unitP;
+        let discBadge = '';
+        if (it.discountType === 'single') {
+          finalUnitP = unitP * (1 - (Number(it.d1) || 0) / 100);
+          discBadge = ` <span class="receipt-item-disc-tag">-${it.d1}%</span>`;
+        } else if (it.discountType === 'tiered') {
+          const step1 = unitP * (1 - (Number(it.d1) || 0) / 100);
+          finalUnitP = step1 * (1 - (Number(it.d2) || 0) / 100);
+          discBadge = ` <span class="receipt-item-disc-tag">-${it.d1}%+${it.d2}%</span>`;
+        }
+        const rowTotal = qty * finalUnitP;
+        return `
+          <div class="receipt-table-row">
+            <div class="receipt-item-info">
+              <strong>${it.name}${discBadge}</strong>
+              <span>${qty} ${it.unit || 'pcs'} x Rp ${formatRupiah(unitP)}</span>
+            </div>
+            <strong class="receipt-item-subtotal">Rp ${formatRupiah(rowTotal)}</strong>
           </div>
-          <strong>Rp ${formatRupiah(it.qty * it.unitPrice)}</strong>
-        </div>
-      `).join('')}
+        `;
+      }).join('')}
     </div>
     <div class="receipt-dashed-line"></div>
     <div class="receipt-totals-section">
-      <div class="receipt-row font-bold text-primary">
+      <div class="receipt-row">
+        <span>Batas Anggaran:</span>
+        <span>Rp ${formatRupiah(h.safetyCap || 500000)}</span>
+      </div>
+      ${h.totalSaved > 0 ? `
+        <div class="receipt-row text-emerald">
+          <span>Total Dihemat:</span>
+          <strong>- Rp ${formatRupiah(h.totalSaved)}</strong>
+        </div>
+      ` : ''}
+      <div class="receipt-row grand-total">
         <span>TOTAL BELANJA:</span>
-        <strong>Rp ${formatRupiah(h.totalSpent)}</strong>
+        <strong class="receipt-grand-amount">Rp ${formatRupiah(h.totalSpent)}</strong>
       </div>
-      <div class="receipt-row text-emerald">
-        <span>Total Dihemat:</span>
-        <strong>Rp ${formatRupiah(h.totalSaved || 0)}</strong>
-      </div>
+    </div>
+    <div class="receipt-barcode-wrap">
+      <div class="receipt-barcode-bars"></div>
+      <span class="receipt-barcode-num">${h.id || 'GROCERYX-TRX'}</span>
+      <p class="receipt-thank-you">*** DOKUMEN HISTORI RESMI GROCERYX ***</p>
     </div>
   `;
 
