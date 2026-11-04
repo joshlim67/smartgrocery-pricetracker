@@ -1743,6 +1743,7 @@ function updateSafetyBanner() {
     }
     state.hasTriggeredOverbudgetModal = false;
   }
+  const locEl = document.getElementById('header-store-location');
   if (locEl) {
     locEl.textContent = (state.currentLocation && state.currentLocation.name) ? state.currentLocation.name : 'Tentukan Lokasi Toko...';
   }
