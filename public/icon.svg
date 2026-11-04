@@ -1,49 +1,76 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
   <defs>
-    <linearGradient id="bgGrad" x1="0%" y1="0%" x2="100%" y2="100%">
-      <stop offset="0%" stop-color="#0f172a"/>
-      <stop offset="50%" stop-color="#1e1b4b"/>
-      <stop offset="100%" stop-color="#052e16"/>
-    </linearGradient>
-    <linearGradient id="neonEmerald" x1="0%" y1="0%" x2="100%" y2="100%">
-      <stop offset="0%" stop-color="#34d399"/>
+    <!-- Bright Modern Vibrant Gradient -->
+    <linearGradient id="modernBg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#0284c7"/>
+      <stop offset="35%" stop-color="#2563eb"/>
+      <stop offset="70%" stop-color="#3b82f6"/>
       <stop offset="100%" stop-color="#10b981"/>
     </linearGradient>
-    <linearGradient id="neonCyan" x1="0%" y1="0%" x2="100%" y2="100%">
-      <stop offset="0%" stop-color="#38bdf8"/>
-      <stop offset="100%" stop-color="#6366f1"/>
+
+    <!-- Sparkle Gold Gradient -->
+    <linearGradient id="sparkleGold" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#fde047"/>
+      <stop offset="100%" stop-color="#fb923c"/>
     </linearGradient>
-    <filter id="glow" x="-20%" y="-20%" width="140%" height="140%">
-      <feGaussianBlur stdDeviation="16" result="blur" />
-      <feComposite in="SourceGraphic" in2="blur" operator="over" />
+
+    <!-- Soft Drop Shadow -->
+    <filter id="softShadow" x="-15%" y="-15%" width="135%" height="135%">
+      <feDropShadow dx="0" dy="10" stdDeviation="14" flood-color="#0f172a" flood-opacity="0.32"/>
+    </filter>
+
+    <!-- Glow Effect -->
+    <filter id="glowEffect" x="-20%" y="-20%" width="140%" height="140%">
+      <feGaussianBlur stdDeviation="8" result="blur"/>
+      <feComposite in="SourceGraphic" in2="blur" operator="over"/>
     </filter>
   </defs>
-  <!-- Background with rounded squircles -->
-  <rect width="512" height="512" rx="128" fill="url(#bgGrad)"/>
-  
-  <!-- Subtle glass shine layer -->
-  <rect x="16" y="16" width="480" height="480" rx="112" fill="none" stroke="rgba(255,255,255,0.15)" stroke-width="4"/>
-  <ellipse cx="256" cy="120" rx="180" ry="70" fill="rgba(255,255,255,0.06)"/>
 
-  <!-- Trolley Cart Body -->
-  <g filter="url(#glow)">
-    <path d="M120 140 H160 L200 320 H370 L400 190 H180" fill="none" stroke="url(#neonEmerald)" stroke-width="24" stroke-linecap="round" stroke-linejoin="round"/>
-    <!-- Cart Grid Lines -->
-    <path d="M240 200 L230 310" stroke="url(#neonEmerald)" stroke-width="12" stroke-linecap="round" opacity="0.7"/>
-    <path d="M300 200 L290 310" stroke="url(#neonEmerald)" stroke-width="12" stroke-linecap="round" opacity="0.7"/>
-    <path d="M360 200 L350 310" stroke="url(#neonEmerald)" stroke-width="12" stroke-linecap="round" opacity="0.7"/>
-    <path d="M190 260 H380" stroke="url(#neonEmerald)" stroke-width="12" stroke-linecap="round" opacity="0.7"/>
-    <!-- Wheels -->
-    <circle cx="210" cy="380" r="28" fill="#10b981" stroke="#34d399" stroke-width="8"/>
-    <circle cx="360" cy="380" r="28" fill="#10b981" stroke="#34d399" stroke-width="8"/>
+  <!-- Squircle Base with Bright Vibrant Gradient -->
+  <rect width="512" height="512" rx="128" fill="url(#modernBg)"/>
+
+  <!-- Specular Glass Highlight -->
+  <path d="M 0 128 C 0 57.3 57.3 0 128 0 L 384 0 C 454.7 0 512 57.3 512 128 C 512 175 380 250 256 250 C 132 250 0 175 0 128 Z" fill="rgba(255, 255, 255, 0.18)"/>
+  <rect x="12" y="12" width="488" height="488" rx="116" fill="none" stroke="rgba(255, 255, 255, 0.35)" stroke-width="4"/>
+
+  <!-- Ambient Light Orbs -->
+  <circle cx="120" cy="120" r="95" fill="#38bdf8" opacity="0.4" filter="url(#glowEffect)"/>
+  <circle cx="395" cy="395" r="110" fill="#34d399" opacity="0.35" filter="url(#glowEffect)"/>
+
+  <!-- Modern Sleek Trolley Shopping Cart -->
+  <g filter="url(#softShadow)">
+    <!-- Cart Basket Translucent Fill -->
+    <path d="M 175 190 L 375 190 L 345 315 L 205 315 Z" fill="rgba(255, 255, 255, 0.16)"/>
+    
+    <!-- Cart Outline & Handle -->
+    <path d="M 125 145 H 168 L 208 325 C 211 336 220 342 232 342 H 362 C 373 342 382 335 385 324 L 412 205 C 415 192 405 180 392 180 H 180" 
+          fill="none" 
+          stroke="#ffffff" 
+          stroke-width="26" 
+          stroke-linecap="round" 
+          stroke-linejoin="round"/>
+
+    <!-- Subtle Cart Internal Grid Lines -->
+    <line x1="242" y1="205" x2="252" y2="305" stroke="#ffffff" stroke-width="12" stroke-linecap="round" opacity="0.6"/>
+    <line x1="295" y1="205" x2="300" y2="305" stroke="#ffffff" stroke-width="12" stroke-linecap="round" opacity="0.6"/>
+    <line x1="348" y1="205" x2="345" y2="305" stroke="#ffffff" stroke-width="12" stroke-linecap="round" opacity="0.6"/>
+    <line x1="190" y1="250" x2="395" y2="250" stroke="#ffffff" stroke-width="12" stroke-linecap="round" opacity="0.6"/>
+
+    <!-- Dual Solid White Wheels with Vibrant Inset Centers -->
+    <circle cx="232" cy="402" r="28" fill="#ffffff"/>
+    <circle cx="232" cy="402" r="12" fill="#2563eb"/>
+    <circle cx="355" cy="402" r="28" fill="#ffffff"/>
+    <circle cx="355" cy="402" r="12" fill="#10b981"/>
   </g>
 
-  <!-- Safety Shield / Shield Lock badge overlay -->
-  <g transform="translate(320, 100) scale(0.9)" filter="url(#glow)">
-    <circle cx="60" cy="60" r="54" fill="#0f172a" stroke="url(#neonCyan)" stroke-width="8"/>
-    <!-- Percent / Savings Spark -->
-    <path d="M45 45 L75 75 M45 75 L75 45" stroke="#38bdf8" stroke-width="10" stroke-linecap="round"/>
-    <circle cx="45" cy="45" r="5" fill="#38bdf8"/>
-    <circle cx="75" cy="75" r="5" fill="#38bdf8"/>
+  <!-- Dynamic Sparkle Star (Smart Savings & Freshness) -->
+  <g transform="translate(340, 105)" filter="url(#glowEffect)">
+    <path d="M 45 0 Q 45 35 80 45 Q 45 55 45 90 Q 45 55 10 45 Q 45 35 45 0 Z" fill="url(#sparkleGold)"/>
+    <circle cx="45" cy="45" r="7" fill="#ffffff"/>
+  </g>
+
+  <!-- Subtle Ambient Sparkle -->
+  <g transform="translate(130, 205) scale(0.55)">
+    <path d="M 30 0 Q 30 22 52 30 Q 30 38 30 60 Q 30 38 8 30 Q 30 22 30 0 Z" fill="#ffffff" opacity="0.85"/>
   </g>
 </svg>

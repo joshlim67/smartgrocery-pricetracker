@@ -11,3 +11,4 @@ export const GOOGLE_OAUTH_CONFIG = {
 if (typeof window !== 'undefined') {
   window.GOOGLE_OAUTH_CONFIG = GOOGLE_OAUTH_CONFIG;
 }
+

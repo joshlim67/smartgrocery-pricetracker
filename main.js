@@ -16,8 +16,8 @@ const I18N = {
     emptyGoShopBtn: 'Buka Etalase Produk',
     catalogTitle: 'Menampilkan Produk Makanan',
     pinHint: 'Klik ❤️ untuk Pin ke Atas',
-    addProdBtn: 'Tambah Produk Baru',
-    btnAddProd: 'Tambah Produk Baru',
+    addProdBtn: 'Tambah Produk Baru ke Katalog',
+    btnAddProd: 'Tambah Produk Baru ke Katalog',
     bundleTitle: 'Paket Hemat Spesial',
     bundleSub: 'Diskon s/d 20%',
     bundleHint: 'Beli combo 2–3 produk hemat langsung di keranjang',
@@ -70,8 +70,8 @@ const I18N = {
     themeIceSub: 'Kaca es transparan biru cyan',
     themeAuroraSub: 'Gradasi violet & peach transparan',
     themeMidnightSub: 'Kaca transparan gelap & neon',
-    langTitle: 'Pilihan Bahasa (Language)',
-    langSub: 'Pilih bahasa tampilan antarmuka aplikasi',
+    langTitle: 'Bahasa',
+    langSub: '',
     audioTitle: 'Efek Suara Belanja',
     audioSub: 'Suara responsif saat scan barcode, klik, dan checkout',
     changePwdTitle: 'Ganti Password Akun',
@@ -88,6 +88,7 @@ const I18N = {
     csNote: 'Hubungi kami jika mengalami kendala atau membutuhkan informasi produk.',
     btnCallCs: 'Hubungi CS',
     btnSwitchAcc: 'Ganti Akun',
+    clearCartText: 'Hapus Semua',
     balanceSub: 'Sisa Dompet:',
     spent: 'Terpakai:',
     maxLimit: 'Batas Maks:',
@@ -179,8 +180,8 @@ const I18N = {
     themeIceSub: 'Cyan blue transparent ice glass',
     themeAuroraSub: 'Translucent violet & peach gradient',
     themeMidnightSub: 'Dark & neon transparent glass',
-    langTitle: 'Language Selection',
-    langSub: 'Select application display language',
+    langTitle: 'Language',
+    langSub: '',
     audioTitle: 'Shopping Sound Effects',
     audioSub: 'Responsive haptics for barcode scan, clicks, and checkout',
     changePwdTitle: 'Change Account Password',
@@ -197,6 +198,7 @@ const I18N = {
     csNote: 'Contact us if you have any issues or need product information.',
     btnCallCs: 'Call CS',
     btnSwitchAcc: 'Switch Account',
+    clearCartText: 'Clear Cart',
     balanceSub: 'Remaining:',
     spent: 'Spent:',
     maxLimit: 'Max Limit:',
@@ -808,7 +810,7 @@ function applyUserSessionToUI() {
 
     if (accProvider) {
       accProvider.textContent = state.currentUser.provider === 'google'
-        ? (isEn ? 'Google Account (Verified OAuth 2.0)' : 'Akun Google Resmi (OAuth 2.0)')
+        ? (isEn ? 'Google Terverifikasi' : 'Akun Google Resmi')
         : (isEn ? 'Verified Account' : 'Akun Terverifikasi');
     }
 
@@ -845,40 +847,166 @@ function applyUserSessionToUI() {
 }
 
 // ==========================================================================
-// 7B. REAL GOOGLE OAUTH 2.0 CLIENT (GOOGLE IDENTITY SERVICES - GIS)
+// 7B. AUTHENTIC GOOGLE OAUTH 2.0 (GOOGLE IDENTITY SERVICES & FIREBASE AUTH)
 // ==========================================================================
 
-function handleGoogleSignIn() {
-  sound.playClick();
-  const googleModal = document.getElementById('google-oauth-modal');
-  if (googleModal) {
-    googleModal.classList.remove('hidden');
-    // Reset custom form if open
-    const customForm = document.getElementById('google-custom-account-form');
-    const accList = document.getElementById('google-accounts-list');
-    if (customForm) customForm.classList.add('hidden');
-    if (accList) accList.classList.remove('hidden');
-    if (window.lucide) window.lucide.createIcons();
+function parseJwt(token) {
+  try {
+    const base64Url = token.split('.')[1];
+    const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
+    const jsonPayload = decodeURIComponent(
+      atob(base64)
+        .split('')
+        .map((c) => '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2))
+        .join('')
+    );
+    return JSON.parse(jsonPayload);
+  } catch (e) {
+    console.error('Failed to parse JWT token:', e);
+    return null;
   }
 }
 
-function selectGoogleAccount(name, email) {
+function getGoogleClientId() {
+  if (typeof window !== 'undefined' && window.GOOGLE_OAUTH_CONFIG && window.GOOGLE_OAUTH_CONFIG.clientId && window.GOOGLE_OAUTH_CONFIG.clientId.trim()) {
+    return window.GOOGLE_OAUTH_CONFIG.clientId.trim();
+  }
+  const local = localStorage.getItem('sg_google_client_id');
+  if (local && local.trim()) return local.trim();
+  return '';
+}
+
+async function handleGoogleSignIn() {
+  sound.playClick();
+  const clientId = getGoogleClientId();
+
+  // 1. If Google OAuth Client ID is available, initiate authentic Google Identity Services
+  if (clientId) {
+    if (window.google && window.google.accounts) {
+      try {
+        // A. GIS OAuth 2.0 Token Client (Official popup with real Google Account Chooser & UserInfo)
+        if (window.google.accounts.oauth2) {
+          const tokenClient = window.google.accounts.oauth2.initTokenClient({
+            client_id: clientId,
+            scope: 'email profile openid',
+            prompt: 'select_account',
+            callback: async (resp) => {
+              if (resp.error) {
+                showToast(`Google OAuth: ${resp.error_description || resp.error}`, 'error');
+                return;
+              }
+              if (resp.access_token) {
+                try {
+                  showToast('Memverifikasi akun Google resmi...', 'info');
+                  const res = await fetch('https://www.googleapis.com/oauth2/v3/userinfo', {
+                    headers: { Authorization: `Bearer ${resp.access_token}` }
+                  });
+                  const profile = await res.json();
+                  if (profile && (profile.email || profile.sub)) {
+                    applyGoogleUserSession({
+                      name: profile.name || profile.given_name || profile.email?.split('@')[0] || 'Google User',
+                      email: profile.email || '',
+                      avatarUrl: profile.picture || '',
+                      googleId: profile.sub || ('gid_' + Date.now())
+                    });
+                  } else {
+                    showToast('Gagal memverifikasi profil Google.', 'error');
+                  }
+                } catch (fetchErr) {
+                  console.error('Google userinfo fetch error:', fetchErr);
+                  showToast('Gagal membaca data profil Google: ' + fetchErr.message, 'error');
+                }
+              }
+            }
+          });
+          tokenClient.requestAccessToken({ prompt: 'select_account' });
+          return;
+        }
+
+        // B. GIS ID Token Client (One-Tap / Credential popup)
+        if (window.google.accounts.id) {
+          window.google.accounts.id.initialize({
+            client_id: clientId,
+            callback: (res) => {
+              const payload = parseJwt(res.credential);
+              if (payload) {
+                applyGoogleUserSession({
+                  name: payload.name || payload.email?.split('@')[0] || 'Google User',
+                  email: payload.email || '',
+                  avatarUrl: payload.picture || '',
+                  googleId: payload.sub || ('gid_' + Date.now())
+                });
+              }
+            }
+          });
+          window.google.accounts.id.prompt();
+          return;
+        }
+      } catch (gisErr) {
+        console.warn('GIS error:', gisErr);
+      }
+    }
+  }
+
+  // 2. Try Firebase Auth GoogleAuthProvider if available
+  try {
+    const { initializeApp, getApps } = await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js');
+    const { getAuth, signInWithPopup, GoogleAuthProvider } = await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js');
+    const cfg = (typeof window !== 'undefined' && window.firebaseConfig) || (await import('./firebase-config.js')).firebaseConfig;
+    if (cfg && cfg.apiKey) {
+      const app = getApps().length > 0 ? getApps()[0] : initializeApp(cfg);
+      const auth = getAuth(app);
+      const provider = new GoogleAuthProvider();
+      provider.setCustomParameters({ prompt: 'select_account' });
+      const result = await signInWithPopup(auth, provider);
+      if (result && result.user) {
+        applyGoogleUserSession({
+          name: result.user.displayName || result.user.email?.split('@')[0] || 'Google User',
+          email: result.user.email,
+          avatarUrl: result.user.photoURL,
+          googleId: result.user.uid
+        });
+        return;
+      }
+    }
+  } catch (fbErr) {
+    if (fbErr.code === 'auth/popup-closed-by-user') {
+      showToast('Login Google dibatalkan.', 'info');
+      return;
+    }
+    console.info('Firebase Auth direct popup note:', fbErr.message);
+  }
+
+  // 3. If neither Client ID nor Firebase Auth is ready, show Google OAuth Setup modal
+  const googleModal = document.getElementById('google-oauth-modal');
+  if (googleModal) {
+    const input = document.getElementById('google-client-id-input');
+    if (input) input.value = clientId || '';
+    googleModal.classList.remove('hidden');
+    if (window.lucide) window.lucide.createIcons();
+  } else {
+    showToast('Silakan masukkan Google OAuth Client ID di file google-auth-config.js.', 'warning');
+  }
+}
+
+function applyGoogleUserSession({ name, email, avatarUrl, googleId }) {
   sound.playClick();
   const isEn = state.language === 'en';
   const cleanEmail = (email || '').trim().toLowerCase();
-  const cleanName = (name || '').trim() || cleanEmail.split('@')[0];
+  const cleanName = (name || '').trim() || cleanEmail.split('@')[0] || 'Google User';
   const role = (cleanEmail === 'joshualim@mutiarabangsa.sch.id' || cleanEmail === 'joshualim.google@gmail.com') ? 'admin' : 'member';
 
   const googleUser = {
-    googleId: 'gid_' + Math.abs(cleanEmail.split('').reduce((a, b) => ((a << 5) - a) + b.charCodeAt(0), 0)),
+    googleId: googleId || ('gid_' + Math.abs(cleanEmail.split('').reduce((a, b) => ((a << 5) - a) + b.charCodeAt(0), 0))),
     username: cleanName,
     email: cleanEmail,
     role: role,
     provider: 'google',
+    avatarUrl: avatarUrl || `https://ui-avatars.com/api/?name=${encodeURIComponent(cleanName)}&background=2563eb&color=fff&bold=true`,
     verifiedEmail: true
   };
 
-  const existingIdx = state.usersList.findIndex((u) => u.email.toLowerCase() === cleanEmail);
+  const existingIdx = state.usersList.findIndex((u) => u.email && u.email.toLowerCase() === cleanEmail);
   if (existingIdx >= 0) {
     state.usersList[existingIdx] = { ...state.usersList[existingIdx], ...googleUser };
   } else {
@@ -902,12 +1030,15 @@ function selectGoogleAccount(name, email) {
   fireConfetti();
   showToast(isEn
     ? `Welcome, ${cleanName}! Signed in via Google Account.`
-    : `Berhasil masuk dengan Akun Google: ${cleanName} (${cleanEmail})!`, 'success');
+    : `Berhasil masuk dengan Akun Google Resmi: ${cleanName} (${cleanEmail})!`, 'success');
 
-  // Trigger popup lokasi setelah login
   setTimeout(() => {
     openStoreLocationModal();
   }, 450);
+}
+
+function selectGoogleAccount(name, email) {
+  applyGoogleUserSession({ name, email });
 }
 
 // ==========================================================================
@@ -918,6 +1049,12 @@ function setTheme(themeName) {
   state.theme = themeName;
   localStorage.setItem(STORAGE_KEYS.THEME, themeName);
   document.documentElement.setAttribute('data-theme', themeName);
+
+  if (themeName === 'midnight-glass') {
+    document.documentElement.classList.add('dark');
+  } else {
+    document.documentElement.classList.remove('dark');
+  }
 
   document.querySelectorAll('.theme-card-btn').forEach((btn) => {
     btn.classList.toggle('active', btn.getAttribute('data-theme') === themeName);
@@ -1304,16 +1441,36 @@ function calculateCartTotals() {
   };
 }
 
+function clearAllCartItems() {
+  if (!state.cart || state.cart.length === 0) return;
+  const isEn = state.language === 'en';
+  const confirmMsg = isEn
+    ? 'Are you sure you want to remove all items from your cart?'
+    : 'Apakah Anda yakin ingin menghapus semua barang dari keranjang belanja?';
+
+  if (confirm(confirmMsg)) {
+    state.cart = [];
+    saveCart();
+    sound.playClick();
+    showToast(isEn ? 'Cart cleared successfully.' : 'Semua barang di keranjang belanja berhasil dihapus.', 'info');
+  }
+}
+
 function renderCart() {
   const container = document.getElementById('cart-items-container');
   const emptyState = document.getElementById('cart-empty-state');
   const badge = document.getElementById('nav-cart-badge');
+  const btnClear = document.getElementById('btn-clear-cart');
   if (!container) return;
 
   const totals = calculateCartTotals();
 
   if (badge) {
     badge.textContent = state.cart.length;
+  }
+
+  if (btnClear) {
+    btnClear.classList.toggle('hidden', state.cart.length === 0);
   }
 
   if (state.cart.length === 0) {
@@ -2350,24 +2507,134 @@ document.addEventListener('DOMContentLoaded', () => {
     };
   }
 
-  // Category Arrow Slide Navigation
+  // Interactive Horizontal Carousel Engine (IDLIX / Netflix Dynamic Edge Fade & Smooth Gestures)
+  function makeHorizontalCarouselInteractive({ container, btnPrev, btnNext, step = 260 }) {
+    if (!container) return () => {};
+
+    function updateScrollState() {
+      const maxScroll = Math.max(0, container.scrollWidth - container.clientWidth);
+      const current = container.scrollLeft;
+
+      container.classList.remove('scroll-fade-both', 'scroll-fade-right', 'scroll-fade-left', 'scroll-fade-none');
+
+      if (maxScroll <= 6) {
+        container.classList.add('scroll-fade-none');
+        if (btnPrev) btnPrev.classList.add('is-hidden');
+        if (btnNext) btnNext.classList.add('is-hidden');
+        return;
+      }
+
+      const atStart = current <= 6;
+      const atEnd = current >= maxScroll - 6;
+
+      if (atStart) {
+        container.classList.add('scroll-fade-right');
+        if (btnPrev) btnPrev.classList.add('is-hidden');
+        if (btnNext) btnNext.classList.remove('is-hidden');
+      } else if (atEnd) {
+        container.classList.add('scroll-fade-left');
+        if (btnPrev) btnPrev.classList.remove('is-hidden');
+        if (btnNext) btnNext.classList.add('is-hidden');
+      } else {
+        container.classList.add('scroll-fade-both');
+        if (btnPrev) btnPrev.classList.remove('is-hidden');
+        if (btnNext) btnNext.classList.remove('is-hidden');
+      }
+    }
+
+    // Floating navigation arrows with smooth scrolling
+    if (btnPrev) {
+      btnPrev.onclick = (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        sound.playClick();
+        container.scrollBy({ left: -step, behavior: 'smooth' });
+      };
+    }
+    if (btnNext) {
+      btnNext.onclick = (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        sound.playClick();
+        container.scrollBy({ left: step, behavior: 'smooth' });
+      };
+    }
+
+    container.addEventListener('scroll', updateScrollState, { passive: true });
+
+    // Smooth Mouse / Gesture Dragging
+    let isDown = false;
+    let startX = 0;
+    let scrollLeftStart = 0;
+    let hasDragged = false;
+
+    container.addEventListener('mousedown', (e) => {
+      if (e.button !== 0) return;
+      isDown = true;
+      hasDragged = false;
+      startX = e.pageX - container.offsetLeft;
+      scrollLeftStart = container.scrollLeft;
+      container.style.scrollBehavior = 'auto';
+      container.style.scrollSnapType = 'none';
+    });
+
+    window.addEventListener('mousemove', (e) => {
+      if (!isDown) return;
+      const x = e.pageX - container.offsetLeft;
+      const walk = (x - startX);
+      if (Math.abs(walk) > 4) {
+        hasDragged = true;
+        container.style.cursor = 'grabbing';
+        container.scrollLeft = scrollLeftStart - walk;
+      }
+    });
+
+    const stopDrag = () => {
+      if (!isDown) return;
+      isDown = false;
+      container.style.cursor = '';
+      container.style.scrollBehavior = 'smooth';
+      container.style.scrollSnapType = 'x mandatory';
+      setTimeout(() => {
+        hasDragged = false;
+      }, 60);
+    };
+
+    window.addEventListener('mouseup', stopDrag);
+
+    // Suppress child click if user performed drag gesture
+    container.addEventListener('click', (e) => {
+      if (hasDragged) {
+        e.preventDefault();
+        e.stopPropagation();
+      }
+    }, true);
+
+    // Initial state trigger
+    requestAnimationFrame(updateScrollState);
+    window.addEventListener('resize', updateScrollState);
+
+    // Observe changes inside container to re-check scroll boundaries
+    if ('MutationObserver' in window) {
+      const observer = new MutationObserver(() => {
+        requestAnimationFrame(updateScrollState);
+      });
+      observer.observe(container, { childList: true, subtree: true });
+    }
+
+    return updateScrollState;
+  }
+
+  // Category Carousel Slider & Touch Gestures (IDLIX / Netflix Fade & Gesture Style)
   const catContainer = document.getElementById('category-filter-container');
   const btnCatPrev = document.getElementById('btn-cat-prev');
   const btnCatNext = document.getElementById('btn-cat-next');
-
-  if (btnCatPrev && catContainer) {
-    btnCatPrev.onclick = () => {
-      catContainer.scrollBy({ left: -220, behavior: 'smooth' });
-      sound.playClick();
-    };
-  }
-
-  if (btnCatNext && catContainer) {
-    btnCatNext.onclick = () => {
-      catContainer.scrollBy({ left: 220, behavior: 'smooth' });
-      sound.playClick();
-    };
-  }
+  makeHorizontalCarouselInteractive({
+    container: catContainer,
+    btnPrev: btnCatPrev,
+    btnNext: btnCatNext,
+    step: 220
+  });
 
   // Shop Search Input
   const searchInput = document.getElementById('shop-search-input');
@@ -2450,6 +2717,14 @@ document.addEventListener('DOMContentLoaded', () => {
         }
       };
       reader.readAsDataURL(file);
+    };
+  }
+
+  // Clear cart button (Hapus Semua)
+  const btnClearCart = document.getElementById('btn-clear-cart');
+  if (btnClearCart) {
+    btnClearCart.onclick = () => {
+      clearAllCartItems();
     };
   }
 
@@ -2598,22 +2873,16 @@ document.addEventListener('DOMContentLoaded', () => {
     };
   }
 
-  // Bundle carousel navigation arrows (slide next & prev)
+  // Bundle Carousel Slider & Touch Gestures (IDLIX / Netflix Fade & Gesture Style)
+  const bundleContainer = document.getElementById('bundle-cards-container');
   const btnBundlePrev = document.getElementById('btn-bundle-prev');
   const btnBundleNext = document.getElementById('btn-bundle-next');
-  const bundleContainer = document.getElementById('bundle-cards-container');
-  if (btnBundlePrev && bundleContainer) {
-    btnBundlePrev.onclick = () => {
-      if (sound) sound.playClick();
-      bundleContainer.scrollBy({ left: -260, behavior: 'smooth' });
-    };
-  }
-  if (btnBundleNext && bundleContainer) {
-    btnBundleNext.onclick = () => {
-      if (sound) sound.playClick();
-      bundleContainer.scrollBy({ left: 260, behavior: 'smooth' });
-    };
-  }
+  makeHorizontalCarouselInteractive({
+    container: bundleContainer,
+    btnPrev: btnBundlePrev,
+    btnNext: btnBundleNext,
+    step: 272
+  });
 
   // Open Add Product Modal with Photo Upload
   const btnOpenAddProduct = document.getElementById('btn-open-add-product');
@@ -2860,15 +3129,88 @@ document.addEventListener('DOMContentLoaded', () => {
     };
   }
 
+  // Password Show / Hide Toggle (Eye Icon)
+  document.querySelectorAll('.btn-toggle-pwd').forEach((btn) => {
+    btn.onclick = (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+      const targetId = btn.getAttribute('data-target');
+      const input = document.getElementById(targetId);
+      if (!input) return;
+
+      const isPassword = input.type === 'password';
+      input.type = isPassword ? 'text' : 'password';
+
+      const icon = btn.querySelector('i, svg');
+      if (icon) {
+        icon.setAttribute('data-lucide', isPassword ? 'eye-off' : 'eye');
+        if (window.lucide) {
+          window.lucide.createIcons();
+        }
+      }
+      btn.setAttribute('aria-label', isPassword ? 'Sembunyikan Password' : 'Lihat Password');
+      sound.playClick();
+    };
+  });
+
   // Login form handler
   if (loginForm) {
+    const errEl = document.getElementById('login-error-msg');
+    const emailInput = document.getElementById('login-email');
+    const pwdInput = document.getElementById('login-password');
+
+    // Real-time error dismissal when user types
+    [emailInput, pwdInput].forEach((inp) => {
+      if (inp) {
+        inp.addEventListener('input', () => {
+          if (errEl) {
+            errEl.classList.add('hidden');
+            errEl.textContent = '';
+          }
+        });
+      }
+    });
+
     loginForm.onsubmit = (e) => {
       e.preventDefault();
-      const email = document.getElementById('login-email').value.trim();
-      const pwd = document.getElementById('login-password').value;
-      const user = state.usersList.find((u) => u.email.toLowerCase() === email.toLowerCase());
+      const identifier = (emailInput?.value || '').trim();
+      const pwd = pwdInput?.value || '';
 
-      if (user && user.password === pwd) {
+      if (!identifier || !pwd) {
+        if (errEl) {
+          errEl.textContent = 'Mohon masukkan email/username dan password.';
+          errEl.classList.remove('hidden');
+        }
+        sound.playWarning();
+        return;
+      }
+
+      // Find user by either email OR username (case-insensitive)
+      const user = state.usersList.find((u) =>
+        (u.email && u.email.trim().toLowerCase() === identifier.toLowerCase()) ||
+        (u.username && u.username.trim().toLowerCase() === identifier.toLowerCase())
+      );
+
+      // Inform user if account was registered via Google Sign-In
+      if (user && user.provider === 'google' && !user.password) {
+        if (errEl) {
+          errEl.textContent = 'Akun ini terdaftar via Google. Silakan klik tombol "Lanjutkan dengan Google".';
+          errEl.classList.remove('hidden');
+        }
+        sound.playWarning();
+        return;
+      }
+
+      // Password comparison (direct or trimmed match)
+      const isPasswordValid = user && user.password && (user.password === pwd || user.password === pwd.trim());
+
+      if (user && isPasswordValid) {
+        if (errEl) {
+          errEl.classList.add('hidden');
+          errEl.textContent = '';
+        }
+        if (pwdInput) pwdInput.value = '';
+
         state.currentUser = user;
         localStorage.setItem(STORAGE_KEYS.CURRENT_USER, JSON.stringify(user));
         localStorage.removeItem('sg_user_logged_out');
@@ -2881,8 +3223,10 @@ document.addEventListener('DOMContentLoaded', () => {
         }, 450);
       } else {
         sound.playWarning();
-        document.getElementById('login-error-msg').textContent = 'Email atau password salah!';
-        document.getElementById('login-error-msg').classList.remove('hidden');
+        if (errEl) {
+          errEl.textContent = 'Email, username, atau password salah!';
+          errEl.classList.remove('hidden');
+        }
       }
     };
   }
@@ -2895,8 +3239,8 @@ document.addEventListener('DOMContentLoaded', () => {
       const email = document.getElementById('reg-email').value.trim();
       const pwd = document.getElementById('reg-password').value;
 
-      if (state.usersList.some((u) => u.email.toLowerCase() === email.toLowerCase())) {
-        document.getElementById('register-error-msg').textContent = 'Email sudah terdaftar!';
+      if (state.usersList.some((u) => u.email.toLowerCase() === email.toLowerCase() || (u.username && u.username.toLowerCase() === username.toLowerCase()))) {
+        document.getElementById('register-error-msg').textContent = 'Email atau username sudah terdaftar!';
         document.getElementById('register-error-msg').classList.remove('hidden');
         return;
       }
@@ -2925,6 +3269,71 @@ document.addEventListener('DOMContentLoaded', () => {
     };
   }
 
+  // Change Password Form in Settings Tab
+  const formChangePwd = document.getElementById('form-change-password');
+  if (formChangePwd) {
+    formChangePwd.onsubmit = (e) => {
+      e.preventDefault();
+      const curPwd = document.getElementById('input-current-pwd')?.value || '';
+      const newPwd = document.getElementById('input-new-pwd')?.value || '';
+      const confirmPwd = document.getElementById('input-confirm-pwd')?.value || '';
+      const msgEl = document.getElementById('change-pwd-msg');
+
+      if (!state.currentUser) {
+        showToast('Silakan login terlebih dahulu.', 'warning');
+        return;
+      }
+
+      if (state.currentUser.password && state.currentUser.password !== curPwd && state.currentUser.password !== curPwd.trim()) {
+        if (msgEl) {
+          msgEl.textContent = 'Password saat ini tidak sesuai!';
+          msgEl.className = 'auth-inline-msg error';
+          msgEl.classList.remove('hidden');
+        }
+        sound.playWarning();
+        return;
+      }
+
+      if (newPwd.length < 6) {
+        if (msgEl) {
+          msgEl.textContent = 'Password baru minimal 6 karakter!';
+          msgEl.className = 'auth-inline-msg error';
+          msgEl.classList.remove('hidden');
+        }
+        sound.playWarning();
+        return;
+      }
+
+      if (newPwd !== confirmPwd) {
+        if (msgEl) {
+          msgEl.textContent = 'Konfirmasi password baru tidak cocok!';
+          msgEl.className = 'auth-inline-msg error';
+          msgEl.classList.remove('hidden');
+        }
+        sound.playWarning();
+        return;
+      }
+
+      state.currentUser.password = newPwd;
+      localStorage.setItem(STORAGE_KEYS.CURRENT_USER, JSON.stringify(state.currentUser));
+
+      const idx = state.usersList.findIndex((u) => u.email?.toLowerCase() === state.currentUser.email?.toLowerCase());
+      if (idx >= 0) {
+        state.usersList[idx].password = newPwd;
+        localStorage.setItem(STORAGE_KEYS.USERS_LIST, JSON.stringify(state.usersList));
+      }
+
+      formChangePwd.reset();
+      if (msgEl) {
+        msgEl.textContent = 'Password berhasil diperbarui!';
+        msgEl.className = 'auth-inline-msg success';
+        msgEl.classList.remove('hidden');
+      }
+      sound.playSuccess();
+      showToast('Password akun berhasil diperbarui!', 'success');
+    };
+  }
+
   // Close Auth Modal
   const btnCloseAuth = document.getElementById('btn-close-auth-modal');
   if (btnCloseAuth && authModal) {
@@ -2933,60 +3342,40 @@ document.addEventListener('DOMContentLoaded', () => {
     };
   }
 
-  // Google OAuth 2.0 Account Chooser (select_account) Handlers
+  // Google OAuth 2.0 Setup / Connect Modal Handlers
   const googleOauthModal = document.getElementById('google-oauth-modal');
   const btnCloseGoogleOauth = document.getElementById('btn-close-google-oauth');
+  const btnCancelGoogleConfig = document.getElementById('btn-cancel-google-config');
+  const googleClientIdForm = document.getElementById('google-clientid-form');
+
   if (btnCloseGoogleOauth && googleOauthModal) {
     btnCloseGoogleOauth.onclick = () => {
       googleOauthModal.classList.add('hidden');
     };
   }
 
-  // Click on account item in Google list
-  document.querySelectorAll('.google-account-item[data-email]').forEach((item) => {
-    item.onclick = () => {
-      const email = item.getAttribute('data-email');
-      const name = item.getAttribute('data-name');
-      selectGoogleAccount(name, email);
-    };
-  });
-
-  // Switch to custom account form
-  const btnGoogleAddAccount = document.getElementById('btn-google-add-account');
-  const googleAccountsList = document.getElementById('google-accounts-list');
-  const googleCustomForm = document.getElementById('google-custom-account-form');
-  const btnCancelCustomGoogle = document.getElementById('btn-cancel-custom-google');
-
-  if (btnGoogleAddAccount && googleAccountsList && googleCustomForm) {
-    btnGoogleAddAccount.onclick = () => {
-      sound.playClick();
-      googleAccountsList.classList.add('hidden');
-      googleCustomForm.classList.remove('hidden');
-      const nameInp = document.getElementById('google-custom-name');
-      if (nameInp) nameInp.focus();
+  if (btnCancelGoogleConfig && googleOauthModal) {
+    btnCancelGoogleConfig.onclick = () => {
+      googleOauthModal.classList.add('hidden');
     };
   }
 
-  if (btnCancelCustomGoogle && googleAccountsList && googleCustomForm) {
-    btnCancelCustomGoogle.onclick = () => {
-      sound.playClick();
-      googleCustomForm.classList.add('hidden');
-      googleAccountsList.classList.remove('hidden');
-    };
-  }
-
-  if (googleCustomForm) {
-    googleCustomForm.onsubmit = (e) => {
+  if (googleClientIdForm) {
+    googleClientIdForm.onsubmit = (e) => {
       e.preventDefault();
-      const nameInp = document.getElementById('google-custom-name');
-      const emailInp = document.getElementById('google-custom-email');
-      const name = (nameInp && nameInp.value.trim()) || 'Google User';
-      const email = (emailInp && emailInp.value.trim()) || '';
-      if (!email) {
-        showToast('Silakan masukkan alamat email Google Anda.', 'warning');
+      const input = document.getElementById('google-client-id-input');
+      const val = (input?.value || '').trim();
+      if (!val) {
+        showToast('Masukkan Google OAuth Client ID yang valid.', 'warning');
         return;
       }
-      selectGoogleAccount(name, email);
+      localStorage.setItem('sg_google_client_id', val);
+      if (typeof window !== 'undefined' && window.GOOGLE_OAUTH_CONFIG) {
+        window.GOOGLE_OAUTH_CONFIG.clientId = val;
+      }
+      if (googleOauthModal) googleOauthModal.classList.add('hidden');
+      showToast('Client ID berhasil disimpan. Membuka login Google resmi...', 'success');
+      handleGoogleSignIn();
     };
   }
 
