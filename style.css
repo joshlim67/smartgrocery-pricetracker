@@ -6151,3 +6151,89 @@ body::after {
     transform: translateY(0);
   }
 }
+
+/* F-05: Warning Thresholds (Kuning Waspada >=90% & Merah Tegas >100%) */
+.safety-status-label.badge-warning-yellow {
+  color: #f59e0b !important;
+}
+.safety-status-label.badge-warning-yellow .status-pulse-dot {
+  background: #f59e0b !important;
+  box-shadow: 0 0 10px rgba(245, 158, 11, 0.6) !important;
+}
+.text-warning-yellow {
+  color: #f59e0b !important;
+  font-weight: 800 !important;
+}
+
+/* F-04: Komparator Harga Realtime Badges */
+.comparator-preview-card {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 12px 14px;
+  background: var(--bg-card-nested);
+  border: 1px solid var(--glass-border);
+  border-radius: 14px;
+  margin-top: 6px;
+  transition: all 0.25s ease;
+}
+.comparator-icon-badge {
+  width: 36px;
+  height: 36px;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+.comparator-icon-badge.badge-up {
+  background: rgba(239, 68, 68, 0.15);
+  color: #ef4444;
+}
+.comparator-icon-badge.badge-down {
+  background: rgba(16, 185, 129, 0.15);
+  color: #10b981;
+}
+.comparator-icon-badge.badge-stable {
+  background: rgba(100, 116, 139, 0.15);
+  color: #94a3b8;
+}
+.comparator-info {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+.comp-label-prev {
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: var(--text-title);
+}
+.comp-explanation {
+  font-size: 0.68rem;
+  color: var(--text-muted);
+  margin: 0;
+}
+.comparator-delta-pill {
+  padding: 5px 10px;
+  border-radius: 9999px;
+  font-size: 0.72rem;
+  font-weight: 800;
+  white-space: nowrap;
+}
+.comparator-delta-pill.pill-up {
+  background: rgba(239, 68, 68, 0.18);
+  color: #ef4444;
+  border: 1px solid rgba(239, 68, 68, 0.3);
+}
+.comparator-delta-pill.pill-down {
+  background: rgba(16, 185, 129, 0.18);
+  color: #10b981;
+  border: 1px solid rgba(16, 185, 129, 0.3);
+}
+.comparator-delta-pill.pill-stable {
+  background: rgba(100, 116, 139, 0.18);
+  color: #94a3b8;
+  border: 1px solid rgba(100, 116, 139, 0.3);
+}

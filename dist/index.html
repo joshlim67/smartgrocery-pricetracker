@@ -1387,7 +1387,7 @@
           </button>
         </div>
 
-        <!-- Store Name Input Form -->
+        <!-- Store Name & Date Input Form (F-01 Selector Tanggal Belanja) -->
         <form id="form-store-location" class="location-name-form">
           <div class="form-group">
             <label class="form-label" for="input-store-name">Nama Toko &amp; Cabang Supermarket</label>
@@ -1395,6 +1395,15 @@
               <i data-lucide="store" class="field-icon"></i>
               <input type="text" id="input-store-name" class="glass-input location-text-input"
                 placeholder="Contoh: Lotte Mart Grocery - Puri Indah" required>
+            </div>
+          </div>
+
+          <!-- F-01: Selector Tanggal Belanja (Date Picker) -->
+          <div class="form-group">
+            <label class="form-label" for="input-store-date">Tanggal Belanja Sesi Ini (Date Picker)</label>
+            <div class="input-with-icon">
+              <i data-lucide="calendar" class="field-icon"></i>
+              <input type="date" id="input-store-date" class="glass-input location-text-input" required>
             </div>
           </div>
 

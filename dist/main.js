@@ -1689,13 +1689,13 @@ function updateSafetyBanner() {
   if (percentBudget) percentBudget.textContent = `${percent}%`;
 
   if (spent > limit) {
-    // OVERBUDGET STATE (Fixed layout, crisp crimson, never overextends)
+    // F-05: BANNER MERAH TEGAS (>100% OVER BUDGET)
     const deficit = spent - limit;
     if (statusPill) {
       statusPill.className = 'safety-status-label badge-overbudget';
     }
     if (statusText) statusText.textContent = isEn ? 'OVER BUDGET!' : 'ANGGARAN LEBIH!';
-    if (balanceSub) balanceSub.textContent = isEn ? 'Deficit:' : 'Defisit:';
+    if (balanceSub) balanceSub.textContent = isEn ? 'Defisit:' : 'Defisit:';
     if (remainingBudget) {
       remainingBudget.textContent = `Rp ${formatRupiah(deficit)}`;
       remainingBudget.className = 'text-deficit';
@@ -1710,8 +1710,24 @@ function updateSafetyBanner() {
       showOverbudgetModal(spent, limit, deficit);
       state.hasTriggeredOverbudgetModal = true;
     }
+  } else if (percent >= 90) {
+    // F-05: KUNING WASPADA (>=90% KAPASITAS DOMPET)
+    if (statusPill) {
+      statusPill.className = 'safety-status-label badge-warning-yellow';
+    }
+    if (statusText) statusText.textContent = isEn ? 'WARNING (>=90%)' : 'WASPADA (>=90%)';
+    if (balanceSub) balanceSub.textContent = isEn ? 'Remaining:' : 'Sisa Dompet:';
+    if (remainingBudget) {
+      remainingBudget.textContent = `Rp ${formatRupiah(remaining)}`;
+      remainingBudget.className = 'text-warning-yellow';
+    }
+    if (meterFill) {
+      meterFill.style.width = `${Math.min(100, percent)}%`;
+      meterFill.style.background = 'linear-gradient(90deg, #f59e0b 0%, #d97706 100%)';
+    }
+    state.hasTriggeredOverbudgetModal = false;
   } else {
-    // BUDGET SAFE STATE
+    // BUDGET SAFE STATE (<90% AMAN)
     if (statusPill) {
       statusPill.className = 'safety-status-label';
     }
@@ -1727,8 +1743,6 @@ function updateSafetyBanner() {
     }
     state.hasTriggeredOverbudgetModal = false;
   }
-
-  const locEl = document.getElementById('header-store-location');
   if (locEl) {
     locEl.textContent = (state.currentLocation && state.currentLocation.name) ? state.currentLocation.name : 'Tentukan Lokasi Toko...';
   }
@@ -2052,14 +2066,17 @@ function openCheckoutModal() {
 function confirmCheckoutAndSave() {
   const totals = calculateCartTotals();
   const locName = (state.currentLocation && state.currentLocation.name) ? state.currentLocation.name : 'Lotte Mart Grocery - Puri Indah';
+  const defaultDateStr = new Date().toLocaleDateString(state.language === 'en' ? 'en-US' : 'id-ID', {
+    day: 'numeric',
+    month: 'long',
+    year: 'numeric'
+  });
   const session = {
     id: 'hist_' + Date.now(),
-    date: new Date().toLocaleDateString(state.language === 'en' ? 'en-US' : 'id-ID', {
-      day: 'numeric',
-      month: 'long',
-      year: 'numeric'
-    }),
+    date: (state.currentLocation && state.currentLocation.shoppingDate) ? state.currentLocation.shoppingDate : defaultDateStr,
+    formattedDate: defaultDateStr,
     timestamp: Date.now(),
+    storeName: locName,
     storeLocation: locName,
     storeCoords: (state.currentLocation && state.currentLocation.coords) ? state.currentLocation.coords : null,
     note: locName,
@@ -2302,9 +2319,14 @@ function openStoreLocationModal() {
   modal.classList.remove('hidden');
 
   const inputName = document.getElementById('input-store-name');
+  const inputDate = document.getElementById('input-store-date');
   if (inputName) {
     inputName.value = (state.currentLocation && state.currentLocation.name) ? state.currentLocation.name : 'Lotte Mart Grocery - Puri Indah';
     inputName.focus();
+  }
+  if (inputDate) {
+    const todayStr = new Date().toISOString().split('T')[0];
+    inputDate.value = (state.currentLocation && state.currentLocation.shoppingDate) ? state.currentLocation.shoppingDate : todayStr;
   }
 
   const statusTitle = document.getElementById('gps-status-title');
@@ -2422,10 +2444,13 @@ function initStoreLocationModule() {
     formLocation.onsubmit = (e) => {
       e.preventDefault();
       const inputName = document.getElementById('input-store-name');
+      const inputDate = document.getElementById('input-store-date');
       const name = (inputName && inputName.value.trim()) || 'Lotte Mart Grocery - Puri Indah';
+      const shoppingDate = (inputDate && inputDate.value) || new Date().toISOString().split('T')[0];
 
       state.currentLocation = {
         name,
+        shoppingDate,
         coords: state.detectedCoords || (state.currentLocation ? state.currentLocation.coords : null),
         updatedAt: Date.now()
       };
@@ -2995,7 +3020,112 @@ document.addEventListener('DOMContentLoaded', () => {
     };
   });
 
+
+// ==========================================================================
+// F-04: KOMPARATOR HARGA REALTIME VS RIWAYAT TOKO & BULAN LALU
+// ==========================================================================
+function findHistoricalPriceReference(productName, storeName) {
+  if (!productName) return null;
+  const cleanName = productName.trim().toLowerCase();
+  const currentStore = storeName || (state.currentLocation && state.currentLocation.name) || 'Lotte Mart Grocery - Puri Indah';
+
+  // 1. Cek dari struk riwayat transaksi sebelumnya (history) di toko yang sama terlebih dahulu
+  if (Array.isArray(state.history) && state.history.length > 0) {
+    for (const receipt of state.history) {
+      if (Array.isArray(receipt.items)) {
+        const found = receipt.items.find((it) => it.name && it.name.trim().toLowerCase() === cleanName);
+        if (found && found.unitPrice) {
+          return {
+            price: Number(found.unitPrice),
+            sourceStore: receipt.storeLocation || receipt.storeName || currentStore,
+            date: receipt.date || receipt.formattedDate || 'Bulan Lalu'
+          };
+        }
+      }
+    }
+  }
+
+  // 2. Cek dari katalog default (normalPrice sebagai referensi harga bulan lalu)
+  const all = getAllCatalogProducts();
+  const match = all.find((p) => p.name.trim().toLowerCase() === cleanName);
+  if (match && match.normalPrice) {
+    return {
+      price: match.normalPrice,
+      sourceStore: currentStore,
+      date: 'Bulan Lalu'
+    };
+  }
+
+  return null;
+}
+
+function updatePriceComparatorUI() {
+  const box = document.getElementById('price-comparator-box');
+  const nameInput = document.getElementById('item-name-input');
+  const priceInput = document.getElementById('item-price-input');
+  if (!box || !nameInput || !priceInput) return;
+
+  const name = nameInput.value.trim();
+  const currentPrice = parseRupiahInput(priceInput.value);
+
+  if (!name || currentPrice <= 0) {
+    box.classList.add('hidden');
+    return;
+  }
+
+  const hist = findHistoricalPriceReference(name);
+  if (!hist || !hist.price) {
+    box.classList.add('hidden');
+    return;
+  }
+
+  box.classList.remove('hidden');
+  const prevP = hist.price;
+  const diff = currentPrice - prevP;
+
+  const lblPrev = document.getElementById('comp-label-prev');
+  const expEl = document.getElementById('comp-explanation');
+  const pillEl = document.getElementById('comp-delta-pill');
+  const iconEl = document.getElementById('comp-icon');
+  const badgeEl = document.getElementById('comp-icon-badge');
+
+  if (lblPrev) lblPrev.textContent = `${hist.date} (${hist.sourceStore}): Rp ${formatRupiah(prevP)}`;
+
+  if (diff > 0) {
+    // Panah Merah Naik (↑): Jika harga naik dibanding riwayat bulan lalu di toko tersebut (+Rp selisih)
+    if (pillEl) {
+      pillEl.className = 'comparator-delta-pill pill-up';
+      pillEl.textContent = `↑ Naik (+Rp ${formatRupiah(diff)})`;
+    }
+    if (expEl) expEl.textContent = `Harga lebih mahal Rp ${formatRupiah(diff)} dibanding ${hist.date.toLowerCase()}`;
+    if (badgeEl) badgeEl.className = 'comparator-icon-badge badge-up';
+    if (iconEl) iconEl.setAttribute('data-lucide', 'arrow-up-right');
+  } else if (diff < 0) {
+    // Panah Hijau Turun (↓): Jika harga turun dibanding riwayat bulan lalu di toko tersebut (-Rp hemat)
+    const hemat = Math.abs(diff);
+    if (pillEl) {
+      pillEl.className = 'comparator-delta-pill pill-down';
+      pillEl.textContent = `↓ Turun (-Rp ${formatRupiah(hemat)} hemat)`;
+    }
+    if (expEl) expEl.textContent = `Lebih murah! Hemat Rp ${formatRupiah(hemat)} dibanding ${hist.date.toLowerCase()}`;
+    if (badgeEl) badgeEl.className = 'comparator-icon-badge badge-down';
+    if (iconEl) iconEl.setAttribute('data-lucide', 'arrow-down-right');
+  } else {
+    // Tanda Setara (=): Jika harga stabil/tetap
+    if (pillEl) {
+      pillEl.className = 'comparator-delta-pill pill-stable';
+      pillEl.textContent = `= Setara (Rp 0)`;
+    }
+    if (expEl) expEl.textContent = `Harga stabil/tetap persis sama dengan ${hist.date.toLowerCase()}`;
+    if (badgeEl) badgeEl.className = 'comparator-icon-badge badge-stable';
+    if (iconEl) iconEl.setAttribute('data-lucide', 'minus');
+  }
+
+  if (window.lucide) window.lucide.createIcons();
+}
+
   function updateModalDiscountPreview() {
+    updatePriceComparatorUI();
     const rawPrice = parseRupiahInput(modalPriceInput.value);
     const qty = parseFloat(document.getElementById('item-qty-input').value) || 1;
     const normalTotal = rawPrice * qty;
