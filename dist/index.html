@@ -881,11 +881,11 @@
         <form id="item-form" autocomplete="off">
           <input type="hidden" id="edit-item-id" value="">
 
-          <!-- 1. UPLOAD FOTO PRODUK (WAJIB & INTERAKTIF) -->
-          <div class="form-group">
-            <label class="form-label">
+          <!-- 1. FOTO PRODUK & PRESET CEPAT SEJAJAR -->
+          <div class="form-group mb-3">
+            <label class="form-label d-flex justify-content-between align-items-center">
               <span id="lbl-item-photo">Foto Produk Makanan</span>
-              <span class="text-hint" id="lbl-photo-hint">Pilih file atau gunakan preset</span>
+              <span class="text-hint" id="lbl-photo-hint">Pilih preset atau unggah</span>
             </label>
             <div class="product-photo-upload-zone" id="photo-upload-dropzone">
               <div class="photo-preview-box" id="photo-preview-box">
@@ -906,9 +906,9 @@
               </div>
             </div>
 
-            <!-- Preset Foto Makanan Cepat -->
-            <div class="quick-preset-photos">
-              <span class="preset-label">Preset Cepat:</span>
+            <!-- Preset Foto Makanan Cepat (Grid rapi sejajar tanpa elemen sendirian) -->
+            <div class="quick-preset-photos mt-2">
+              <span class="preset-label">Preset:</span>
               <button type="button" class="btn-preset-photo"
                 data-img="https://images.unsplash.com/photo-1586201375761-83865001e31c?w=300&auto=format&fit=crop&q=80">Beras</button>
               <button type="button" class="btn-preset-photo"
@@ -916,123 +916,52 @@
               <button type="button" class="btn-preset-photo"
                 data-img="https://images.unsplash.com/photo-1582722872445-44dc5f7e3c8f?w=300&auto=format&fit=crop&q=80">Telur</button>
               <button type="button" class="btn-preset-photo"
-                data-img="https://images.unsplash.com/photo-1612927601601-6638404737ce?w=300&auto=format&fit=crop&q=80">Mi
-                Instan</button>
+                data-img="https://images.unsplash.com/photo-1612927601601-6638404737ce?w=300&auto=format&fit=crop&q=80">Mi Instan</button>
               <button type="button" class="btn-preset-photo"
                 data-img="https://images.unsplash.com/photo-1563636619-e9143da7973b?w=300&auto=format&fit=crop&q=80">Susu</button>
               <button type="button" class="btn-preset-photo"
-                data-img="https://images.unsplash.com/photo-1540420773420-3366772f4999?w=300&auto=format&fit=crop&q=80">Sayur</button>
+                data-img="https://images.unsplash.com/photo-1540420773420-3366772f4999?w=300&auto=format&fit=crop&q=80">Sayuran</button>
+              <button type="button" class="btn-preset-photo"
+                data-img="https://images.unsplash.com/photo-1544025162-d76694265947?w=300&auto=format&fit=crop&q=80">Daging</button>
+              <button type="button" class="btn-preset-photo"
+                data-img="https://images.unsplash.com/photo-1558961363-fa8fdf82db35?w=300&auto=format&fit=crop&q=80">Biskuit</button>
             </div>
           </div>
 
-          <!-- 2. Nama Produk & Barcode -->
-          <div class="form-group">
+          <!-- 2. NAMA PRODUK (DENGAN DROPDOWN SESUAI KATALOG ETALASE) -->
+          <div class="form-group mb-3">
             <div class="label-with-hint">
               <label class="form-label" for="item-name-input" id="lbl-item-name">Nama Produk Supermarket</label>
-              <span class="text-hint" id="lbl-auto-compare">Auto-compare aktif</span>
+              <span class="text-hint text-primary font-bold" id="lbl-auto-compare">⚡ Auto-compare aktif</span>
             </div>
             <div class="input-with-icon">
               <i data-lucide="tag" class="field-icon"></i>
-              <input type="text" id="item-name-input" placeholder="Contoh: Minyak Goreng 2L, Beras 5kg" required
+              <input type="text" id="item-name-input" placeholder="Pilih dari etalase atau ketik baru..." required
                 list="preset-items-datalist">
             </div>
             <datalist id="preset-items-datalist">
-              <option value="Minyak Goreng 2L"></option>
-              <option value="Beras Ramos 5kg"></option>
-              <option value="Telur Ayam 1kg"></option>
-              <option value="Indomie Goreng (Dus)"></option>
-              <option value="Susu UHT Full Cream 1L"></option>
-              <option value="Sunlight Jeruk Nipis 700ml"></option>
-              <option value="Lifebuoy Sabun Mandi 4x110g"></option>
-              <option value="Kopi Kapal Api Mix 10s"></option>
-              <option value="Gula Pasir 1kg"></option>
-              <option value="Biskuit Roma Kelapa 300g"></option>
+              <option value="Beras Ramos Premium 5kg">Bahan Pokok (Rp 74.000)</option>
+              <option value="Minyak Goreng Pouch 2L">Bahan Pokok (Rp 34.500)</option>
+              <option value="Telur Ayam Negeri Fresh 1kg">Bahan Pokok (Rp 28.000)</option>
+              <option value="Indomie Goreng (Dus)">Makanan Instan (Rp 112.000)</option>
+              <option value="Susu UHT Full Cream 1L">Susu & Olahan (Rp 19.500)</option>
+              <option value="Bayam Hijau Segar Ikat">Sayur Segar (Rp 18.000)</option>
+              <option value="Daging Sapi Segar 500g">Daging Segar (Rp 65.000)</option>
+              <option value="Roti Tawar Gandum Kupas">Bahan Pokok (Rp 17.500)</option>
+              <option value="Biskuit Roma Kelapa 300g">Camilan & Snack (Rp 11.500)</option>
+              <option value="Sunlight Jeruk Nipis Refill 700ml">Sabun Cuci (Rp 14.500)</option>
+              <option value="Lifebuoy Sabun Mandi 4x110g">Perlengkapan Mandi (Rp 23.000)</option>
+              <option value="Kopi Kapal Api Special Mix 10s">Bumbu & Dapur (Rp 14.000)</option>
+              <option value="Roma Kelapa Biskuit 300g">Camilan & Snack (Rp 9.500)</option>
             </datalist>
           </div>
 
-          <!-- Kode Barcode Produk -->
-          <div class="form-group">
-            <label class="form-label" for="item-barcode-input">Kode Barcode (Hasil Pindai Kamera / Manual)</label>
-            <div class="input-with-icon">
-              <i data-lucide="barcode" class="field-icon"></i>
-              <input type="text" id="item-barcode-input" placeholder="Contoh: 8991234567890">
-            </div>
-          </div>
-
-          <!-- Price Comparator Banner -->
-          <div id="price-comparator-box" class="comparator-preview-card hidden">
-            <div class="comparator-icon-badge" id="comp-icon-badge">
-              <i data-lucide="trending-up" id="comp-icon"></i>
-            </div>
-            <div class="comparator-info">
-              <span class="comp-label-prev" id="comp-label-prev">Bulan Lalu: Rp 0</span>
-              <p class="comp-explanation" id="comp-explanation">Harga stabil persis sama</p>
-            </div>
-            <div class="comparator-delta-pill" id="comp-delta-pill">= Stabil (Rp 0)</div>
-          </div>
-
-          <!-- 3. Kategori Produk (Dropdown & Tambah Kategori Baru) -->
-          <div class="form-group">
-            <div class="label-with-action">
-              <label class="form-label" for="item-category-select" id="lbl-category">Kategori Produk</label>
-              <button type="button" id="btn-toggle-new-cat" class="btn-text-action">
-                <i data-lucide="plus"></i> <span id="lbl-btn-add-cat">Tambah Kategori Baru</span>
-              </button>
-            </div>
-            <div class="select-with-icon">
-              <i data-lucide="layers" class="field-icon"></i>
-              <select id="item-category-select" class="glass-select category-dropdown">
-                <!-- Dynamically populated via JS -->
-              </select>
-            </div>
-            <input type="hidden" id="item-category-input" value="Bahan Pokok">
-
-            <!-- Inline Add New Category Box -->
-            <div id="new-category-inline-box" class="new-category-inline-box hidden">
-              <input type="text" id="input-new-cat-name" placeholder="Nama kategori baru..." class="glass-input-sm">
-              <button type="button" id="btn-confirm-add-cat" class="btn-sm-primary">
-                <i data-lucide="check"></i> <span id="lbl-save-cat-btn">Simpan</span>
-              </button>
-              <button type="button" id="btn-cancel-add-cat" class="btn-sheet-close-sm">
-                <i data-lucide="x"></i>
-              </button>
-            </div>
-          </div>
-
-          <!-- 4. Penilaian Kesehatan Produk (Sehat Meter Classifier) -->
-          <div class="form-group">
-            <label class="form-label" id="lbl-item-health-grade">Klasifikasi Sehat Meter</label>
-            <div class="health-classifier-grid">
-              <label class="health-radio-btn active">
-                <input type="radio" name="item-health-type" value="healthy" checked>
-                <div class="health-btn-pill pill-healthy">
-                  <span class="pill-dot"></span>
-                  <span>🟢 Bahan Segar / Alami</span>
-                </div>
-              </label>
-              <label class="health-radio-btn">
-                <input type="radio" name="item-health-type" value="neutral">
-                <div class="health-btn-pill pill-neutral">
-                  <span class="pill-dot"></span>
-                  <span>🟡 Olahan Seimbang</span>
-                </div>
-              </label>
-              <label class="health-radio-btn">
-                <input type="radio" name="item-health-type" value="unhealthy">
-                <div class="health-btn-pill pill-unhealthy">
-                  <span class="pill-dot"></span>
-                  <span>🔴 Tinggi Gula / Garam</span>
-                </div>
-              </label>
-            </div>
-          </div>
-
-          <!-- 5. Satuan & Kuantitas Stepper -->
-          <div class="form-row-2col">
+          <!-- 3. SATUAN & KUANTITAS STEPPER (LANGSUNG SETELAH NAMA) -->
+          <div class="form-row-2col mb-3">
             <div class="form-group">
               <label class="form-label" for="item-unit-input" id="lbl-unit">Satuan</label>
               <select id="item-unit-input" class="glass-select">
-                <option value="pcs">pcs (buah)</option>
+                <option value="pcs" selected>pcs (buah)</option>
                 <option value="kg">kg (kilogram)</option>
                 <option value="liter">liter (lt)</option>
                 <option value="pack">pack</option>
@@ -1058,8 +987,8 @@
             </div>
           </div>
 
-          <!-- 6. Harga Satuan Normal -->
-          <div class="form-group">
+          <!-- 4. HARGA SATUAN NORMAL & KOMPARATOR HARGA INSTAN -->
+          <div class="form-group mb-3">
             <label for="item-price-input" class="form-label">
               <span id="lbl-unit-price">Harga Satuan Normal</span>
               <span class="text-hint" id="lbl-per-item-hint">per satuan item</span>
@@ -1068,102 +997,166 @@
               <span class="currency-prefix">Rp</span>
               <input type="text" id="item-price-input" inputmode="numeric" placeholder="0" required>
             </div>
-            <div class="quick-price-chips">
+            <div class="quick-price-chips mt-1">
               <button type="button" class="btn-price-chip" data-add="5000">+5rb</button>
               <button type="button" class="btn-price-chip" data-add="10000">+10rb</button>
               <button type="button" class="btn-price-chip" data-add="20000">+20rb</button>
               <button type="button" class="btn-price-chip" data-add="50000">+50rb</button>
             </div>
+
+            <!-- F-04: Price Comparator Live Card (Panah Merah / Hijau / Setara) -->
+            <div id="price-comparator-box" class="comparator-preview-card hidden">
+              <div class="comparator-icon-badge" id="comp-icon-badge">
+                <i data-lucide="trending-up" id="comp-icon"></i>
+              </div>
+              <div class="comparator-info">
+                <span class="comp-label-prev" id="comp-label-prev">Harga Riwayat Lalu: Rp 0</span>
+                <p class="comp-explanation" id="comp-explanation">Harga stabil persis sama</p>
+              </div>
+              <div class="comparator-delta-pill" id="comp-delta-pill">= Setara (Rp 0)</div>
+            </div>
           </div>
 
-          <!-- 7. Kalkulator Diskon Promo (Tanpa Diskon, Tunggal, Bertingkat) -->
-          <div class="discount-calculator-box glass-card-nested">
-            <div class="discount-box-header">
-              <div class="header-left">
-                <i data-lucide="percent" class="text-emerald"></i>
-                <label class="form-label mb-0" id="lbl-discount-calc-title">Kalkulator Diskon Promo</label>
-              </div>
-            </div>
-            <div class="discount-mode-toggle">
-              <button type="button" class="mode-btn active" data-mode="none" id="btn-mode-none">Tanpa Diskon</button>
-              <button type="button" class="mode-btn" data-mode="single" id="btn-mode-single">Tunggal</button>
-              <button type="button" class="mode-btn" data-mode="tiered" id="btn-mode-tiered">Bertingkat</button>
+          <!-- 5. OPSI LANJUTAN (KOLAPSIBEL / OPTIONAL): KATEGORI, SEHAT METER, BARCODE & DISKON -->
+          <div class="optional-details-wrapper glass-card-nested p-3 mb-3">
+            <div class="d-flex justify-content-between align-items-center mb-2">
+              <span class="text-xs font-bold text-muted uppercase">Pilihan Tambahan (Opsional)</span>
             </div>
 
-            <!-- Single Discount Mode Container -->
-            <div id="section-discount-single" class="discount-inputs-section hidden">
-              <div class="discount-input-row">
-                <label for="input-discount-single" id="lbl-discount-single-label">Diskon (%) :</label>
-                <div class="input-percent-group">
-                  <input type="number" id="input-discount-single" min="0" max="100" placeholder="25" value="0">
-                  <span class="percent-sign">%</span>
+            <!-- Kode Barcode Produk -->
+            <div class="form-group mb-2">
+              <label class="form-label text-xs" for="item-barcode-input">Kode Barcode (Pindai / Manual)</label>
+              <div class="input-with-icon">
+                <i data-lucide="barcode" class="field-icon"></i>
+                <input type="text" id="item-barcode-input" placeholder="Contoh: 8991234567890">
+              </div>
+            </div>
+
+            <!-- Kategori Produk -->
+            <div class="form-group mb-2">
+              <div class="label-with-action">
+                <label class="form-label text-xs" for="item-category-select" id="lbl-category">Kategori Produk</label>
+                <button type="button" id="btn-toggle-new-cat" class="btn-text-action">
+                  <i data-lucide="plus"></i> <span id="lbl-btn-add-cat">Kategori Baru</span>
+                </button>
+              </div>
+              <div class="select-with-icon">
+                <i data-lucide="layers" class="field-icon"></i>
+                <select id="item-category-select" class="glass-select category-dropdown">
+                  <!-- Dynamically populated via JS -->
+                </select>
+              </div>
+              <input type="hidden" id="item-category-input" value="Bahan Pokok">
+
+              <div id="new-category-inline-box" class="new-category-inline-box hidden">
+                <input type="text" id="input-new-cat-name" placeholder="Nama kategori baru..." class="glass-input-sm">
+                <button type="button" id="btn-confirm-add-cat" class="btn-sm-primary">
+                  <i data-lucide="check"></i> <span id="lbl-save-cat-btn">Simpan</span>
+                </button>
+                <button type="button" id="btn-cancel-add-cat" class="btn-sheet-close-sm">
+                  <i data-lucide="x"></i>
+                </button>
+              </div>
+            </div>
+
+            <!-- Klasifikasi Sehat Meter -->
+            <div class="form-group mb-2">
+              <label class="form-label text-xs" id="lbl-item-health-grade">Klasifikasi Sehat Meter</label>
+              <div class="health-classifier-grid">
+                <label class="health-radio-btn active">
+                  <input type="radio" name="item-health-type" value="healthy" checked>
+                  <div class="health-btn-pill pill-healthy">
+                    <span class="pill-dot"></span>
+                    <span>Alami / Segar</span>
+                  </div>
+                </label>
+                <label class="health-radio-btn">
+                  <input type="radio" name="item-health-type" value="neutral">
+                  <div class="health-btn-pill pill-neutral">
+                    <span class="pill-dot"></span>
+                    <span>Olahan</span>
+                  </div>
+                </label>
+                <label class="health-radio-btn">
+                  <input type="radio" name="item-health-type" value="unhealthy">
+                  <div class="health-btn-pill pill-unhealthy">
+                    <span class="pill-dot"></span>
+                    <span>Tinggi Gula</span>
+                  </div>
+                </label>
+              </div>
+            </div>
+
+            <!-- Kalkulator Diskon Promo -->
+            <div class="discount-calculator-box mt-3">
+              <div class="discount-box-header">
+                <div class="header-left">
+                  <i data-lucide="percent" class="text-emerald"></i>
+                  <label class="form-label mb-0 text-xs" id="lbl-discount-calc-title">Kalkulator Diskon Promo</label>
                 </div>
               </div>
-              <div class="quick-discount-pills">
-                <button type="button" class="disc-preset" data-d1="10">10%</button>
-                <button type="button" class="disc-preset" data-d1="20">20%</button>
-                <button type="button" class="disc-preset" data-d1="30">30%</button>
-                <button type="button" class="disc-preset" data-d1="50">50% (Buy 1 Get 1)</button>
+              <div class="discount-mode-toggle">
+                <button type="button" class="mode-btn active" data-mode="none" id="btn-mode-none">Tanpa Diskon</button>
+                <button type="button" class="mode-btn" data-mode="single" id="btn-mode-single">Tunggal</button>
+                <button type="button" class="mode-btn" data-mode="tiered" id="btn-mode-tiered">Bertingkat</button>
               </div>
-            </div>
 
-            <!-- Tiered Discount Mode Container -->
-            <div id="section-discount-tiered" class="discount-inputs-section hidden">
-              <div class="tiered-inputs-wrapper">
-                <div class="tiered-col">
-                  <label for="input-discount-d1" id="lbl-discount-d1">Diskon 1 (%)</label>
+              <div id="section-discount-single" class="discount-inputs-section hidden">
+                <div class="discount-input-row">
+                  <label for="input-discount-single" id="lbl-discount-single-label">Diskon (%) :</label>
                   <div class="input-percent-group">
-                    <input type="number" id="input-discount-d1" min="0" max="100" placeholder="50" value="0">
+                    <input type="number" id="input-discount-single" min="0" max="100" placeholder="25" value="0">
                     <span class="percent-sign">%</span>
                   </div>
                 </div>
-                <span class="tiered-plus-symbol">+</span>
-                <div class="tiered-col">
-                  <label for="input-discount-d2" id="lbl-discount-d2">Diskon 2 (%)</label>
-                  <div class="input-percent-group">
-                    <input type="number" id="input-discount-d2" min="0" max="100" placeholder="20" value="0">
-                    <span class="percent-sign">%</span>
-                  </div>
+                <div class="quick-discount-pills">
+                  <button type="button" class="disc-preset" data-d1="10">10%</button>
+                  <button type="button" class="disc-preset" data-d1="20">20%</button>
+                  <button type="button" class="disc-preset" data-d1="30">30%</button>
+                  <button type="button" class="disc-preset" data-d1="50">50%</button>
                 </div>
               </div>
-              <div class="quick-discount-pills">
-                <button type="button" class="disc-tiered-preset" data-d1="50" data-d2="20">50% + 20% (=60%)</button>
-                <button type="button" class="disc-tiered-preset" data-d1="70" data-d2="20">70% + 20% (=76%)</button>
-              </div>
-            </div>
 
-            <!-- Discount Calculation Result Breakdown -->
-            <div class="discount-calculation-result" id="discount-calc-preview">
-              <div class="calc-row">
-                <span id="lbl-before-discount">Harga Sebelum Diskon:</span>
-                <span id="preview-normal-total">Rp 0</span>
+              <div id="section-discount-tiered" class="discount-inputs-section hidden">
+                <div class="tiered-inputs-wrapper">
+                  <div class="tiered-col">
+                    <label for="input-discount-d1" id="lbl-discount-d1">Diskon 1 (%)</label>
+                    <div class="input-percent-group">
+                      <input type="number" id="input-discount-d1" min="0" max="100" placeholder="50" value="0">
+                      <span class="percent-sign">%</span>
+                    </div>
+                  </div>
+                  <span class="tiered-plus-symbol">+</span>
+                  <div class="tiered-col">
+                    <label for="input-discount-d2" id="lbl-discount-d2">Diskon 2 (%)</label>
+                    <div class="input-percent-group">
+                      <input type="number" id="input-discount-d2" min="0" max="100" placeholder="20" value="0">
+                      <span class="percent-sign">%</span>
+                    </div>
+                  </div>
+                </div>
+                <div class="quick-discount-pills">
+                  <button type="button" class="disc-tiered-preset" data-d1="50" data-d2="20">50% + 20% (=60%)</button>
+                  <button type="button" class="disc-tiered-preset" data-d1="70" data-d2="20">70% + 20% (=76%)</button>
+                </div>
               </div>
-              <div class="calc-row text-emerald">
-                <span id="lbl-saved-cut">Potongan Hemat:</span>
-                <span id="preview-discount-saved">- Rp 0</span>
-              </div>
-              <div class="calc-row font-bold border-top">
-                <span id="lbl-final-row-price">Harga Akhir Baris:</span>
-                <span class="preview-final-val" id="preview-final-total">Rp 0</span>
+
+              <div class="discount-calculation-result" id="discount-calc-preview">
+                <div class="calc-row">
+                  <span id="lbl-before-discount">Harga Sebelum:</span>
+                  <span id="preview-normal-total">Rp 0</span>
+                </div>
+                <div class="calc-row text-emerald">
+                  <span id="lbl-saved-cut">Potongan:</span>
+                  <span id="preview-discount-saved">- Rp 0</span>
+                </div>
+                <div class="calc-row font-bold border-top">
+                  <span id="lbl-final-row-price">Total Item:</span>
+                  <span class="preview-final-val" id="preview-final-total">Rp 0</span>
+                </div>
               </div>
             </div>
           </div>
-
-          <!-- SMART BUYING TIPS SECTION IN MODAL -->
-          <div class="buying-tips-box glass-card-nested">
-            <div class="buying-tips-header">
-              <i data-lucide="lightbulb" class="text-amber"></i>
-              <h4 id="lbl-buying-tips-title">Tips Cerdas Saat Pembelian</h4>
-            </div>
-            <ul class="buying-tips-list" id="modal-buying-tips-list">
-              <li><strong>Perhatikan Harga Satuan:</strong> Selalu cek harga per satuan kg/liter, bukan semata kemasan
-                besar.</li>
-              <li><strong>Waspada Promo Bertingkat:</strong> Diskon 50%+20% berarti diskon riil 60% (bukan 70%).</li>
-              <li><strong>Cek Tanggal Kedaluwarsa:</strong> Periksa expired date barang supermarket terutama barang
-                diskon besar.</li>
-            </ul>
-          </div>
-
         </form>
       </div>
 

@@ -2130,15 +2130,21 @@ function renderHistory() {
   container.innerHTML = state.history.map((h, idx) => `
     <div class="history-card glass-card" data-hist-idx="${idx}">
       <div class="history-card-header">
-        <div>
-          <h4>📍 ${h.storeLocation || h.note}</h4>
-          <span class="history-date">${h.date} • ${h.itemCount} Item</span>
+        <div style="flex: 1; padding-right: 12px;">
+          <h4>📍 ${h.storeLocation || h.storeName || h.note || 'Lotte Mart Grocery'}</h4>
+          <div class="history-date mt-1">
+            <span>📅 ${h.formattedDate || h.date}</span>
+            <span style="opacity: 0.5;">•</span>
+            <span>🛍️ ${h.itemCount || (h.items ? h.items.length : 1)} Item</span>
+          </div>
         </div>
-        <strong class="history-total text-primary">Rp ${formatRupiah(h.totalSpent)}</strong>
+        <div style="text-align: right;">
+          <strong class="history-total">Rp ${formatRupiah(h.totalSpent)}</strong>
+        </div>
       </div>
       <div class="history-card-actions">
         <button type="button" class="btn-outline-glass btn-sm btn-view-receipt" data-hist-idx="${idx}">
-          <i data-lucide="eye"></i> <span>Lihat Struk &amp; Lokasi</span>
+          <i data-lucide="receipt"></i> <span>Lihat Rincian Struk</span>
         </button>
       </div>
     </div>
