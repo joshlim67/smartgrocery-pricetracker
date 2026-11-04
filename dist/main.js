@@ -1,4 +1,4 @@
-﻿/**
+/**
  * GROCERYX 2.0 • Modern Food E-Commerce & Smart Budget Safety Tracker
  * Architecture: Vanilla ES Modules, Liquid Glass UI, Mobile-First 430px Chassis
  */
@@ -2155,11 +2155,14 @@ function renderHistory() {
     <div class="history-card glass-card" data-hist-idx="${idx}">
       <div class="history-card-header">
         <div class="history-card-info">
-          <h4 class="history-store-title">ðŸ“ ${h.storeLocation || h.storeName || h.note || 'Lotte Mart Grocery'}</h4>
+          <div class="history-store-row">
+            <i data-lucide="map-pin" class="store-icon text-primary"></i>
+            <h4 class="history-store-title">${h.storeLocation || h.storeName || h.note || 'Lotte Mart Grocery - Puri Indah'}</h4>
+          </div>
           <div class="history-meta-sub">
-            <span>ðŸ“… ${h.formattedDate || h.date}</span>
-            <span class="meta-dot">â€¢</span>
-            <span>ðŸ›ï¸ ${h.itemCount || (h.items ? h.items.length : 1)} Item</span>
+            <span class="meta-item"><i data-lucide="calendar"></i> ${h.formattedDate || h.date}</span>
+            <span class="meta-dot">&bull;</span>
+            <span class="meta-item"><i data-lucide="shopping-bag"></i> ${h.itemCount || (h.items ? h.items.length : 1)} Item</span>
           </div>
         </div>
         <div class="history-price-badge">
@@ -2212,7 +2215,7 @@ function openHistoryDetailModal(idx) {
         </div>
         <div class="receipt-meta-row">
           <span>Lokasi:</span>
-          <strong>ðŸ“ ${h.storeLocation || h.storeName || h.note || 'Supermarket'}</strong>
+          <strong><i data-lucide="map-pin" class="text-primary" style="width:13px;height:13px;display:inline-block;vertical-align:middle;margin-right:2px;"></i> ${h.storeLocation || h.storeName || h.note || 'Supermarket'}</strong>
         </div>
         <div class="receipt-meta-row">
           <span>Status Sesi:</span>
@@ -2282,10 +2285,6 @@ function openHistoryDetailModal(idx) {
   updateIcons();
   modal.classList.remove('hidden');
 }
-
-// ==========================================================================
-// 16. ACCOUNT STATS & CATEGORY PROPORTION
-// ==========================================================================
 
 function renderAccountStats() {
   const totalSpentAll = state.history.reduce((sum, h) => sum + (h.totalSpent || 0), 0);
