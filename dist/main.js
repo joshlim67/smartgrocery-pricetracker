@@ -1290,6 +1290,17 @@ function renderCatalog() {
   // Event handlers for quick add
   grid.querySelectorAll('.btn-quick-add').forEach((btn) => {
     btn.onclick = () => {
+      const totals = calculateCartTotals();
+      const limit = state.safetyCap || 500000;
+      if (totals.finalNetTotal > limit) {
+        sound.playWarning();
+        const deficit = totals.finalNetTotal - limit;
+        showToast(`Batas anggaran terlampaui (+Rp ${formatRupiah(deficit)}). Tidak dapat menambah barang ke keranjang!`, 'error');
+        if (typeof showOverbudgetModal === 'function') {
+          showOverbudgetModal(totals.finalNetTotal, limit, deficit);
+        }
+        return;
+      }
       const id = btn.getAttribute('data-id');
       const prod = all.find((p) => p.id === id);
       if (prod) {
@@ -1313,6 +1324,17 @@ function renderCatalog() {
   // Stepper handlers
   grid.querySelectorAll('.btn-cart-inc').forEach((btn) => {
     btn.onclick = () => {
+      const totals = calculateCartTotals();
+      const limit = state.safetyCap || 500000;
+      if (totals.finalNetTotal > limit) {
+        sound.playWarning();
+        const deficit = totals.finalNetTotal - limit;
+        showToast(`Batas anggaran terlampaui (+Rp ${formatRupiah(deficit)}). Tidak dapat menambah kuantitas barang!`, 'error');
+        if (typeof showOverbudgetModal === 'function') {
+          showOverbudgetModal(totals.finalNetTotal, limit, deficit);
+        }
+        return;
+      }
       const name = btn.getAttribute('data-name');
       const item = state.cart.find((i) => i.name === name);
       if (item) {
@@ -2394,6 +2416,7 @@ function renderAccountStats() {
 
 function switchTab(targetViewId) {
   sound.playClick();
+  setTimeout(updateJumpToCheckoutVisibility, 60);
 
   // ROUTE PROTECTION: Require login for private tabs (Account & History)
   const protectedTabs = ['view-account', 'view-history'];
@@ -3054,6 +3077,17 @@ document.addEventListener('DOMContentLoaded', () => {
   const btnRemovePhoto = document.getElementById('btn-remove-photo');
 
   function openAddItemModal() {
+    const totals = calculateCartTotals();
+    const limit = state.safetyCap || 500000;
+    if (totals.finalNetTotal > limit) {
+      sound.playWarning();
+      const deficit = totals.finalNetTotal - limit;
+      showToast(`Batas anggaran terlampaui (Overbudget Rp ${formatRupiah(deficit)}). Tidak dapat menambah produk baru sebelum anggaran aman!`, 'error');
+      if (typeof showOverbudgetModal === 'function') {
+        showOverbudgetModal(totals.finalNetTotal, limit, deficit);
+      }
+      return;
+    }
     sound.playClick();
     if (itemModal) itemModal.classList.remove('hidden');
   }
@@ -3724,9 +3758,13 @@ function updateJumpToCheckoutVisibility() {
   const jumpBtn = document.getElementById('btn-jump-to-checkout');
   if (!jumpBtn) return;
 
-  // Tampilkan tombol melayang jika item di keranjang >= 3 item
-  if (state.cart && state.cart.length >= 3) {
+  const cartView = document.getElementById('view-cart');
+  const isCartActive = cartView && !cartView.classList.contains('hidden');
+
+  // Tampilkan panah melayang di tab keranjang jika ada item
+  if (isCartActive && state.cart && state.cart.length >= 2) {
     jumpBtn.classList.remove('hidden');
+    updateIcons();
   } else {
     jumpBtn.classList.add('hidden');
   }
@@ -3738,9 +3776,16 @@ function initJumpToCheckoutButton() {
 
   jumpBtn.onclick = () => {
     sound.playClick();
+    const checkoutBtn = document.getElementById('btn-checkout-session');
     const dock = document.getElementById('cart-summary-dock');
-    if (dock) {
+    const mainContent = document.querySelector('.app-main-content');
+
+    if (checkoutBtn) {
+      checkoutBtn.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    } else if (dock) {
       dock.scrollIntoView({ behavior: 'smooth', block: 'end' });
+    } else if (mainContent) {
+      mainContent.scrollTo({ top: mainContent.scrollHeight, behavior: 'smooth' });
     }
   };
 }

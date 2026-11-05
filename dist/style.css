@@ -7044,50 +7044,55 @@ body::after {
   transform: scale(0.98) !important;
 }
 
-/* Floating Quick Jump to Checkout Button */
+/* Floating Round Down Arrow to Jump Straight to Selesaikan Struk */
 .btn-jump-checkout {
   position: fixed;
   bottom: 84px;
-  right: 18px;
-  z-index: 95;
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  background: var(--primary-gradient, linear-gradient(135deg, #2563eb, #1d4ed8));
+  right: calc(50% - 215px + 18px);
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  background: #2563eb;
   color: #ffffff;
-  padding: 10px 18px;
-  border-radius: 9999px;
-  font-size: 0.82rem;
-  font-weight: 800;
-  border: 1px solid rgba(255, 255, 255, 0.35);
-  box-shadow: 0 8px 24px rgba(37, 99, 235, 0.4), 0 2px 6px rgba(0, 0, 0, 0.15);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 90;
+  border: 2.5px solid #ffffff;
+  box-shadow: 0 8px 24px rgba(37, 99, 235, 0.5), 0 2px 8px rgba(0, 0, 0, 0.15);
   cursor: pointer;
   transition: all 0.25s var(--spring-bounce);
-  animation: floatBounce 2.5s infinite ease-in-out;
+  animation: jumpBounce 2s infinite ease-in-out;
+}
+
+@media (max-width: 450px) {
+  .btn-jump-checkout {
+    right: 18px !important;
+  }
 }
 
 .btn-jump-checkout i,
 .btn-jump-checkout svg {
-  width: 16px;
-  height: 16px;
-  stroke-width: 2.5;
-  transition: transform 0.2s;
+  width: 24px;
+  height: 24px;
+  stroke-width: 3;
 }
 
 .btn-jump-checkout:hover {
-  transform: translateY(-2px) scale(1.03);
-  box-shadow: 0 12px 28px rgba(37, 99, 235, 0.5);
+  transform: scale(1.1);
+  background: #1d4ed8;
+  box-shadow: 0 10px 28px rgba(37, 99, 235, 0.6);
 }
 
 .btn-jump-checkout:active {
-  transform: scale(0.96);
+  transform: scale(0.92);
 }
 
-@keyframes floatBounce {
+@keyframes jumpBounce {
   0%, 100% {
     transform: translateY(0);
   }
   50% {
-    transform: translateY(-5px);
+    transform: translateY(-8px);
   }
 }
