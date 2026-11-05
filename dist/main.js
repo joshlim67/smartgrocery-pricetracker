@@ -1566,6 +1566,14 @@ function renderCart() {
 
   container.querySelectorAll('.btn-cart-row-inc').forEach((btn) => {
     btn.onclick = () => {
+      const totals = calculateCartTotals();
+      const limit = state.safetyCap || 500000;
+      if (totals.finalNetTotal > limit) {
+        sound.playWarning();
+        const deficit = totals.finalNetTotal - limit;
+        showToast(`Batas anggaran terlampaui (+Rp ${formatRupiah(deficit)}). Tidak dapat menambah kuantitas barang!`, 'error');
+        return;
+      }
       const idx = parseInt(btn.getAttribute('data-idx'), 10);
       if (state.cart[idx]) {
         state.cart[idx].qty += 1;
@@ -1592,7 +1600,27 @@ function renderCart() {
   updateIcons();
 }
 
+function isCartOverbudget() {
+  const totals = calculateCartTotals();
+  const limit = state.safetyCap || 500000;
+  return totals.finalNetTotal > limit;
+}
+
 function addItemToCart(itemData) {
+  const totals = calculateCartTotals();
+  const limit = state.safetyCap || 500000;
+
+  // STRICT OVERBUDGET LOCK: Jika belanjaan sudah melampaui limit anggaran, blokir penambahan barang baru
+  if (totals.finalNetTotal > limit) {
+    sound.playWarning();
+    const deficit = totals.finalNetTotal - limit;
+    showToast(`Batas anggaran terlampaui (Overbudget Rp ${formatRupiah(deficit)}). Hapus atau kurangi item sebelum menambah barang baru!`, 'error');
+    if (typeof showOverbudgetModal === 'function') {
+      showOverbudgetModal(totals.finalNetTotal, limit, deficit);
+    }
+    return false;
+  }
+
   const existing = state.cart.find((i) => i.name.toLowerCase() === itemData.name.toLowerCase());
   if (existing) {
     existing.qty += (itemData.qty || 1);
@@ -1603,6 +1631,7 @@ function addItemToCart(itemData) {
     });
   }
   saveCart();
+  return true;
 }
 
 function saveCart() {
