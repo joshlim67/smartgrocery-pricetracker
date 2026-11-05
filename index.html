@@ -206,7 +206,6 @@
             </div>
             <div>
               <h2 id="lbl-cart-page-title">Keranjang Belanja</h2>
-              <p id="lbl-cart-page-desc">Periksa kuantitas item, masukkan voucher diskon, dan amankan budget Anda.</p>
             </div>
           </div>
           <button type="button" id="btn-clear-cart" class="btn-clear-cart hidden" title="Hapus Semua Barang dari Keranjang" aria-label="Hapus Semua Barang">
@@ -689,32 +688,23 @@
           </button>
         </div>
 
-        <!-- HELP CENTER (PUSAT BANTUAN) -->
-        <div class="settings-section glass-card" id="account-help-center-section">
-          <div class="settings-section-header">
-            <i data-lucide="headphones" class="text-primary"></i>
-            <div>
-              <h3 id="lbl-help-title">Pusat Bantuan (Help Center)</h3>
-              <p id="lbl-help-sub">Hubungi Customer Service kami jika membutuhkan bantuan</p>
+        <!-- HELP CENTER (PUSAT BANTUAN - CLEAN SINGLE ROW) -->
+        <div class="help-center-clean-card glass-card" id="account-help-center-section">
+          <div class="help-clean-left">
+            <div class="help-clean-icon">
+              <i data-lucide="headphones"></i>
             </div>
-          </div>
-          <div class="help-center-card-content">
-            <div class="help-cs-card glass-card-nested">
-              <div class="help-cs-details">
-                <span class="help-cs-badge"><i data-lucide="clock" class="help-badge-icon"></i> CS Siap Membantu</span>
-                <div class="help-phone-row">
-                  <i data-lucide="phone-call" class="text-primary"></i>
-                  <strong class="help-cs-phone" id="lbl-cs-phone">+62 123456777</strong>
-                </div>
-                <p class="help-cs-note" id="lbl-cs-note">Hubungi kami jika mengalami kendala atau membutuhkan informasi
-                  produk.</p>
-              </div>
-              <a href="tel:+62123456777" class="btn-glow-primary btn-call-cs-action" id="btn-call-cs">
-                <i data-lucide="phone"></i>
-                <span id="lbl-btn-call-cs">Hubungi CS</span>
+            <div class="help-clean-info">
+              <h3 id="lbl-help-title">Pusat Bantuan</h3>
+              <a href="tel:+62123456777" class="help-clean-phone" id="lbl-cs-phone" title="Telepon Customer Service">
+                <i data-lucide="phone-call"></i> <span>+62 123456777</span>
               </a>
             </div>
           </div>
+          <a href="tel:+62123456777" class="btn-glow-primary btn-call-cs-clean" id="btn-call-cs">
+            <i data-lucide="phone"></i>
+            <span id="lbl-btn-call-cs">Hubungi CS</span>
+          </a>
         </div>
 
       </section>
