@@ -2320,17 +2320,38 @@ function renderAccountStats() {
     return;
   }
 
+  const CAT_PALETTE = {
+    'Bahan Pokok': '#2563eb',
+    'Sayuran': '#10b981',
+    'Buah & Sayur': '#10b981',
+    'Daging & Seafood': '#ef4444',
+    'Bumbu & Masak': '#f59e0b',
+    'Minyak & Saus': '#f97316',
+    'Susu & Olahan': '#06b6d4',
+    'Minuman': '#8b5cf6',
+    'Snack & Biskuit': '#ec4899',
+    'Lainnya': '#64748b'
+  };
+  const DEFAULT_COLORS = ['#2563eb', '#10b981', '#f59e0b', '#8b5cf6', '#ec4899', '#06b6d4'];
+
   entries.sort((a, b) => b[1] - a[1]);
-  catBars.innerHTML = entries.slice(0, 4).map(([cat, total]) => {
+  catBars.innerHTML = entries.slice(0, 5).map(([cat, total], idx) => {
     const p = totalSpentAll > 0 ? Math.round((total / totalSpentAll) * 100) : 0;
+    const color = CAT_PALETTE[cat] || DEFAULT_COLORS[idx % DEFAULT_COLORS.length];
     return `
       <div class="cat-bar-item">
-        <div class="cat-bar-labels">
-          <span>${cat}</span>
-          <strong>Rp ${formatRupiah(total)} (${p}%)</strong>
+        <div class="cat-bar-header">
+          <div class="cat-name-wrap">
+            <span class="cat-color-dot" style="background: ${color};"></span>
+            <span class="cat-name">${cat}</span>
+          </div>
+          <div class="cat-val-wrap">
+            <strong class="cat-amount">Rp ${formatRupiah(total)}</strong>
+            <span class="cat-percent-badge">${p}%</span>
+          </div>
         </div>
         <div class="cat-bar-track">
-          <div class="cat-bar-fill" style="width: ${p}%;"></div>
+          <div class="cat-bar-fill" style="width: ${p}%; background: ${color};"></div>
         </div>
       </div>
     `;
