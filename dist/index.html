@@ -127,9 +127,9 @@
               </button>
             </div>
           </div>
-          <button type="button" id="btn-open-add-product" class="btn-inline-add-prod" title="Tambah Produk Baru ke Katalog" aria-label="Tambah Produk">
+          <button type="button" id="btn-open-add-product-inline" class="btn-inline-add-prod" title="Tambah Produk Baru ke Katalog" aria-label="Tambah Produk">
             <i data-lucide="plus"></i>
-            <span class="btn-inline-text">Produk</span>
+            <span class="btn-inline-text">+ Produk</span>
           </button>
         </div>
 
@@ -714,7 +714,13 @@
 
     </main>
 
-    <!-- Floating Add Button moved inline to Search Bar -->
+    <!-- Floating Liquid Glass Action Button for Adding New Product (Etalase View - Request 6) -->
+    <button type="button" id="btn-open-add-product" class="btn-floating-fab btn-fab-add" title="Tambah Produk Baru ke Katalog" aria-label="Tambah Produk Baru">
+      <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round">
+        <line x1="12" y1="5" x2="12" y2="19"></line>
+        <line x1="5" y1="12" x2="19" y2="12"></line>
+      </svg>
+    </button>
 
     <!-- Floating Liquid Glass Button to Jump to Checkout (Cart View) -->
     <button type="button" id="btn-jump-to-checkout" class="btn-floating-fab btn-jump-checkout hidden" title="Langsung ke Selesaikan Struk" aria-label="Scroll ke Selesaikan Struk">

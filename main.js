@@ -3351,6 +3351,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // Open Add Product Modal with Photo Upload
   const btnOpenAddProduct = document.getElementById('btn-open-add-product');
+  const btnOpenAddProductInline = document.getElementById('btn-open-add-product-inline');
   const itemModal = document.getElementById('item-modal');
   const btnCloseItemModal = document.getElementById('btn-close-item-modal');
   const photoFile = document.getElementById('item-photo-file');
@@ -3359,23 +3360,16 @@ document.addEventListener('DOMContentLoaded', () => {
   const btnRemovePhoto = document.getElementById('btn-remove-photo');
 
   function openAddItemModal() {
-    const totals = calculateCartTotals();
-    const limit = state.safetyCap || 500000;
-    if (totals.finalNetTotal > limit) {
-      sound.playWarning();
-      const deficit = totals.finalNetTotal - limit;
-      showToast(`Batas anggaran terlampaui (Overbudget Rp ${formatRupiah(deficit)}). Tidak dapat menambah produk baru sebelum anggaran aman!`, 'error');
-      if (typeof showOverbudgetModal === 'function') {
-        showOverbudgetModal(totals.finalNetTotal, limit, deficit);
-      }
-      return;
-    }
+    // Membuka modal tambah produk ke katalog/etalase
     sound.playClick();
     if (itemModal) itemModal.classList.remove('hidden');
   }
 
   if (btnOpenAddProduct) {
     btnOpenAddProduct.onclick = openAddItemModal;
+  }
+  if (btnOpenAddProductInline) {
+    btnOpenAddProductInline.onclick = openAddItemModal;
   }
 
   if (btnCloseItemModal) {
