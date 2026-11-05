@@ -7044,54 +7044,81 @@ body::after {
   transform: scale(0.98) !important;
 }
 
-/* Floating Round Down Arrow to Jump Straight to Selesaikan Struk */
-.btn-jump-checkout {
+/* ==========================================================================
+   TRANSLUCENT LIQUID GLASS FLOATING ACTION BUTTONS (FAB)
+   ========================================================================== */
+.btn-floating-fab {
   position: absolute;
   bottom: 84px;
   right: 18px;
   width: 52px;
   height: 52px;
   border-radius: 50%;
-  background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
-  color: #ffffff;
   display: flex;
   align-items: center;
   justify-content: center;
   z-index: 95;
-  border: 3px solid #ffffff;
-  box-shadow: 0 10px 25px rgba(37, 99, 235, 0.45), 0 4px 10px rgba(0, 0, 0, 0.18);
   cursor: pointer;
   outline: none;
-  transition: transform 0.25s var(--spring-bounce), box-shadow 0.2s ease, opacity 0.2s ease;
-  animation: jumpBounce 2s infinite ease-in-out;
+  
+  /* Modern Liquid Glass Translucency */
+  background: rgba(37, 99, 235, 0.38) !important;
+  backdrop-filter: blur(16px) saturate(190%) !important;
+  -webkit-backdrop-filter: blur(16px) saturate(190%) !important;
+  border: 1.5px solid rgba(255, 255, 255, 0.65) !important;
+  box-shadow: 
+    0 8px 30px rgba(37, 99, 235, 0.28),
+    0 2px 8px rgba(0, 0, 0, 0.08),
+    inset 0 1px 1.5px rgba(255, 255, 255, 0.7),
+    inset 0 -1px 2px rgba(0, 0, 0, 0.12) !important;
+  color: #ffffff !important;
+  transition: transform 0.25s var(--spring-bounce), background 0.2s ease, box-shadow 0.2s ease, opacity 0.2s ease !important;
 }
 
-.btn-jump-checkout.hidden {
+.btn-floating-fab.hidden {
   display: none !important;
 }
 
-.btn-jump-checkout:hover {
-  transform: scale(1.08);
-  background: #1d4ed8;
-  box-shadow: 0 12px 30px rgba(37, 99, 235, 0.6);
+.btn-floating-fab:hover {
+  transform: scale(1.08) !important;
+  background: rgba(37, 99, 235, 0.52) !important;
+  box-shadow: 
+    0 12px 32px rgba(37, 99, 235, 0.38),
+    inset 0 1px 2px rgba(255, 255, 255, 0.85) !important;
 }
 
-.btn-jump-checkout:active {
-  transform: scale(0.92);
+.btn-floating-fab:active {
+  transform: scale(0.92) !important;
 }
 
-.btn-jump-checkout svg,
-.btn-jump-checkout i {
+.btn-floating-fab svg,
+.btn-floating-fab i {
+  color: #ffffff !important;
+  filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.4));
+}
+
+.btn-jump-checkout svg {
   width: 26px;
   height: 26px;
   stroke: #ffffff;
   stroke-width: 2.8;
 }
 
-[data-theme="midnight-glass"] .btn-jump-checkout,
-.dark .btn-jump-checkout {
-  border-color: rgba(255, 255, 255, 0.85);
-  box-shadow: 0 10px 25px rgba(37, 99, 235, 0.7), 0 4px 12px rgba(0, 0, 0, 0.5);
+.btn-fab-add svg {
+  width: 28px;
+  height: 28px;
+  stroke: #ffffff;
+  stroke-width: 2.6;
+}
+
+/* Down arrow button in cart */
+.btn-jump-checkout {
+  animation: jumpBounce 2s infinite ease-in-out;
+}
+
+/* + Add product button in etalase */
+.btn-fab-add {
+  animation: fabFloat 3s infinite ease-in-out;
 }
 
 @keyframes jumpBounce {
@@ -7101,4 +7128,24 @@ body::after {
   50% {
     transform: translateY(-7px);
   }
+}
+
+@keyframes fabFloat {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-5px);
+  }
+}
+
+/* Dark theme overrides for liquid glass FAB */
+[data-theme="midnight-glass"] .btn-floating-fab,
+.dark .btn-floating-fab {
+  background: rgba(37, 99, 235, 0.42) !important;
+  border-color: rgba(255, 255, 255, 0.4) !important;
+  box-shadow: 
+    0 8px 30px rgba(0, 0, 0, 0.5),
+    0 0 16px rgba(59, 130, 246, 0.3),
+    inset 0 1px 1.5px rgba(255, 255, 255, 0.5) !important;
 }

@@ -1619,7 +1619,7 @@ function renderCart() {
   });
 
   updateSafetyBanner();
-  updateJumpToCheckoutVisibility();
+  updateFloatingButtonsVisibility();
   updateIcons();
 }
 
@@ -2450,7 +2450,7 @@ function switchTab(targetViewId) {
   }
 
   window.scrollTo({ top: 0, behavior: 'smooth' });
-  updateJumpToCheckoutVisibility();
+  updateFloatingButtonsVisibility();
   updateIcons();
 }
 
@@ -3754,43 +3754,63 @@ function updatePriceComparatorUI() {
 });
 
 
-// Quick Jump to Selesaikan Struk button handler
-function updateJumpToCheckoutVisibility() {
+// Floating Action Buttons Visibility Engine (Etalase + / Cart v)
+function updateFloatingButtonsVisibility() {
+  const fabAddBtn = document.getElementById('btn-open-add-product');
   const jumpBtn = document.getElementById('btn-jump-to-checkout');
-  if (!jumpBtn) return;
 
+  const shopView = document.getElementById('view-shop');
   const cartView = document.getElementById('view-cart');
+
+  const isShopActive = (state.activeTab === 'view-shop') || (shopView && !shopView.classList.contains('hidden'));
   const isCartActive = (state.activeTab === 'view-cart') || (cartView && !cartView.classList.contains('hidden'));
 
-  // Tampilkan panah melayang di tab keranjang jika ada item
-  if (isCartActive && state.cart && state.cart.length > 0) {
-    jumpBtn.classList.remove('hidden');
-    jumpBtn.style.display = 'flex';
-  } else {
-    jumpBtn.classList.add('hidden');
-    jumpBtn.style.display = 'none';
+  // Etalase FAB (+)
+  if (fabAddBtn) {
+    if (isShopActive) {
+      fabAddBtn.classList.remove('hidden');
+      fabAddBtn.style.display = 'flex';
+    } else {
+      fabAddBtn.classList.add('hidden');
+      fabAddBtn.style.display = 'none';
+    }
   }
+
+  // Cart Jump Button (v)
+  if (jumpBtn) {
+    if (isCartActive && state.cart && state.cart.length > 0) {
+      jumpBtn.classList.remove('hidden');
+      jumpBtn.style.display = 'flex';
+    } else {
+      jumpBtn.classList.add('hidden');
+      jumpBtn.style.display = 'none';
+    }
+  }
+}
+
+function updateJumpToCheckoutVisibility() {
+  updateFloatingButtonsVisibility();
 }
 
 function initJumpToCheckoutButton() {
   const jumpBtn = document.getElementById('btn-jump-to-checkout');
-  if (!jumpBtn) return;
+  if (jumpBtn) {
+    jumpBtn.onclick = (e) => {
+      if (e) {
+        e.preventDefault();
+        e.stopPropagation();
+      }
+      if (typeof sound !== 'undefined' && sound.playClick) sound.playClick();
+      const checkoutBtn = document.getElementById('btn-checkout-session');
+      const mainContent = document.querySelector('.app-main-content');
 
-  jumpBtn.onclick = (e) => {
-    if (e) {
-      e.preventDefault();
-      e.stopPropagation();
-    }
-    if (typeof sound !== 'undefined' && sound.playClick) sound.playClick();
-    const checkoutBtn = document.getElementById('btn-checkout-session');
-    const mainContent = document.querySelector('.app-main-content');
-
-    if (checkoutBtn) {
-      checkoutBtn.scrollIntoView({ behavior: 'smooth', block: 'center' });
-    }
-    if (mainContent) {
-      mainContent.scrollTo({ top: mainContent.scrollHeight, behavior: 'smooth' });
-    }
-  };
-  updateJumpToCheckoutVisibility();
+      if (checkoutBtn) {
+        checkoutBtn.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      }
+      if (mainContent) {
+        mainContent.scrollTo({ top: mainContent.scrollHeight, behavior: 'smooth' });
+      }
+    };
+  }
+  updateFloatingButtonsVisibility();
 }
