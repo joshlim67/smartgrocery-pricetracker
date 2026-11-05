@@ -1597,6 +1597,7 @@ function renderCart() {
   });
 
   updateSafetyBanner();
+  updateJumpToCheckoutVisibility();
   updateIcons();
 }
 
@@ -2646,6 +2647,7 @@ document.addEventListener('DOMContentLoaded', () => {
   renderSehatMeter();
   updateSafetyBanner();
   initStoreLocationModule();
+  initJumpToCheckoutButton();
 
   // Bottom Navigation Dock Click Handlers
   document.querySelectorAll('.nav-tab-btn[data-target]').forEach((btn) => {
@@ -3715,3 +3717,30 @@ function updatePriceComparatorUI() {
 
   updateIcons();
 });
+
+
+// Quick Jump to Selesaikan Struk button handler
+function updateJumpToCheckoutVisibility() {
+  const jumpBtn = document.getElementById('btn-jump-to-checkout');
+  if (!jumpBtn) return;
+
+  // Tampilkan tombol melayang jika item di keranjang >= 3 item
+  if (state.cart && state.cart.length >= 3) {
+    jumpBtn.classList.remove('hidden');
+  } else {
+    jumpBtn.classList.add('hidden');
+  }
+}
+
+function initJumpToCheckoutButton() {
+  const jumpBtn = document.getElementById('btn-jump-to-checkout');
+  if (!jumpBtn) return;
+
+  jumpBtn.onclick = () => {
+    sound.playClick();
+    const dock = document.getElementById('cart-summary-dock');
+    if (dock) {
+      dock.scrollIntoView({ behavior: 'smooth', block: 'end' });
+    }
+  };
+}

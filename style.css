@@ -7043,3 +7043,51 @@ body::after {
 .btn-checkout-glow:active {
   transform: scale(0.98) !important;
 }
+
+/* Floating Quick Jump to Checkout Button */
+.btn-jump-checkout {
+  position: fixed;
+  bottom: 84px;
+  right: 18px;
+  z-index: 95;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: var(--primary-gradient, linear-gradient(135deg, #2563eb, #1d4ed8));
+  color: #ffffff;
+  padding: 10px 18px;
+  border-radius: 9999px;
+  font-size: 0.82rem;
+  font-weight: 800;
+  border: 1px solid rgba(255, 255, 255, 0.35);
+  box-shadow: 0 8px 24px rgba(37, 99, 235, 0.4), 0 2px 6px rgba(0, 0, 0, 0.15);
+  cursor: pointer;
+  transition: all 0.25s var(--spring-bounce);
+  animation: floatBounce 2.5s infinite ease-in-out;
+}
+
+.btn-jump-checkout i,
+.btn-jump-checkout svg {
+  width: 16px;
+  height: 16px;
+  stroke-width: 2.5;
+  transition: transform 0.2s;
+}
+
+.btn-jump-checkout:hover {
+  transform: translateY(-2px) scale(1.03);
+  box-shadow: 0 12px 28px rgba(37, 99, 235, 0.5);
+}
+
+.btn-jump-checkout:active {
+  transform: scale(0.96);
+}
+
+@keyframes floatBounce {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-5px);
+  }
+}
