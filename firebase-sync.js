@@ -3,7 +3,7 @@
 // ==========================================================================
 // - Guest Mode (belum login): TIDAK ADA data yang disimpan ke Firebase Cloud.
 // - Authenticated User (sudah login): Setiap akun memiliki dokumen Firestore sendiri
-//   berdasarkan User ID / Email unik ('users_data/{userId}').
+//   berdasarkan User ID / Email unik ('users_grocery_data/{userId}').
 // - Realtime Snapshot: Perubahan tersinkronisasi instan multi-perangkat via onSnapshot.
 // ==========================================================================
 
@@ -19,6 +19,7 @@ import {
 import { firebaseConfig as fileConfig } from './firebase-config.js';
 
 const STORAGE_KEY_FIREBASE_CONFIG = 'sg_firebase_config_v1';
+const STORAGE_KEY_CURRENT_USER = 'sg_current_user_v1';
 const USERS_COLLECTION = 'users_grocery_data';
 
 // ID unik tab/perangkat saat ini agar tidak terjadi infinite loop saat menerima update dari diri sendiri
@@ -57,22 +58,44 @@ function getEffectiveConfig() {
   return null;
 }
 
-// Generate doc ID unik yang aman untuk Firestore berdasarkan User
-function getUserDocId() {
-  if (!window.SmartGrocery || !window.SmartGrocery.state) return null;
-  const user = window.SmartGrocery.state.currentUser;
+// Generate doc ID unik yang konsisten di seluruh perangkat (PC, HP, Tablet)
+export function getUserDocId() {
+  let user = null;
+  if (window.SmartGrocery && window.SmartGrocery.state && window.SmartGrocery.state.currentUser) {
+    user = window.SmartGrocery.state.currentUser;
+  } else {
+    try {
+      const raw = localStorage.getItem(STORAGE_KEY_CURRENT_USER);
+      if (raw) user = JSON.parse(raw);
+    } catch (_) {}
+  }
+
   if (!user) return null;
 
-  // Gunakan Google ID, UID, atau sanitized email
-  if (user.googleId) return 'gid_' + String(user.googleId).replace(/[^a-zA-Z0-9_-]/g, '_');
-  if (user.uid) return 'uid_' + String(user.uid).replace(/[^a-zA-Z0-9_-]/g, '_');
-  if (user.email) return 'email_' + String(user.email).toLowerCase().replace(/[^a-zA-Z0-9_-]/g, '_');
-  if (user.username) return 'usr_' + String(user.username).toLowerCase().replace(/[^a-zA-Z0-9_-]/g, '_');
+  // Prioritas utama pada EMAIL agar akun Google maupun akun manual di HP dan PC terhubung ke dokumen yang persis sama
+  if (user.email && String(user.email).trim().length > 0) {
+    const cleanEmail = String(user.email).trim().toLowerCase();
+    return 'usr_' + cleanEmail.replace(/[^a-zA-Z0-9_-]/g, '_');
+  }
+
+  if (user.username && String(user.username).trim().length > 0) {
+    const cleanUser = String(user.username).trim().toLowerCase();
+    return 'usr_' + cleanUser.replace(/[^a-zA-Z0-9_-]/g, '_');
+  }
+
+  if (user.googleId) {
+    return 'gid_' + String(user.googleId).replace(/[^a-zA-Z0-9_-]/g, '_');
+  }
+
+  if (user.uid) {
+    return 'uid_' + String(user.uid).replace(/[^a-zA-Z0-9_-]/g, '_');
+  }
+
   return null;
 }
 
 // Perbarui status badge di UI
-function updateSyncStatusUI() {
+export function updateSyncStatusUI() {
   const dot = document.getElementById('cloud-status-dot');
   const btn = document.getElementById('btn-cloud-sync');
   const statusEl = document.getElementById('cloud-modal-status-text');
@@ -82,7 +105,7 @@ function updateSyncStatusUI() {
     dot.className = 'cloud-status-dot ' + syncStatus.state;
   }
   if (btn) {
-    btn.setAttribute('title', Cloud Sync:  + syncStatus.statusText);
+    btn.setAttribute('title', 'Cloud Sync: ' + syncStatus.statusText);
   }
   if (statusEl) {
     statusEl.textContent = syncStatus.statusText;
@@ -95,7 +118,7 @@ function updateSyncStatusUI() {
   }
 }
 
-// Helper untuk menerapkan data remote dari dokumen akun ke state lokal
+// Helper untuk menerapkan data remote dari dokumen akun ke state lokal secara real-time
 function applyRemoteData(remoteData) {
   if (!window.SmartGrocery || !window.SmartGrocery.state) {
     setTimeout(() => applyRemoteData(remoteData), 60);
@@ -137,12 +160,17 @@ function applyRemoteData(remoteData) {
       currentState.appliedVoucher = remoteData.appliedVoucher;
     }
 
+    // 7. Lokasi Toko Aktif (Location)
+    if (remoteData.currentLocation && typeof remoteData.currentLocation === 'object') {
+      currentState.currentLocation = remoteData.currentLocation;
+    }
+
     // Simpan ke localStorage sebagai cache offline
     if (typeof sg.saveStateToLocalStorage === 'function') {
       sg.saveStateToLocalStorage();
     }
 
-    // Render ulang seluruh UI seketika tanpa reload
+    // Render ulang seluruh UI seketika tanpa reload halaman
     if (typeof sg.renderAll === 'function') {
       sg.renderAll();
     }
@@ -235,7 +263,7 @@ export async function initFirebaseSync() {
       const userName = user ? (user.username || user.email) : 'Akun';
 
       if (!docSnap.exists()) {
-        console.log([Firebase Sync] Dokumen baru untuk user \. Melakukan inisialisasi cloud...);
+        console.log(`[Firebase Sync] Inisialisasi dokumen baru untuk user ${userName} (${docId})`);
         pushLocalStateToFirebase(true);
         return;
       }
@@ -245,18 +273,18 @@ export async function initFirebaseSync() {
       // Abaikan jika update ini berasal dari perangkat/tab ini sendiri
       if (remoteData.updatedBy === CLIENT_ID) {
         syncStatus.connected = true;
-        syncStatus.statusText = Realtime Aktif: \;
+        syncStatus.statusText = `Realtime Aktif: ${userName}`;
         syncStatus.state = 'connected';
         syncStatus.lastSync = remoteData.updatedAt || Date.now();
         updateSyncStatusUI();
         return;
       }
 
-      console.log([Firebase Sync] Data snapshot diterima untuk user \:, remoteData);
+      console.log(`[Firebase Sync] Menerima data real-time dari perangkat lain untuk ${userName}:`, remoteData);
       applyRemoteData(remoteData);
 
       syncStatus.connected = true;
-      syncStatus.statusText = Realtime Aktif: \;
+      syncStatus.statusText = `Realtime Aktif: ${userName}`;
       syncStatus.state = 'connected';
       syncStatus.lastSync = remoteData.updatedAt || Date.now();
       updateSyncStatusUI();
@@ -267,7 +295,7 @@ export async function initFirebaseSync() {
       syncStatus.errorMsg = error.message;
 
       if (error.code === 'permission-denied') {
-        syncStatus.statusText = 'Izin Firestore Ditolak (Security Rules)';
+        syncStatus.statusText = 'Izin Firestore Ditolak (Periksa Security Rules)';
       } else {
         syncStatus.statusText = 'Koneksi Terputus: ' + (error.message || 'Error');
       }
@@ -294,18 +322,21 @@ export async function initFirebaseSync() {
 // Kirim perubahan lokal ke dokumen akun di Firestore (HANYA JIKA SUDAH LOGIN)
 export function pushLocalStateToFirebase(forceImmediate = false) {
   if (isApplyingRemoteChange) return;
-  if (!firestoreDb) return;
 
   // STRICT GUEST CHECK: Jika belum login, jangan simpan data ke Firebase!
   const docId = getUserDocId();
   if (!docId) {
-    // Mode tamu: Tidak ada data yang dikirim ke cloud
     return;
   }
 
-  // Jika listener belum aktif untuk akun ini, aktifkan
-  if (!unsubscribeSnapshot || currentSubscribedUserId !== docId) {
-    initFirebaseSync();
+  // Jika Firestore DB belum siap atau listener belum aktif untuk akun ini, aktifkan
+  if (!firestoreDb || !unsubscribeSnapshot || currentSubscribedUserId !== docId) {
+    initFirebaseSync().then((ready) => {
+      if (ready) {
+        pushLocalStateToFirebase(forceImmediate);
+      }
+    });
+    return;
   }
 
   if (debounceTimer) {
@@ -330,6 +361,7 @@ export function pushLocalStateToFirebase(forceImmediate = false) {
       safetyCap: currentState.safetyCap || 500000,
       history: currentState.history || [],
       appliedVoucher: currentState.appliedVoucher || null,
+      currentLocation: currentState.currentLocation || null,
       updatedAt: Date.now(),
       updatedBy: CLIENT_ID,
       deviceInfo: (navigator.userAgent.includes('Mobi') ? 'Mobile' : 'Desktop')
@@ -345,7 +377,7 @@ export function pushLocalStateToFirebase(forceImmediate = false) {
 
       const userName = currentState.currentUser?.username || 'Akun';
       syncStatus.connected = true;
-      syncStatus.statusText = Realtime Aktif: \;
+      syncStatus.statusText = `Realtime Aktif: ${userName}`;
       syncStatus.state = 'connected';
       syncStatus.lastSync = Date.now();
       updateSyncStatusUI();
@@ -365,7 +397,7 @@ export function pushLocalStateToFirebase(forceImmediate = false) {
   if (forceImmediate) {
     sendData();
   } else {
-    debounceTimer = setTimeout(sendData, 200); // 200ms debounce
+    debounceTimer = setTimeout(sendData, 200); // 200ms debounce responsif
   }
 }
 
