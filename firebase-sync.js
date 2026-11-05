@@ -203,6 +203,22 @@ export function detachListener() {
     errorMsg: ''
   };
   updateSyncStatusUI();
+
+  // Item 10: Reset state in-memory agar akun berikutnya tidak mewarisi data akun lama
+  if (window.SmartGrocery && window.SmartGrocery.state) {
+    const s = window.SmartGrocery.state;
+    s.cart = [];
+    s.history = [];
+    s.customProducts = [];
+    s.pinnedProducts = [];
+    s.appliedVoucher = null;
+    if (typeof window.SmartGrocery.saveStateToLocalStorage === 'function') {
+      window.SmartGrocery.saveStateToLocalStorage();
+    }
+    if (typeof window.SmartGrocery.renderAll === 'function') {
+      window.SmartGrocery.renderAll();
+    }
+  }
 }
 
 // Inisialisasi atau Pasang Listener Realtime untuk Akun Tertentu
@@ -264,7 +280,20 @@ export async function initFirebaseSync() {
 
       if (!docSnap.exists()) {
         console.log(`[Firebase Sync] Inisialisasi dokumen baru untuk user ${userName} (${docId})`);
-        pushLocalStateToFirebase(true);
+        // Item 10: Inisialisasi dokumen akun baru secara bersih (empty state) tanpa mencemari dengan memori lokal akun sebelumnya
+        const initialFreshData = {
+          cart: [],
+          history: [],
+          customProducts: [],
+          pinnedProducts: [],
+          appliedVoucher: null,
+          safetyCap: (window.SmartGrocery?.state?.safetyCap || 500000),
+          updatedAt: Date.now(),
+          updatedBy: CLIENT_ID,
+          userEmail: user?.email || '',
+          userName: userName
+        };
+        setDoc(userDocRef, initialFreshData).catch(err => console.error(err));
         return;
       }
 

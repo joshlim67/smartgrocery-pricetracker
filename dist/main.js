@@ -116,7 +116,41 @@ const I18N = {
     regEmail: 'Email',
     regPassword: 'Password',
     authRegSubmit: 'Buat Akun Sekarang',
-    btnSearchPlaceholder: 'Cari beras, minyak, susu, snack...'
+    btnSearchPlaceholder: 'Cari beras, minyak, susu, snack...',
+    itemPhoto: 'Foto Produk Makanan',
+    photoHint: 'Pilih preset atau unggah',
+    choosePhotoBtn: 'Unggah Foto',
+    itemName: 'Nama Produk Supermarket',
+    autoCompare: 'âš¡ Auto-compare aktif',
+    unit: 'Satuan',
+    quantity: 'Kuantitas (Qty)',
+    unitPrice: 'Harga Satuan Normal',
+    perItemHint: 'per satuan item',
+    category: 'Kategori Produk',
+    btnAddCat: 'Kategori Baru',
+    saveCatBtn: 'Simpan',
+    itemHealthGrade: 'Klasifikasi Sehat Meter',
+    discountCalcTitle: 'Kalkulator Diskon Promo',
+    discountSingleLabel: 'Diskon (%) :',
+    discountD1: 'Diskon 1 (%)',
+    discountD2: 'Diskon 2 (%)',
+    beforeDiscount: 'Harga Sebelum:',
+    savedCut: 'Potongan:',
+    finalRowPrice: 'Total Item:',
+    btnSaveItem: 'Simpan ke Etalase',
+    receiptMetaStore: 'Toko:',
+    receiptMetaDate: 'Waktu:',
+    receiptMetaUser: 'Kasir:',
+    receiptLimit: 'Batas Anggaran:',
+    receiptSubtotal: 'Subtotal Normal:',
+    receiptDiscountSaved: 'Total Hemat (Diskon & Voucher):',
+    receiptNetTotal: 'TOTAL BERSIH DIBAYAR:',
+    confirmSaveReceiptBtn: 'Simpan ke Riwayat & Selesai',
+    cancelCheckoutBtn: 'Kembali ke Keranjang',
+    reloadToCartBtn: 'Salin Semua Item ke Troli Baru',
+    locationDesc: 'Tentukan cabang toko supermarket belanjaan Anda.',
+    btnGps: 'Deteksi Lokasi GPS Saya',
+    savedLocationsTitle: 'Pilihan Lokasi Tersimpan:'
   },
   en: {
     appTitle: 'GroceryX',
@@ -226,7 +260,41 @@ const I18N = {
     regEmail: 'Email',
     regPassword: 'Password',
     authRegSubmit: 'Create Account Now',
-    btnSearchPlaceholder: 'Search rice, cooking oil, milk, snack...'
+    btnSearchPlaceholder: 'Search rice, cooking oil, milk, snack...',
+    itemPhoto: 'Product Photo',
+    photoHint: 'Choose preset or upload',
+    choosePhotoBtn: 'Upload Photo',
+    itemName: 'Supermarket Product Name',
+    autoCompare: 'âš¡ Auto-compare active',
+    unit: 'Unit',
+    quantity: 'Quantity (Qty)',
+    unitPrice: 'Regular Unit Price',
+    perItemHint: 'per unit item',
+    category: 'Product Category',
+    btnAddCat: 'New Category',
+    saveCatBtn: 'Save',
+    itemHealthGrade: 'Health Meter Rating',
+    discountCalcTitle: 'Promo Discount Calculator',
+    discountSingleLabel: 'Discount (%) :',
+    discountD1: 'Discount 1 (%)',
+    discountD2: 'Discount 2 (%)',
+    beforeDiscount: 'Original Price:',
+    savedCut: 'Saved Amount:',
+    finalRowPrice: 'Item Total:',
+    btnSaveItem: 'Save to Catalog',
+    receiptMetaStore: 'Store:',
+    receiptMetaDate: 'Date & Time:',
+    receiptMetaUser: 'Cashier:',
+    receiptLimit: 'Budget Safety Cap:',
+    receiptSubtotal: 'Regular Subtotal:',
+    receiptDiscountSaved: 'Total Savings (Discounts & Voucher):',
+    receiptNetTotal: 'NET TOTAL PAYABLE:',
+    confirmSaveReceiptBtn: 'Save Receipt to History & Complete',
+    cancelCheckoutBtn: 'Return to Cart',
+    reloadToCartBtn: 'Duplicate Items to New Cart',
+    locationDesc: 'Set your shopping grocery store and supermarket branch.',
+    btnGps: 'Detect My GPS Location',
+    savedLocationsTitle: 'Saved Locations:'
   }
 };
 
@@ -514,9 +582,16 @@ const state = {
   currentUser: null,
   currentLocation: JSON.parse(localStorage.getItem('groceryx_location_v2') || 'null') || {
     name: 'Lotte Mart Grocery - Puri Indah',
+    note: '',
     coords: null,
     updatedAt: Date.now()
   },
+  savedLocations: JSON.parse(localStorage.getItem('groceryx_saved_locations_v2') || 'null') || [
+    { name: 'Lotte Mart Grocery - Puri Indah', note: 'Supermarket Langganan' },
+    { name: 'Superindo - Citra Raya', note: 'Dekat Rumah' },
+    { name: 'Grand Lucky - SCBD', note: 'Dekat Kantor' }
+  ],
+  barcodeScanTarget: 'cart', // 'cart' or 'modal'
   detectedCoords: null,
   hasTriggeredOverbudgetModal: false,
   stream: null,
@@ -553,6 +628,21 @@ function syncToFirebase(immediate = false) {
   if (window.FirebaseSync && typeof window.FirebaseSync.pushLocalState === 'function') {
     window.FirebaseSync.pushLocalState(immediate);
   }
+}
+
+function resetUserLocalData() {
+  state.cart = [];
+  state.history = [];
+  state.customProducts = [];
+  state.pinnedProducts = [];
+  state.appliedVoucher = null;
+  try {
+    localStorage.removeItem(STORAGE_KEYS.CART);
+    localStorage.removeItem(STORAGE_KEYS.HISTORY);
+    localStorage.removeItem(STORAGE_KEYS.CUSTOM_PRODUCTS);
+    localStorage.removeItem(STORAGE_KEYS.PINNED_PRODUCTS);
+    localStorage.removeItem(STORAGE_KEYS.APPLIED_VOUCHER);
+  } catch (_) {}
 }
 
 function saveStateToLocalStorage() {
@@ -1170,22 +1260,42 @@ function toggleLikeProduct(prodId) {
   syncToFirebase();
 }
 
+// Item 3: Category Dropdown (Kebawah, 4-5 pilihan visible dengan scroll vertikal)
 function renderCategoryPills() {
   const container = document.getElementById('category-filter-container');
+  const triggerText = document.getElementById('selected-category-text');
   if (!container) return;
 
+  const activeCategory = state.selectedCategory || 'Semua';
+  const activeLabel = state.language === 'en' ? (CATEGORY_NAMES_EN[activeCategory] || activeCategory) : activeCategory;
+  if (triggerText) {
+    triggerText.textContent = activeLabel;
+  }
+
+  const all = getAllCatalogProducts();
+
   container.innerHTML = DEFAULT_CATEGORIES.map((cat) => {
-    const isActive = state.selectedCategory === cat ? 'active' : '';
+    const isActive = activeCategory === cat ? 'active' : '';
     const label = state.language === 'en' ? (CATEGORY_NAMES_EN[cat] || cat) : cat;
-    return `<button type="button" class="filter-pill ${isActive}" data-category="${cat}">${label}</button>`;
+    const count = cat === 'Semua' ? all.length : all.filter(p => p.category === cat).length;
+    return `
+      <button type="button" class="cat-dropdown-item ${isActive}" data-category="${cat}">
+        <span>${label}</span>
+        <span class="cat-item-badge">(${count})</span>
+      </button>
+    `;
   }).join('');
 
-  container.querySelectorAll('.filter-pill').forEach((btn) => {
-    btn.onclick = () => {
+  container.querySelectorAll('.cat-dropdown-item').forEach((btn) => {
+    btn.onclick = (e) => {
+      e.stopPropagation();
       sound.playClick();
       state.selectedCategory = btn.getAttribute('data-category');
       renderCategoryPills();
       renderCatalog();
+      container.classList.add('hidden');
+      const trigger = document.getElementById('btn-toggle-cat-dropdown');
+      if (trigger) trigger.classList.remove('active');
     };
   });
 }
@@ -1797,7 +1907,12 @@ function updateSafetyBanner() {
   }
   const locEl = document.getElementById('header-store-location');
   if (locEl) {
-    locEl.textContent = (state.currentLocation && state.currentLocation.name) ? state.currentLocation.name : 'Tentukan Lokasi Toko...';
+    if (state.currentLocation && state.currentLocation.name) {
+      const noteSuffix = state.currentLocation.note ?  () : '';
+      locEl.textContent = ${state.currentLocation.name};
+    } else {
+      locEl.textContent = 'Tentukan Lokasi Toko...';
+    }
   }
 }
 
@@ -2004,12 +2119,87 @@ function closeBarcodeScannerModal() {
   }
 }
 
-function handleBarcodeDetected(barcode) {
+// Item 11: Universal Supermarket Barcode Database (Open Food Facts API)
+async function fetchProductFromOpenFoodFacts(barcode) {
+  try {
+    const clean = String(barcode).trim();
+    const res = await fetch(`https://world.openfoodfacts.org/api/v0/product/${clean}.json`);
+    if (!res.ok) return null;
+    const data = await res.json();
+    if (data && data.status === 1 && data.product) {
+      const p = data.product;
+      const rawName = p.product_name_id || p.product_name || p.product_name_en || (p.brands ? p.brands : '');
+      const brand = p.brands ? p.brands.trim() : '';
+      let fullName = rawName;
+      if (brand && rawName && !rawName.toLowerCase().includes(brand.toLowerCase())) {
+        fullName = `${brand} - ${rawName}`;
+      } else if (!rawName && brand) {
+        fullName = brand;
+      }
+      if (!fullName) fullName = 'Produk Supermarket';
+
+      const img = p.image_url || p.image_front_url || p.image_small_url || 'https://images.unsplash.com/photo-1588964895597-cfccd6e2dbf9?w=300&auto=format&fit=crop&q=80';
+      const grade = (p.nutriscore_grade || p.nutrition_grades || '').toLowerCase();
+      let healthType = 'healthy';
+      if (['c', 'd'].includes(grade)) healthType = 'neutral';
+      else if (['e'].includes(grade)) healthType = 'caution';
+
+      let category = 'Makanan Instan & Olahan';
+      const cats = (p.categories_tags || []).join(' ').toLowerCase();
+      if (cats.includes('beverage') || cats.includes('drink') || cats.includes('milk') || cats.includes('dairy') || cats.includes('susu')) category = 'Susu, Keju & Olahan';
+      else if (cats.includes('snack') || cats.includes('biscuit') || cats.includes('camilan')) category = 'Camilan & Snack';
+      else if (cats.includes('plant') || cats.includes('fruit') || cats.includes('vegetable') || cats.includes('sayur')) category = 'Sayur & Buah Segar';
+      else if (cats.includes('meat') || cats.includes('seafood') || cats.includes('fish') || cats.includes('daging')) category = 'Daging & Seafood Segar';
+      else if (cats.includes('rice') || cats.includes('flour') || cats.includes('beras') || cats.includes('oil') || cats.includes('minyak')) category = 'Bahan Pokok';
+
+      return {
+        name: fullName,
+        image: img,
+        healthType,
+        category,
+        barcode: clean,
+        unit: p.quantity || 'pcs'
+      };
+    }
+  } catch (err) {
+    console.warn('[Open Food Facts Lookup Error]', err);
+  }
+  return null;
+}
+
+async function handleBarcodeDetected(barcode) {
   if (!barcode) return;
   const cleanCode = barcode.toString().trim();
   sound.playScanBeep();
   closeBarcodeScannerModal();
 
+  // Item 12: Jika scan dipicu dari Form Tambah Produk Modal
+  if (state.barcodeScanTarget === 'modal') {
+    const barInput = document.getElementById('item-barcode-input');
+    if (barInput) barInput.value = cleanCode;
+    showToast(`Barcode [${cleanCode}] tersimpan ke form produk`, 'success');
+
+    const nameInput = document.getElementById('item-name-input');
+    if (nameInput && !nameInput.value.trim()) {
+      showToast('Mencari data produk di database supermarket universal...', 'info');
+      const offData = await fetchProductFromOpenFoodFacts(cleanCode);
+      if (offData) {
+        nameInput.value = offData.name;
+        const photoPreview = document.getElementById('item-photo-preview-img');
+        const photoUrl = document.getElementById('item-photo-data-url');
+        if (photoPreview) photoPreview.src = offData.image;
+        if (photoUrl) photoUrl.value = offData.image;
+        const catSelect = document.getElementById('item-category-select');
+        if (catSelect && offData.category) catSelect.value = offData.category;
+        sound.playSuccess();
+        showToast(`Produk dikenali: ${offData.name}`, 'success');
+      }
+    }
+    state.barcodeScanTarget = 'cart';
+    return;
+  }
+
+  // Scan normal dari Bottom Nav (Ke Keranjang)
   const all = getAllCatalogProducts();
   const found = all.find((p) => p.barcode === cleanCode);
 
@@ -2028,20 +2218,38 @@ function handleBarcodeDetected(barcode) {
     });
     fireConfetti();
     showToast(`Barcode [${cleanCode}] Terdeteksi: ${found.name} (Rp ${formatRupiah(found.price)}) dimasukkan ke keranjang!`, 'success');
-  } else {
-    sound.playWarning();
-    showToast(`Barcode [${cleanCode}] belum ada di katalog. Membuka form tambah produk...`, 'info');
+    return;
+  }
 
-    // Automatically open "Tambah Produk Baru" modal and pre-fill the scanned barcode
+  // Item 11: Barcode umum di supermarket (lookup ke Open Food Facts)
+  showToast(`Barcode [${cleanCode}] - Mencari di database supermarket...`, 'info');
+  const offData = await fetchProductFromOpenFoodFacts(cleanCode);
+  if (offData) {
+    sound.playSuccess();
+    showToast(`Produk ditemukan: ${offData.name}! Silakan tentukan harga toko.`, 'success');
     openAddItemModal();
     const barcodeInput = document.getElementById('item-barcode-input');
-    const nameInput = document.getElementById('item-name-input');
     if (barcodeInput) barcodeInput.value = cleanCode;
-    if (nameInput) {
-      nameInput.value = '';
-      nameInput.focus();
-    }
+    const nameInput = document.getElementById('item-name-input');
+    if (nameInput) nameInput.value = offData.name;
+    const photoPreview = document.getElementById('item-photo-preview-img');
+    const photoUrl = document.getElementById('item-photo-data-url');
+    if (photoPreview) photoPreview.src = offData.image;
+    if (photoUrl) photoUrl.value = offData.image;
+    const catSelect = document.getElementById('item-category-select');
+    if (catSelect && offData.category) catSelect.value = offData.category;
+    const priceInput = document.getElementById('item-price-input');
+    if (priceInput) priceInput.focus();
+    return;
   }
+
+  sound.playWarning();
+  showToast(`Barcode [${cleanCode}] belum ada di katalog. Membuka form tambah produk...`, 'info');
+  openAddItemModal();
+  const barcodeInput = document.getElementById('item-barcode-input');
+  if (barcodeInput) barcodeInput.value = cleanCode;
+  const nameInput = document.getElementById('item-name-input');
+  if (nameInput) nameInput.focus();
 }
 
 // ==========================================================================
@@ -2458,6 +2666,42 @@ function switchTab(targetViewId) {
 // 17B. STORE LOCATION & GEOLOCATION METADATA ENGINE
 // ==========================================================================
 
+function renderSavedLocationsChips() {
+  const container = document.getElementById('saved-locations-container');
+  if (!container) return;
+  if (!Array.isArray(state.savedLocations) || state.savedLocations.length === 0) {
+    container.innerHTML = '<span class="text-xs text-muted">Belum ada lokasi tersimpan.</span>';
+    return;
+  }
+
+  container.innerHTML = state.savedLocations.map((loc, idx) => {
+    const isCurrent = state.currentLocation && state.currentLocation.name === loc.name;
+    const noteBadge = loc.note ? `<span class="loc-chip-tag">${loc.note}</span>` : '';
+    return `
+      <button type="button" class="btn-store-chip saved-location-chip ${isCurrent ? 'active' : ''}" data-idx="${idx}">
+        <span>${loc.name}</span>
+        ${noteBadge}
+      </button>
+    `;
+  }).join('');
+
+  container.querySelectorAll('.saved-location-chip').forEach(btn => {
+    btn.onclick = () => {
+      sound.playClick();
+      const idx = parseInt(btn.getAttribute('data-idx'), 10);
+      const loc = state.savedLocations[idx];
+      if (loc) {
+        const inputName = document.getElementById('input-store-name');
+        const inputNote = document.getElementById('input-store-note');
+        if (inputName) inputName.value = loc.name;
+        if (inputNote) inputNote.value = loc.note || '';
+        container.querySelectorAll('.saved-location-chip').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+      }
+    };
+  });
+}
+
 function openStoreLocationModal() {
   sound.playClick();
   const modal = document.getElementById('store-location-modal');
@@ -2465,15 +2709,21 @@ function openStoreLocationModal() {
   modal.classList.remove('hidden');
 
   const inputName = document.getElementById('input-store-name');
+  const inputNote = document.getElementById('input-store-note');
   const inputDate = document.getElementById('input-store-date');
   if (inputName) {
     inputName.value = (state.currentLocation && state.currentLocation.name) ? state.currentLocation.name : 'Lotte Mart Grocery - Puri Indah';
     inputName.focus();
   }
+  if (inputNote) {
+    inputNote.value = (state.currentLocation && state.currentLocation.note) ? state.currentLocation.note : '';
+  }
   if (inputDate) {
     const todayStr = new Date().toISOString().split('T')[0];
     inputDate.value = (state.currentLocation && state.currentLocation.shoppingDate) ? state.currentLocation.shoppingDate : todayStr;
   }
+
+  renderSavedLocationsChips();
 
   const statusTitle = document.getElementById('gps-status-title');
   const statusDetail = document.getElementById('gps-status-detail');
@@ -2584,28 +2834,46 @@ function initStoreLocationModule() {
     };
   });
 
-  // Location form submit
+  // Location form submit (Item 1)
   const formLocation = document.getElementById('form-store-location');
   if (formLocation) {
     formLocation.onsubmit = (e) => {
       e.preventDefault();
       const inputName = document.getElementById('input-store-name');
+      const inputNote = document.getElementById('input-store-note');
       const inputDate = document.getElementById('input-store-date');
       const name = (inputName && inputName.value.trim()) || 'Lotte Mart Grocery - Puri Indah';
+      const note = (inputNote && inputNote.value.trim()) || '';
       const shoppingDate = (inputDate && inputDate.value) || new Date().toISOString().split('T')[0];
 
       state.currentLocation = {
         name,
+        note,
         shoppingDate,
         coords: state.detectedCoords || (state.currentLocation ? state.currentLocation.coords : null),
         updatedAt: Date.now()
       };
 
+      // Simpan ke daftar lokasi tersimpan (Item 1)
+      if (!Array.isArray(state.savedLocations)) state.savedLocations = [];
+      const matchIdx = state.savedLocations.findIndex(l => l.name.toLowerCase() === name.toLowerCase());
+      if (matchIdx >= 0) {
+        state.savedLocations[matchIdx].note = note || state.savedLocations[matchIdx].note;
+        state.savedLocations[matchIdx].updatedAt = Date.now();
+      } else {
+        state.savedLocations.unshift({ name, note, updatedAt: Date.now() });
+      }
+      if (state.savedLocations.length > 15) state.savedLocations.pop();
+      try {
+        localStorage.setItem('groceryx_saved_locations_v2', JSON.stringify(state.savedLocations));
+      } catch (_) {}
+
       saveStateToLocalStorage();
       updateSafetyBanner();
       closeStoreLocationModal();
       sound.playSuccess();
-      showToast(`Lokasi belanja aktif: ${name}`, 'success');
+      const toastNote = note ? ` (${note})` : '';
+      showToast(`Lokasi belanja aktif: ${name}${toastNote}`, 'success');
       syncToFirebase(true);
     };
   }
@@ -2809,24 +3077,36 @@ document.addEventListener('DOMContentLoaded', () => {
     return updateScrollState;
   }
 
-  // Category Carousel Slider & Touch Gestures (IDLIX / Netflix Fade & Gesture Style)
-  const catContainer = document.getElementById('category-filter-container');
-  const btnCatPrev = document.getElementById('btn-cat-prev');
-  const btnCatNext = document.getElementById('btn-cat-next');
-  makeHorizontalCarouselInteractive({
-    container: catContainer,
-    btnPrev: btnCatPrev,
-    btnNext: btnCatNext,
-    step: 220
-  });
+  // Item 3: Category Dropdown Trigger toggle
+  const btnToggleCat = document.getElementById('btn-toggle-cat-dropdown');
+  const catDropdownMenu = document.getElementById('category-filter-container');
+  if (btnToggleCat && catDropdownMenu) {
+    btnToggleCat.onclick = (e) => {
+      e.stopPropagation();
+      sound.playClick();
+      const isHidden = catDropdownMenu.classList.contains('hidden');
+      catDropdownMenu.classList.toggle('hidden', !isHidden);
+      btnToggleCat.classList.toggle('active', isHidden);
+    };
+    document.addEventListener('click', (e) => {
+      if (!btnToggleCat.contains(e.target) && !catDropdownMenu.contains(e.target)) {
+        catDropdownMenu.classList.add('hidden');
+        btnToggleCat.classList.remove('active');
+      }
+    });
+  }
 
-  // Shop Search Input
+  // Shop Search Input (Item 8: Hide bundle section when searching)
   const searchInput = document.getElementById('shop-search-input');
   const searchClear = document.getElementById('shop-search-clear');
+  const bundleContainer = document.querySelector('.bundle-section-container');
   if (searchInput) {
     searchInput.oninput = (e) => {
       state.searchQuery = e.target.value.trim();
       if (searchClear) searchClear.classList.toggle('hidden', !state.searchQuery);
+      if (bundleContainer) {
+        bundleContainer.classList.toggle('hidden', state.searchQuery.length > 0);
+      }
       renderCatalog();
     };
   }
@@ -2835,6 +3115,7 @@ document.addEventListener('DOMContentLoaded', () => {
       searchInput.value = '';
       state.searchQuery = '';
       searchClear.classList.add('hidden');
+      if (bundleContainer) bundleContainer.classList.remove('hidden');
       renderCatalog();
     };
   }
@@ -3182,36 +3463,41 @@ document.addEventListener('DOMContentLoaded', () => {
 // ==========================================================================
 // F-04: KOMPARATOR HARGA REALTIME VS RIWAYAT TOKO & BULAN LALU
 // ==========================================================================
+// Item 9: Fluktuasi harga ketat berdasarkan kesamaan lokasi toko
 function findHistoricalPriceReference(productName, storeName) {
   if (!productName) return null;
   const cleanName = productName.trim().toLowerCase();
-  const currentStore = storeName || (state.currentLocation && state.currentLocation.name) || 'Lotte Mart Grocery - Puri Indah';
+  const currentStore = (storeName || (state.currentLocation && state.currentLocation.name) || 'Lotte Mart Grocery - Puri Indah').trim().toLowerCase();
 
-  // 1. Cek dari struk riwayat transaksi sebelumnya (history) di toko yang sama terlebih dahulu
+  // 1. Cek dari struk riwayat transaksi sebelumnya (history) HANYA jika toko persis sama
   if (Array.isArray(state.history) && state.history.length > 0) {
     for (const receipt of state.history) {
-      if (Array.isArray(receipt.items)) {
+      const receiptStore = (receipt.storeLocation || receipt.storeName || '').trim().toLowerCase();
+      if (receiptStore === currentStore && Array.isArray(receipt.items)) {
         const found = receipt.items.find((it) => it.name && it.name.trim().toLowerCase() === cleanName);
         if (found && found.unitPrice) {
           return {
             price: Number(found.unitPrice),
-            sourceStore: receipt.storeLocation || receipt.storeName || currentStore,
-            date: receipt.date || receipt.formattedDate || 'Bulan Lalu'
+            sourceStore: receipt.storeLocation || receipt.storeName,
+            date: receipt.date || receipt.formattedDate || 'Riwayat Belanja'
           };
         }
       }
     }
   }
 
-  // 2. Cek dari katalog default (normalPrice sebagai referensi harga bulan lalu)
-  const all = getAllCatalogProducts();
-  const match = all.find((p) => p.name.trim().toLowerCase() === cleanName);
-  if (match && match.normalPrice) {
-    return {
-      price: match.normalPrice,
-      sourceStore: currentStore,
-      date: 'Bulan Lalu'
-    };
+  // 2. Referensi katalog default HANYA berlaku untuk toko default 'Lotte Mart Grocery - Puri Indah'
+  // Jika pengguna memilih toko/cabang berbeda, dianggap sebagai etalase toko baru (null)
+  if (currentStore.includes('lotte mart') || currentStore.includes('puri indah')) {
+    const all = getAllCatalogProducts();
+    const match = all.find((p) => p.name.trim().toLowerCase() === cleanName);
+    if (match && match.normalPrice) {
+      return {
+        price: match.normalPrice,
+        sourceStore: 'Lotte Mart',
+        date: 'Bulan Lalu'
+      };
+    }
   }
 
   return null;
@@ -3319,6 +3605,27 @@ function updatePriceComparatorUI() {
     updateModalDiscountPreview();
   };
 
+  // Item 4: Realtime discount & price recalculation on Desktop/PC
+  ['input-discount-single', 'input-discount-d1', 'input-discount-d2', 'item-qty-input', 'item-name-input'].forEach((id) => {
+    const el = document.getElementById(id);
+    if (el) {
+      el.addEventListener('input', updateModalDiscountPreview);
+      el.addEventListener('change', updateModalDiscountPreview);
+      el.addEventListener('keyup', updateModalDiscountPreview);
+    }
+  });
+
+  // Item 12: Scan barcode camera button in Add Product modal
+  const btnScanBarModal = document.getElementById('btn-scan-barcode-modal');
+  if (btnScanBarModal) {
+    btnScanBarModal.onclick = (e) => {
+      e.preventDefault();
+      sound.playClick();
+      state.barcodeScanTarget = 'modal';
+      openBarcodeScannerModal();
+    };
+  }
+
   // Save new product from modal
   const btnSaveItemModal = document.getElementById('btn-save-item-modal');
   if (btnSaveItemModal) {
@@ -3362,26 +3669,14 @@ function updatePriceComparatorUI() {
       state.customProducts.push(newProduct);
       localStorage.setItem(STORAGE_KEYS.CUSTOM_PRODUCTS, JSON.stringify(state.customProducts));
 
-      // Also add to active cart
-      addItemToCart({
-        name,
-        category,
-        unit,
-        qty,
-        unitPrice: rawPrice,
-        discountType: currentDiscountMode,
-        d1,
-        d2,
-        image: photo,
-        healthType
-      });
-
+      // Item 7: Masuk etalase saja, jangan langsung ke keranjang!
       sound.playSuccess();
       fireConfetti();
       itemModal.classList.add('hidden');
       document.getElementById('item-form').reset();
       renderCatalog();
       syncToFirebase(true);
+      showToast(state.language === 'en' ? `Product "${name}" added to catalog!` : `Produk "${name}" berhasil ditambahkan ke etalase!`, 'success');
     };
   }
 
@@ -3698,10 +3993,13 @@ function updatePriceComparatorUI() {
         state.currentUser = null;
         localStorage.removeItem(STORAGE_KEYS.CURRENT_USER);
         localStorage.setItem('sg_user_logged_out', 'true');
+        // Item 10: Bersihkan local data agar terisolasi sempurna
+        resetUserLocalData();
         if (window.FirebaseSync && typeof window.FirebaseSync.detachListener === 'function') {
           window.FirebaseSync.detachListener();
         }
         sound.playClick();
+        renderAll();
         applyUserSessionToUI();
         if (authModal) {
           authModal.classList.remove('hidden');

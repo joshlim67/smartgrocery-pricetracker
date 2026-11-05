@@ -115,16 +115,22 @@
       <!-- ================= TAB 1: ETALASE PRODUK MAKANAN (ASTRO & SHOPEE STYLE) ================= -->
       <section id="view-shop" class="app-view active" aria-label="Tab Etalase Produk Makanan">
 
-        <!-- Search Bar -->
-        <div class="shop-search-bar glass-card">
-          <div class="search-input-wrapper">
-            <i data-lucide="search" class="search-icon"></i>
-            <input type="text" id="shop-search-input" placeholder="Cari beras, minyak, susu, snack..."
-              autocomplete="off">
-            <button id="shop-search-clear" class="btn-clear hidden" aria-label="Clear Search">
-              <i data-lucide="x"></i>
-            </button>
+        <!-- Search Bar & Inline Add Product Button (Item 5) -->
+        <div class="shop-search-row">
+          <div class="shop-search-bar glass-card flex-1">
+            <div class="search-input-wrapper">
+              <i data-lucide="search" class="search-icon"></i>
+              <input type="text" id="shop-search-input" placeholder="Cari beras, minyak, susu, snack..."
+                autocomplete="off">
+              <button id="shop-search-clear" class="btn-clear hidden" aria-label="Clear Search">
+                <i data-lucide="x"></i>
+              </button>
+            </div>
           </div>
+          <button type="button" id="btn-open-add-product" class="btn-inline-add-prod" title="Tambah Produk Baru ke Katalog" aria-label="Tambah Produk">
+            <i data-lucide="plus"></i>
+            <span class="btn-inline-text">Produk</span>
+          </button>
         </div>
 
         <!-- PAKET HEMAT (COMBO BUNDLE CAROUSEL - ASTRO STYLE) -->
@@ -153,20 +159,17 @@
           </div>
         </div>
 
-        <!-- CATEGORY SLIDER (NO EMOJIS, LIQUID GLASS ARROWS, TRANSLUCENT FADE) -->
-        <div class="shop-category-wrapper">
-          <div class="category-filter-wrapper">
-            <button type="button" id="btn-cat-prev" class="cat-nav-arrow btn-prev is-hidden" aria-label="Geser Kategori Kiri"
-              title="Geser Kiri">
-              <i data-lucide="chevron-left"></i>
-            </button>
-            <div class="category-filter-scroll scroll-fade-right" id="category-filter-container">
-              <!-- Dynamically rendered via JS without emojis -->
+        <!-- CATEGORY DROPDOWN (DOWNWARDS, 4-5 CHOICES VISIBLE WITH VERTICAL SCROLL - Item 3) -->
+        <div class="shop-category-dropdown-wrap">
+          <button type="button" id="btn-toggle-cat-dropdown" class="cat-dropdown-trigger glass-card" aria-expanded="false" aria-haspopup="true">
+            <div class="cat-trigger-content">
+              <i data-lucide="grid" class="cat-trigger-icon"></i>
+              <span id="selected-category-text" class="selected-cat-label">Semua Kategori</span>
             </div>
-            <button type="button" id="btn-cat-next" class="cat-nav-arrow btn-next" aria-label="Geser Kategori Kanan"
-              title="Geser Kanan">
-              <i data-lucide="chevron-right"></i>
-            </button>
+            <i data-lucide="chevron-down" id="cat-dropdown-chevron" class="cat-chevron"></i>
+          </button>
+          <div class="category-dropdown-menu glass-card hidden" id="category-filter-container">
+            <!-- Dynamically rendered via JS with 4-5 visible choices and vertical scroll -->
           </div>
         </div>
 
@@ -711,13 +714,7 @@
 
     </main>
 
-    <!-- Floating Liquid Glass Action Button for Adding New Product (Etalase View) -->
-    <button type="button" id="btn-open-add-product" class="btn-floating-fab btn-fab-add" title="Tambah Produk Baru ke Katalog" aria-label="Tambah Produk Baru">
-      <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round">
-        <line x1="12" y1="5" x2="12" y2="19"></line>
-        <line x1="5" y1="12" x2="19" y2="12"></line>
-      </svg>
-    </button>
+    <!-- Floating Add Button moved inline to Search Bar -->
 
     <!-- Floating Liquid Glass Button to Jump to Checkout (Cart View) -->
     <button type="button" id="btn-jump-to-checkout" class="btn-floating-fab btn-jump-checkout hidden" title="Langsung ke Selesaikan Struk" aria-label="Scroll ke Selesaikan Struk">
@@ -903,8 +900,8 @@
               <span id="lbl-item-photo">Foto Produk Makanan</span>
               <span class="text-hint" id="lbl-photo-hint">Pilih preset atau unggah</span>
             </label>
-            <div class="product-photo-upload-zone" id="photo-upload-dropzone">
-              <div class="photo-preview-box" id="photo-preview-box">
+            <div class="product-photo-upload-compact" id="photo-upload-dropzone">
+              <div class="photo-preview-compact" id="photo-preview-box">
                 <img id="item-photo-preview-img"
                   src="https://images.unsplash.com/photo-1588964895597-cfccd6e2dbf9?w=300&auto=format&fit=crop&q=80"
                   alt="Preview Produk">
@@ -912,35 +909,25 @@
                   <i data-lucide="x"></i>
                 </button>
               </div>
-              <div class="photo-upload-controls">
-                <label for="item-photo-file" class="btn-outline-glass btn-sm">
-                  <i data-lucide="upload"></i> <span id="lbl-choose-photo-btn">Unggah Foto</span>
-                </label>
-                <input type="file" id="item-photo-file" accept="image/*" class="hidden">
-                <input type="hidden" id="item-photo-data-url"
-                  value="https://images.unsplash.com/photo-1588964895597-cfccd6e2dbf9?w=300&auto=format&fit=crop&q=80">
+              <div class="photo-controls-compact">
+                <div class="photo-upload-btn-wrap">
+                  <label for="item-photo-file" class="btn-outline-glass btn-xs">
+                    <i data-lucide="upload"></i> <span id="lbl-choose-photo-btn">Unggah Foto</span>
+                  </label>
+                  <input type="file" id="item-photo-file" accept="image/*" class="hidden">
+                  <input type="hidden" id="item-photo-data-url"
+                    value="https://images.unsplash.com/photo-1588964895597-cfccd6e2dbf9?w=300&auto=format&fit=crop&q=80">
+                </div>
+                <div class="quick-preset-photos-inline">
+                  <span class="preset-label-xs">Preset:</span>
+                  <button type="button" class="btn-preset-photo" data-img="https://images.unsplash.com/photo-1586201375761-83865001e31c?w=300&auto=format&fit=crop&q=80">Beras</button>
+                  <button type="button" class="btn-preset-photo" data-img="https://images.unsplash.com/photo-1474979266404-7eaacbcd87c5?w=300&auto=format&fit=crop&q=80">Minyak</button>
+                  <button type="button" class="btn-preset-photo" data-img="https://images.unsplash.com/photo-1582722872445-44dc5f7e3c8f?w=300&auto=format&fit=crop&q=80">Telur</button>
+                  <button type="button" class="btn-preset-photo" data-img="https://images.unsplash.com/photo-1612927601601-6638404737ce?w=300&auto=format&fit=crop&q=80">Mi</button>
+                  <button type="button" class="btn-preset-photo" data-img="https://images.unsplash.com/photo-1563636619-e9143da7973b?w=300&auto=format&fit=crop&q=80">Susu</button>
+                  <button type="button" class="btn-preset-photo" data-img="https://images.unsplash.com/photo-1540420773420-3366772f4999?w=300&auto=format&fit=crop&q=80">Sayur</button>
+                </div>
               </div>
-            </div>
-
-            <!-- Preset Foto Makanan Cepat (Grid rapi sejajar tanpa elemen sendirian) -->
-            <div class="quick-preset-photos mt-2">
-              <span class="preset-label">Preset:</span>
-              <button type="button" class="btn-preset-photo"
-                data-img="https://images.unsplash.com/photo-1586201375761-83865001e31c?w=300&auto=format&fit=crop&q=80">Beras</button>
-              <button type="button" class="btn-preset-photo"
-                data-img="https://images.unsplash.com/photo-1474979266404-7eaacbcd87c5?w=300&auto=format&fit=crop&q=80">Minyak</button>
-              <button type="button" class="btn-preset-photo"
-                data-img="https://images.unsplash.com/photo-1582722872445-44dc5f7e3c8f?w=300&auto=format&fit=crop&q=80">Telur</button>
-              <button type="button" class="btn-preset-photo"
-                data-img="https://images.unsplash.com/photo-1612927601601-6638404737ce?w=300&auto=format&fit=crop&q=80">Mi Instan</button>
-              <button type="button" class="btn-preset-photo"
-                data-img="https://images.unsplash.com/photo-1563636619-e9143da7973b?w=300&auto=format&fit=crop&q=80">Susu</button>
-              <button type="button" class="btn-preset-photo"
-                data-img="https://images.unsplash.com/photo-1540420773420-3366772f4999?w=300&auto=format&fit=crop&q=80">Sayuran</button>
-              <button type="button" class="btn-preset-photo"
-                data-img="https://images.unsplash.com/photo-1544025162-d76694265947?w=300&auto=format&fit=crop&q=80">Daging</button>
-              <button type="button" class="btn-preset-photo"
-                data-img="https://images.unsplash.com/photo-1558961363-fa8fdf82db35?w=300&auto=format&fit=crop&q=80">Biskuit</button>
             </div>
           </div>
 
@@ -1039,12 +1026,18 @@
               <span class="text-xs font-bold text-muted uppercase">Pilihan Tambahan (Opsional)</span>
             </div>
 
-            <!-- Kode Barcode Produk -->
+            <!-- Kode Barcode Produk (Item 12: Pindai Kamera Langsung) -->
             <div class="form-group mb-2">
               <label class="form-label text-xs" for="item-barcode-input">Kode Barcode (Pindai / Manual)</label>
-              <div class="input-with-icon">
-                <i data-lucide="barcode" class="field-icon"></i>
-                <input type="text" id="item-barcode-input" placeholder="Contoh: 8991234567890">
+              <div class="input-with-action-group">
+                <div class="input-with-icon flex-1">
+                  <i data-lucide="barcode" class="field-icon"></i>
+                  <input type="text" id="item-barcode-input" placeholder="Contoh: 8991234567890">
+                </div>
+                <button type="button" id="btn-scan-barcode-modal" class="btn-outline-glass btn-scan-inline" title="Pindai Barcode Kamera">
+                  <i data-lucide="scan"></i>
+                  <span>Pindai</span>
+                </button>
               </div>
             </div>
 
@@ -1417,6 +1410,16 @@
             </div>
           </div>
 
+          <!-- Keterangan / Label Lokasi (cth: home) - Item 1 -->
+          <div class="form-group">
+            <label class="form-label" for="input-store-note">Keterangan / Label Lokasi</label>
+            <div class="input-with-icon">
+              <i data-lucide="tag" class="field-icon"></i>
+              <input type="text" id="input-store-note" class="glass-input location-text-input"
+                placeholder="cth: home">
+            </div>
+          </div>
+
           <!-- F-01: Selector Tanggal Belanja (Date Picker) -->
           <div class="form-group">
             <label class="form-label" for="input-store-date">Tanggal Belanja Sesi Ini (Date Picker)</label>
@@ -1426,18 +1429,11 @@
             </div>
           </div>
 
-          <!-- Quick Store Suggestions -->
+          <!-- Quick Store Suggestions & Saved Locations (Item 1) -->
           <div class="quick-store-chips-wrap">
-            <span class="chips-label">Pilih Rekomendasi / Riwayat Cepat:</span>
-            <div class="quick-store-chips">
-              <button type="button" class="btn-store-chip" data-store="Lotte Mart Grocery - Puri Indah">Lotte Mart -
-                Puri Indah</button>
-              <button type="button" class="btn-store-chip" data-store="Superindo - Citra Raya">Superindo - Citra
-                Raya</button>
-              <button type="button" class="btn-store-chip" data-store="Grand Lucky - SCBD">Grand Lucky - SCBD</button>
-              <button type="button" class="btn-store-chip" data-store="Hypermart - Lippo Karawaci">Hypermart - Lippo
-                Karawaci</button>
-              <button type="button" class="btn-store-chip" data-store="Pasar Modern BSD">Pasar Modern BSD</button>
+            <span class="chips-label" id="lbl-saved-locations-title">Pilihan Lokasi Tersimpan:</span>
+            <div class="quick-store-chips" id="saved-locations-container">
+              <!-- Dynamically rendered via JS -->
             </div>
           </div>
 
