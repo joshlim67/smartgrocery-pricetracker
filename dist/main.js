@@ -1908,8 +1908,8 @@ function updateSafetyBanner() {
   const locEl = document.getElementById('header-store-location');
   if (locEl) {
     if (state.currentLocation && state.currentLocation.name) {
-      const noteSuffix = state.currentLocation.note ?  () : '';
-      locEl.textContent = ${state.currentLocation.name};
+      const noteSuffix = state.currentLocation.note ? (' (' + state.currentLocation.note + ')') : '';
+      locEl.textContent = state.currentLocation.name + noteSuffix;
     } else {
       locEl.textContent = 'Tentukan Lokasi Toko...';
     }
@@ -3099,13 +3099,13 @@ document.addEventListener('DOMContentLoaded', () => {
   // Shop Search Input (Item 8: Hide bundle section when searching)
   const searchInput = document.getElementById('shop-search-input');
   const searchClear = document.getElementById('shop-search-clear');
-  const bundleContainer = document.querySelector('.bundle-section-container');
+  const bundleSectionWrap = document.querySelector('.bundle-section-container');
   if (searchInput) {
     searchInput.oninput = (e) => {
       state.searchQuery = e.target.value.trim();
       if (searchClear) searchClear.classList.toggle('hidden', !state.searchQuery);
-      if (bundleContainer) {
-        bundleContainer.classList.toggle('hidden', state.searchQuery.length > 0);
+      if (bundleSectionWrap) {
+        bundleSectionWrap.classList.toggle('hidden', state.searchQuery.length > 0);
       }
       renderCatalog();
     };
@@ -3115,7 +3115,7 @@ document.addEventListener('DOMContentLoaded', () => {
       searchInput.value = '';
       state.searchQuery = '';
       searchClear.classList.add('hidden');
-      if (bundleContainer) bundleContainer.classList.remove('hidden');
+      if (bundleSectionWrap) bundleSectionWrap.classList.remove('hidden');
       renderCatalog();
     };
   }
