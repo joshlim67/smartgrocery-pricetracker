@@ -2450,6 +2450,7 @@ function switchTab(targetViewId) {
   }
 
   window.scrollTo({ top: 0, behavior: 'smooth' });
+  updateJumpToCheckoutVisibility();
   updateIcons();
 }
 
@@ -3759,14 +3760,15 @@ function updateJumpToCheckoutVisibility() {
   if (!jumpBtn) return;
 
   const cartView = document.getElementById('view-cart');
-  const isCartActive = cartView && !cartView.classList.contains('hidden');
+  const isCartActive = (state.activeTab === 'view-cart') || (cartView && !cartView.classList.contains('hidden'));
 
   // Tampilkan panah melayang di tab keranjang jika ada item
-  if (isCartActive && state.cart && state.cart.length >= 2) {
+  if (isCartActive && state.cart && state.cart.length > 0) {
     jumpBtn.classList.remove('hidden');
-    updateIcons();
+    jumpBtn.style.display = 'flex';
   } else {
     jumpBtn.classList.add('hidden');
+    jumpBtn.style.display = 'none';
   }
 }
 
@@ -3774,18 +3776,21 @@ function initJumpToCheckoutButton() {
   const jumpBtn = document.getElementById('btn-jump-to-checkout');
   if (!jumpBtn) return;
 
-  jumpBtn.onclick = () => {
-    sound.playClick();
+  jumpBtn.onclick = (e) => {
+    if (e) {
+      e.preventDefault();
+      e.stopPropagation();
+    }
+    if (typeof sound !== 'undefined' && sound.playClick) sound.playClick();
     const checkoutBtn = document.getElementById('btn-checkout-session');
-    const dock = document.getElementById('cart-summary-dock');
     const mainContent = document.querySelector('.app-main-content');
 
     if (checkoutBtn) {
       checkoutBtn.scrollIntoView({ behavior: 'smooth', block: 'center' });
-    } else if (dock) {
-      dock.scrollIntoView({ behavior: 'smooth', block: 'end' });
-    } else if (mainContent) {
+    }
+    if (mainContent) {
       mainContent.scrollTo({ top: mainContent.scrollHeight, behavior: 'smooth' });
     }
   };
+  updateJumpToCheckoutVisibility();
 }
